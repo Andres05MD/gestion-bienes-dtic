@@ -18,17 +18,7 @@
             <div class="bg-dark-850 overflow-hidden shadow-2xl sm:rounded-2xl border border-dark-800">
                 <div class="p-6">
                     
-                    @if(session('success'))
-                        <div class="mb-6 bg-brand-purple/10 border-l-4 border-brand-lila text-brand-lila p-4 rounded-r shadow-sm" role="alert">
-                            <span class="block sm:inline font-bold">✨ {{ session('success') }}</span>
-                        </div>
-                    @endif
 
-                    @if(session('error'))
-                        <div class="mb-6 bg-rose-500/10 border-l-4 border-rose-500 text-rose-500 p-4 rounded-r shadow-sm" role="alert">
-                            <span class="block sm:inline font-bold">⚠️ {{ session('error') }}</span>
-                        </div>
-                    @endif
 
                     <!-- Barra de Búsqueda y Filtros -->
                     <form method="GET" action="{{ route('usuarios.index') }}" class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4">

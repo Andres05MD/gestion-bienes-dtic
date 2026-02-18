@@ -58,7 +58,7 @@
                                 name="procedencia_id"
                                 placeholder="Procedencia"
                                 icon="o-building-office-2"
-                                :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()"
+                                :options="array_merge([['value' => 'dtic', 'label' => 'DTIC']], $departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray())"
                                 :value="request('procedencia_id')"
                             />
 
@@ -105,7 +105,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">{{ $transferencia->numero_bien }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ $transferencia->descripcion }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->serial ?? '—' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->procedencia?->nombre ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->procedencia?->nombre ?? 'DTIC' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->destino?->nombre ?? 'N/A' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->fecha->format('d/m/Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -168,22 +168,5 @@
         message="¿Estás seguro de que deseas eliminar esta transferencia interna? Esta acción es irreversible."
     />
 
-    @if(session('success'))
-        <x-modal name="success-modal" :show="true" focusable>
-            <div class="p-8 bg-white dark:bg-dark-850 relative overflow-hidden">
-                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-brand-purple/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-brand-lila/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="relative z-10 flex flex-col items-center text-center">
-                    <div class="w-20 h-20 bg-linear-to-tr from-brand-lila to-brand-purple rounded-full flex items-center justify-center shadow-lg shadow-brand-purple/30 mb-6 animate-bounce">
-                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                    </div>
-                    <h3 class="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight mb-2">¡Operación Exitosa!</h3>
-                    <p class="text-gray-500 dark:text-gray-300 font-medium mb-8 text-lg">{{ session('success') }}</p>
-                    <button x-on:click="$dispatch('close-modal', 'success-modal')" class="w-full inline-flex justify-center items-center px-6 py-4 bg-dark-800 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-dark-700 active:scale-95 transition-all duration-150">
-                        Entendido
-                    </button>
-                </div>
-            </div>
-        </x-modal>
-    @endif
+
 </x-app-layout>

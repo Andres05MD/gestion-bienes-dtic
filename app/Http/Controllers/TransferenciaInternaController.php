@@ -39,9 +39,12 @@ class TransferenciaInternaController extends Controller
             $query->where('estatus_acta_id', $request->input('estatus_acta_id'));
         }
 
-        // Filtro por procedencia
         if ($request->filled('procedencia_id')) {
-            $query->where('procedencia_id', $request->input('procedencia_id'));
+            if ($request->input('procedencia_id') === 'dtic') {
+                $query->whereNull('procedencia_id');
+            } else {
+                $query->where('procedencia_id', $request->input('procedencia_id'));
+            }
         }
 
         // Filtro por destino
@@ -71,8 +74,9 @@ class TransferenciaInternaController extends Controller
     {
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
 
-        return view('transferencias-internas.create', compact('departamentos', 'estatuses'));
+        return view('transferencias-internas.create', compact('departamentos', 'estatuses', 'areas'));
     }
 
     /**
@@ -86,7 +90,7 @@ class TransferenciaInternaController extends Controller
         ]);
 
         // Actualizar ubicación del bien transferido
-        $this->actualizarUbicacionBien($transferencia);
+        $this->actualizarUbicacionBien($transferencia, $request->input('area_id'));
 
         return redirect()->route('transferencias-internas.index')
             ->with('success', 'Transferencia interna creada exitosamente.');
@@ -108,11 +112,13 @@ class TransferenciaInternaController extends Controller
     {
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
 
         return view('transferencias-internas.edit', [
             'transferencia' => $transferencias_interna,
             'departamentos' => $departamentos,
             'estatuses' => $estatuses,
+            'areas' => $areas,
         ]);
     }
 
@@ -124,7 +130,7 @@ class TransferenciaInternaController extends Controller
         $transferencias_interna->update($request->validated());
 
         // Actualizar ubicación del bien transferido
-        $this->actualizarUbicacionBien($transferencias_interna);
+        $this->actualizarUbicacionBien($transferencias_interna, $request->input('area_id'));
 
         return redirect()->route('transferencias-internas.index')
             ->with('success', 'Transferencia interna actualizada exitosamente.');
@@ -142,13 +148,99 @@ class TransferenciaInternaController extends Controller
     }
 
     /**
-     * Actualiza la ubicación (departamento) del bien vinculado a la transferencia.
+     * Actualiza la ubicación y la tabla del bien (DTIC <-> Externo).
      */
-    private function actualizarUbicacionBien(TransferenciaInterna $transferencia): void
+    private function actualizarUbicacionBien(TransferenciaInterna $transferencia, ?string $areaId = null): void
     {
-        if ($transferencia->bien_externo_id && $transferencia->destino_id) {
-            BienExterno::where('id', $transferencia->bien_externo_id)
-                ->update(['departamento_id' => $transferencia->destino_id]);
+        // Escenario 1: DTIC a Externo (Movimiento de tabla)
+        // Origen: DTIC (procedencia_id IS NULL) -> Destino: Externo (destino_id IS NOT NULL)
+        if (is_null($transferencia->procedencia_id) && !is_null($transferencia->destino_id)) {
+            if ($transferencia->bien_id) {
+                $bienOriginal = Bien::find($transferencia->bien_id);
+                
+                if ($bienOriginal) {
+                    // 1. Crear Bien Externo
+                    $bienExterno = BienExterno::create([
+                        'equipo' => $bienOriginal->equipo,
+                        'marca' => $bienOriginal->marca,
+                        'modelo' => $bienOriginal->modelo,
+                        'serial' => $bienOriginal->serial,
+                        'color' => $bienOriginal->color,
+                        'numero_bien' => $bienOriginal->numero_bien,
+                        'categoria_bien_id' => $bienOriginal->categoria_bien_id,
+                        'estado_id' => $bienOriginal->estado_id,
+                        'observaciones' => $bienOriginal->observaciones,
+                        'departamento_id' => $transferencia->destino_id,
+                        'user_id' => auth()->id(), // O el original si se prefiere conservar
+                    ]);
+
+                    // 2. Actualizar Transferencia
+                    $transferencia->update([
+                        'bien_externo_id' => $bienExterno->id,
+                        'bien_id' => null
+                    ]);
+
+                    // 3. Eliminar Bien Original
+                    $bienOriginal->delete();
+                }
+            }
+            // Si era un bien externo recuperado que se vuelve a enviar fuera, solo actualizamos departamento
+             elseif ($transferencia->bien_externo_id) {
+                BienExterno::where('id', $transferencia->bien_externo_id)
+                    ->update(['departamento_id' => $transferencia->destino_id]);
+            }
+        }
+
+        // Escenario 2: Externo a DTIC (Movimiento de tabla)
+        // Origen: Externo (procedencia_id IS NOT NULL) -> Destino: DTIC (destino_id IS NULL)
+        elseif (!is_null($transferencia->procedencia_id) && is_null($transferencia->destino_id)) {
+            if ($transferencia->bien_externo_id) {
+                $bienExternoOriginal = BienExterno::find($transferencia->bien_externo_id);
+
+                if ($bienExternoOriginal) {
+                    // 1. Crear Bien Interno (DTIC)
+                    $bienInterno = Bien::create([
+                        'equipo' => $bienExternoOriginal->equipo,
+                        'marca' => $bienExternoOriginal->marca,
+                        'modelo' => $bienExternoOriginal->modelo,
+                        'serial' => $bienExternoOriginal->serial,
+                        'color' => $bienExternoOriginal->color,
+                        'numero_bien' => $bienExternoOriginal->numero_bien,
+                        'categoria_bien_id' => $bienExternoOriginal->categoria_bien_id,
+                        'estado_id' => $bienExternoOriginal->estado_id,
+                        'observaciones' => $bienExternoOriginal->observaciones,
+                        'area_id' => $areaId, // Área de destino en DTIC
+                        'user_id' => auth()->id(),
+                    ]);
+
+                    // 2. Actualizar Transferencia
+                    $transferencia->update([
+                        'bien_id' => $bienInterno->id,
+                        'bien_externo_id' => null
+                    ]);
+
+                    // 3. Eliminar Bien Externo Original
+                    $bienExternoOriginal->delete();
+                }
+            }
+        }
+
+        // Escenario 3: Externo a Externo
+        // Solo actualizamos el departamento del bien externo
+        elseif (!is_null($transferencia->procedencia_id) && !is_null($transferencia->destino_id)) {
+            if ($transferencia->bien_externo_id) {
+                BienExterno::where('id', $transferencia->bien_externo_id)
+                    ->update(['departamento_id' => $transferencia->destino_id]);
+            }
+        }
+
+        // Escenario 4: DTIC a DTIC (Movimiento interno)
+        // Solo actualizamos el área del bien interno
+        elseif (is_null($transferencia->procedencia_id) && is_null($transferencia->destino_id)) {
+            if ($transferencia->bien_id && $areaId) {
+                Bien::where('id', $transferencia->bien_id)
+                    ->update(['area_id' => $areaId]);
+            }
         }
     }
 }

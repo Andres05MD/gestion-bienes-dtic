@@ -82,7 +82,7 @@
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Procedencia</p>
-                                            <p class="text-lg font-bold text-white">{{ $transferencia->procedencia?->nombre ?? 'N/A' }}</p>
+                                            <p class="text-lg font-bold text-white">{{ $transferencia->procedencia?->nombre ?? 'DTIC' }}</p>
                                         </div>
                                     </div>
                                     <div class="flex items-start gap-4">

@@ -96,9 +96,9 @@
                                     this.bienResults = [];
                                     this.openOrigen = false;
                                     this.limpiarCampos();
-                                    // Automatización: Si es DTIC, poner procedencia DTIC (ID 2)
+                                    // Automatización: Si es DTIC, poner procedencia DTIC (vacío)
                                     if (tipo === 'dtic') {
-                                        this.$dispatch('set-selected-procedencia-id', 2);
+                                        this.$dispatch('set-selected-procedencia-id', 'DTIC');
                                     }
                                 },
 
@@ -125,7 +125,7 @@
                                     if (this.tipoBien === 'dtic') {
                                         document.getElementById('bien_id').value = bien.id;
                                         document.getElementById('bien_externo_id').value = '';
-                                        this.$dispatch('set-selected-procedencia-id', 2);
+                                        this.$dispatch('set-selected-procedencia-id', 'DTIC');
                                     } else {
                                         document.getElementById('bien_externo_id').value = bien.id;
                                         document.getElementById('bien_id').value = '';
@@ -356,9 +356,35 @@
                                 <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Ubicación</h3>
                             </div>
 
-                            <div class="space-y-6">
-                                <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('procedencia_id', $transferencia->procedencia_id)" />
-                                <x-select-premium name="destino_id" label="Destino" placeholder="Depto. de destino" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('destino_id', $transferencia->destino_id)" />
+                            <div class="space-y-6" x-data="{
+                                destino: @js(old('destino_id', $transferencia->destino_id ?? 'DTIC'))
+                            }">
+                                <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="array_merge([['value' => 'DTIC', 'label' => 'DTIC']], $departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray())" :value="old('procedencia_id', $transferencia->procedencia_id ?? 'DTIC')" />
+                                
+                                <div class="space-y-6">
+                                    <x-select-premium 
+                                        name="destino_id" 
+                                        label="Destino" 
+                                        placeholder="Depto. de destino" 
+                                        required 
+                                        icon="o-building-office-2" 
+                                        :options="array_merge([['value' => 'DTIC', 'label' => 'DTIC']], $departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray())" 
+                                        :value="old('destino_id', $transferencia->destino_id ?? 'DTIC')" 
+                                        @option-selected="destino = $event.detail"
+                                    />
+
+                                    <div x-show="destino === 'DTIC'" x-transition>
+                                        <x-select-premium
+                                            name="area_id"
+                                            label="Ubicación en DTIC (Área)"
+                                            placeholder="Seleccione Área de destino"
+                                            icon="o-map-pin"
+                                            :options="$areas->map(fn($a) => ['value' => $a->id, 'label' => $a->nombre])->toArray()"
+                                            :value="old('area_id')"
+                                            :required="false"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

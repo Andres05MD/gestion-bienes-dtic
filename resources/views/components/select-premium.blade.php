@@ -9,20 +9,23 @@
     'class' => '',
 ])
 
-<div class="space-y-2 {{ $class }} transition-all duration-300 relative" 
+<div {{ $attributes->merge(['class' => "space-y-2 $class transition-all duration-300 relative"]) }} 
      :class="open ? 'z-50' : 'z-0'"
      x-data="{ 
         open: false, 
         selected: @js($value),
         options: @js($options),
         get selectedLabel() {
-            if (!this.selected) return '{{ $placeholder }}';
             const option = this.options.find(o => o.value == this.selected);
             return option ? option.label : '{{ $placeholder }}';
         },
         select(val) {
             this.selected = val;
             this.open = false;
+            // Despachar evento personalizado para evitar conflictos con 'change' nativo si fuera un input real, 
+            // aunque aquí está bien, aseguramos que burbujee correctamente.
+            this.$dispatch('option-selected', val);
+            this.$dispatch('change', val); // Mantener compatibility
         }
      }"
      @click.away="open = false"

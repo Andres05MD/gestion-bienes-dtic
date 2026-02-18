@@ -47,6 +47,7 @@ class BienExterno extends Model
         'estado_id',
         'observaciones',
         'departamento_id', // En lugar de area_id
+        'area_id',
         'user_id',
     ];
 
@@ -72,6 +73,14 @@ class BienExterno extends Model
     public function departamento(): BelongsTo
     {
         return $this->belongsTo(Departamento::class);
+    }
+
+    /**
+     * Relación: el área de ubicación del bien (cuando está en DTIC).
+     */
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class);
     }
 
     /**

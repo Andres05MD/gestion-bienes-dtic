@@ -45,6 +45,7 @@
             </div>
         </div>
 
+        @include('components.notification')
         @fluxScripts
     </body>
 </html>
