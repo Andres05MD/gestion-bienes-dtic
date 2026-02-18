@@ -1,0 +1,103 @@
+@props([
+    'label' => null,
+    'name',
+    'options' => [],
+    'icon' => null,
+    'placeholder' => 'Seleccione una opción',
+    'required' => false,
+    'value' => null,
+    'class' => '',
+])
+
+<div class="space-y-2 {{ $class }} transition-all duration-300 relative" 
+     :class="open ? 'z-50' : 'z-0'"
+     x-data="{ 
+        open: false, 
+        selected: @js($value),
+        options: @js($options),
+        get selectedLabel() {
+            if (!this.selected) return '{{ $placeholder }}';
+            const option = this.options.find(o => o.value == this.selected);
+            return option ? option.label : '{{ $placeholder }}';
+        },
+        select(val) {
+            this.selected = val;
+            this.open = false;
+        }
+     }"
+     @click.away="open = false"
+     @set-selected-{{ str_replace('_', '-', $name) }}.window="selected = $event.detail">
+    
+    @if($label)
+        <label for="{{ $name }}" class="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.2em] ml-1">
+            {{ $label }} @if($required)<span class="text-brand-purple">*</span>@endif
+        </label>
+    @endif
+
+    <div class="relative group">
+        <!-- Input Simulado -->
+        <button 
+            type="button"
+            @click="open = !open"
+            class="relative w-full flex items-center {{ $icon ? 'pl-11' : 'pl-5' }} pr-12 py-4 {{ $label ? 'h-14' : 'h-12' }} bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 rounded-2xl text-left text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20 transition-all duration-300 shadow-sm dark:shadow-none hover:bg-gray-50 dark:hover:bg-[#222] cursor-pointer"
+            :class="{'ring-2 ring-brand-purple/20 bg-gray-50 dark:bg-[#222]': open}"
+        >
+            @if($icon)
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <x-mary-icon :name="$icon" class="w-5 h-5 text-gray-400 dark:text-gray-500 group-hover:text-brand-purple transition-colors duration-300" x-bind:class="{'text-brand-purple': open}" />
+                </div>
+            @endif
+
+            <span class="block truncate font-medium text-sm" :class="{'text-gray-400 dark:text-gray-500': !selected, 'text-gray-900 dark:text-white': selected}" x-text="selectedLabel"></span>
+
+            <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none transition-transform duration-300" :class="{'rotate-180': open}">
+                <x-mary-icon name="o-chevron-down" class="w-4 h-4 text-gray-400" />
+            </span>
+        </button>
+
+        <!-- Input oculto para el formulario -->
+        <input type="hidden" name="{{ $name }}" :value="selected" @if($required) required @endif>
+
+        <!-- Dropdown Panel -->
+        <div 
+            x-show="open"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 scale-95 -translate-y-2"
+            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+            x-transition:leave-end="opacity-0 scale-95 -translate-y-2"
+            class="absolute z-50 w-full mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl overflow-hidden"
+            style="display: none;"
+        >
+            <div class="max-h-60 overflow-y-auto py-2 custom-scrollbar">
+                <template x-for="option in options" :key="option.value">
+                    <button 
+                        type="button"
+                        @click="select(option.value)"
+                        class="w-full flex items-center px-4 py-3 text-sm transition-all duration-200 hover:bg-brand-purple/5 dark:hover:bg-brand-purple/10 group relative"
+                        :class="{'bg-brand-purple/10 text-brand-purple font-bold': selected == option.value, 'text-gray-700 dark:text-gray-300': selected != option.value}"
+                    >
+                        <!-- Indicador de seleccionado -->
+                        <div x-show="selected == option.value" class="absolute left-0 w-1 h-6 bg-brand-purple rounded-r-full"></div>
+                        
+                        <span class="ml-2" x-text="option.label"></span>
+
+                        <x-mary-icon 
+                            x-show="selected == option.value" 
+                            name="o-check" 
+                            class="ml-auto w-4 h-4 text-brand-purple" 
+                        />
+                    </button>
+                </template>
+
+                <div x-show="options.length === 0" class="px-4 py-8 text-center text-gray-500">
+                    <x-mary-icon name="o-inbox" class="w-8 h-8 mx-auto mb-2 opacity-20" />
+                    <p class="text-[10px] uppercase tracking-widest">Sin opciones</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <x-input-error :messages="$errors->get($name)" class="mt-1" />
+</div>

@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@import "../../vendor/livewire/flux/dist/flux.css";
+
+@theme {
+    /* Set Outfit as the default sans font */
+    --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+    --color-dark-950: #0d0b14;
+    --color-dark-900: #15121f;
+    --color-dark-850: #1e1b2e;
+    --color-dark-800: #2d2943;
+    --color-dark-text: #9ba0b9;
+
+    --color-brand-lila: #c084fc;
+    --color-brand-purple: #a855f7;
+    --color-brand-neon: #d8b4fe;
+
+    --radius-4xl: 2rem;
+
+    --animate-gradient-x: gradient-x 3s ease infinite;
+
+    @keyframes gradient-x {
+
+        0%,
+        100% {
+            background-size: 200% 200%;
+            background-position: left center;
+        }
+
+        50% {
+            background-size: 200% 200%;
+            background-position: right center;
+        }
+    }
+}
+
+@import "preline/variants.css";
+
+/* maryUI */
+@source "../../vendor/robsontenorio/mary/src/View/Components/**/*.php";
+@source "../../vendor/livewire/flux/stubs/**/*.blade.php";
+@source "../../node_modules/preline/dist/*.js";
+@source "../../node_modules/flowbite/**/*.js";
+@source "../../resources/views/**/*.blade.php";
+@source "../../app/Livewire/**/*.php";
+@source "../../app/View/**/*.php";
+@source "../../app/Providers/Filament/**/*.php";
+
+/* Theme toggle */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/**
+* Paginator - Traditional style
+* Because Laravel defaults does not match well the design of daisyUI.
+*/
+
+.mary-table-pagination span[aria-current="page"]>span {
+    @apply bg-brand-purple text-white
+}
+
+.mary-table-pagination button {
+    @apply cursor-pointer
+}
+
+/* Custom Scrollbar for Webkit browsers */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #15121f;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #2d2943;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a855f7;
+}
+
+/* Custom Scrollbar Utility */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.2);
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.5);
+}
+
+/* Base Select improvements */
+select {
+    @apply transition-all duration-300;
+}
+
+select option {
+    @apply bg-[#1a1a1a] text-white py-2;
+}
+
+/* Firefox styling for options */
+@-moz-document url-prefix() {
+    select option {
+        background-color: #1a1a1a !important;
+        color: white !important;
+    }
+}
