@@ -129,7 +129,6 @@
                                     name="categoria_bien_id"
                                     label="Categoría del Bien"
                                     placeholder="Seleccione una categoría"
-                                    required
                                     icon="o-bookmark"
                                     :options="$categorias->map(fn($c) => ['value' => $c->id, 'label' => $c->nombre])->toArray()"
                                     :value="old('categoria_bien_id')"
@@ -140,7 +139,6 @@
                                     name="numero_bien"
                                     label="Número de Bien"
                                     placeholder="Ej: 12345"
-                                    required
                                     icon="o-hashtag"
                                 />
                             </div>

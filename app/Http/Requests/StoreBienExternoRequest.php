@@ -29,8 +29,8 @@ class StoreBienExternoRequest extends FormRequest
             'modelo' => ['nullable', 'string', 'max:255'],
             'serial' => ['nullable', 'string', 'max:255'],
             'color' => ['nullable', 'string', 'max:255'],
-            'numero_bien' => ['required', 'string', 'max:255', 'unique:bienes_externos,numero_bien'],
-            'categoria_bien_id' => ['required', 'exists:categoria_bienes,id'],
+            'numero_bien' => ['nullable', 'string', 'max:255', 'unique:bienes_externos,numero_bien'],
+            'categoria_bien_id' => ['nullable', 'exists:categoria_bienes,id'],
             'estado_id' => ['required', 'exists:estados,id'],
             'observaciones' => ['nullable', 'string'],
             'departamento_id' => ['required', 'exists:departamentos,id'], // Cambio clave
@@ -46,9 +46,7 @@ class StoreBienExternoRequest extends FormRequest
     {
         return [
             'equipo.required' => 'El nombre del equipo es obligatorio.',
-            'numero_bien.required' => 'El número de bien es obligatorio.',
             'numero_bien.unique' => 'Este número de bien ya está registrado.',
-            'categoria_bien_id.required' => 'La categoría del bien es obligatoria.',
             'categoria_bien_id.exists' => 'La categoría seleccionada no es válida.',
             'estado_id.required' => 'El estado del bien es obligatorio.',
             'estado_id.exists' => 'El estado seleccionado no es válido.',

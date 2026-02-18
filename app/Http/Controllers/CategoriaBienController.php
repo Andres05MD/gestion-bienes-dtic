@@ -30,31 +30,31 @@ class CategoriaBienController extends Controller
         return redirect()->route('categorias.index')->with('success', 'Categoría creada exitosamente.');
     }
 
-    public function show(CategoriaBien $categoria_bien)
+    public function show(CategoriaBien $categoria)
     {
-        return view('categorias.show', compact('categoria_bien'));
+        return view('categorias.show', compact('categoria'));
     }
 
-    public function edit(CategoriaBien $categoria_bien)
+    public function edit(CategoriaBien $categoria)
     {
-        return view('categorias.edit', compact('categoria_bien'));
+        return view('categorias.edit', compact('categoria'));
     }
 
-    public function update(Request $request, CategoriaBien $categoria_bien)
+    public function update(Request $request, CategoriaBien $categoria)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255|unique:categoria_bienes,nombre,' . $categoria_bien->id,
+            'nombre' => 'required|string|max:255|unique:categoria_bienes,nombre,' . $categoria->id,
             'descripcion' => 'nullable|string',
         ]);
 
-        $categoria_bien->update($request->all());
+        $categoria->update($request->all());
 
         return redirect()->route('categorias.index')->with('success', 'Categoría actualizada exitosamente.');
     }
 
-    public function destroy(CategoriaBien $categoria_bien)
+    public function destroy(CategoriaBien $categoria)
     {
-        $categoria_bien->forceDelete();
+        $categoria->forceDelete();
         return redirect()->route('categorias.index')->with('success', 'Categoría eliminada exitosamente.');
     }
 }

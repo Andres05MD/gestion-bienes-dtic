@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
     // Detalles (Configuración)
     Route::resource('areas', AreaController::class)->middleware('can:ver areas');
     Route::resource('estados', EstadoController::class)->middleware('can:ver estados');
-    Route::resource('categorias', CategoriaBienController::class)->parameters(['categorias' => 'categoria_bien'])->middleware('can:ver categorias');
+    Route::resource('categorias', CategoriaBienController::class)->parameters(['categorias' => 'categoria'])->middleware('can:ver categorias');
     Route::resource('departamentos', \App\Http\Controllers\DepartamentoController::class)->middleware('can:ver departamentos');
     Route::resource('estatus-actas', EstatusActaController::class)->middleware('can:ver estatus actas');
 });

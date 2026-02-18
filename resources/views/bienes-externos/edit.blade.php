@@ -137,7 +137,6 @@
                                     name="categoria_bien_id"
                                     label="Categoría del Bien"
                                     placeholder="Seleccione una categoría"
-                                    required
                                     icon="o-bookmark"
                                     :options="$categorias->map(fn($c) => ['value' => $c->id, 'label' => $c->nombre])->toArray()"
                                     :value="old('categoria_bien_id', $bienExterno->categoria_bien_id)"
@@ -149,7 +148,6 @@
                                     label="Número de Patrimonio"
                                     :value="$bienExterno->numero_bien"
                                     placeholder="Ej: DTIC-2024-001"
-                                    required
                                     icon="o-hashtag"
                                 />
                             </div>
