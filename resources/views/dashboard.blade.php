@@ -196,7 +196,7 @@
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <!-- Card Inventario Total (Destacada) -->
-                    <div class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-brand-purple to-purple-700 rounded-3xl p-6 shadow-xl shadow-brand-purple/20 relative overflow-hidden group">
+                    <a href="{{ route('bienes.index') }}" class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-brand-purple to-purple-700 rounded-3xl p-6 shadow-xl shadow-brand-purple/20 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
                         <div class="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <x-mary-icon name="o-rectangle-group" class="w-36 h-36 text-white" />
                         </div>
@@ -207,10 +207,10 @@
                                 Resumen Global
                             </span>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Card Bienes DTIC -->
-                    <div class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-blue-600 to-blue-800 rounded-3xl p-6 shadow-xl shadow-blue-500/20 relative overflow-hidden group">
+                    <a href="{{ route('bienes.index') }}" class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-blue-600 to-blue-800 rounded-3xl p-6 shadow-xl shadow-blue-500/20 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
                         <div class="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <x-mary-icon name="o-cpu-chip" class="w-36 h-36 text-white" />
                         </div>
@@ -221,10 +221,10 @@
                                 Activos Internos
                             </span>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Card Bienes Externos -->
-                    <div class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-indigo-600 to-indigo-800 rounded-3xl p-6 shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
+                    <a href="{{ route('bienes-externos.index') }}" class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-indigo-600 to-indigo-800 rounded-3xl p-6 shadow-xl shadow-indigo-500/20 relative overflow-hidden group hover:scale-[1.02] transition-all duration-300">
                         <div class="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <x-mary-icon name="o-building-office" class="w-36 h-36 text-white" />
                         </div>
@@ -235,7 +235,7 @@
                                 Activos Fuera de DTIC
                             </span>
                         </div>
-                    </div>
+                    </a>
 
                     @php
                         // Mapa de colores hardcodeados para evitar problemas de purge en Tailwind
@@ -293,7 +293,10 @@
                             $style = $estadoStyles[$estadoNombre] ?? $defaultStyle;
                             $porcentaje = $totalBienes > 0 ? round(($estadoCount / $totalBienes) * 100, 1) : 0;
                         @endphp
-                        <div class="bg-white dark:bg-dark-850 p-5 rounded-3xl border {{ $style['border'] }} shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        @php
+                            $estadoId = \App\Models\Estado::where('nombre', $estadoNombre)->first()?->id;
+                        @endphp
+                        <a href="{{ route('bienes.index', ['estado_id' => $estadoId]) }}" class="bg-white dark:bg-dark-850 p-5 rounded-3xl border {{ $style['border'] }} shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                             <div class="flex items-start justify-between mb-3">
                                 <div class="p-2.5 {{ $style['iconBg'] }} rounded-xl {{ $style['text'] }}">
                                     <x-mary-icon name="{{ $style['icon'] }}" class="w-5 h-5" />
@@ -304,7 +307,7 @@
                             </div>
                             <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">{{ $estadoNombre }}</p>
                             <h3 class="text-3xl font-black text-gray-900 dark:text-white tabular-nums tracking-tighter leading-none">{{ $estadoCount }}</h3>
-                        </div>
+                        </a>
                     @endforeach
                 </div>
             </section>
