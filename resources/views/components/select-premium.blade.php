@@ -7,6 +7,7 @@
     'required' => false,
     'value' => null,
     'class' => '',
+    'searchable' => true,
 ])
 
 <div {{ $attributes->merge(['class' => "space-y-2 $class transition-all duration-300 relative"]) }} 
@@ -14,21 +15,27 @@
      x-data="{ 
         open: false, 
         selected: @js($value),
-        options: @js($options),
+        search: '',
+        allOptions: @js($options),
+        get filteredOptions() {
+            if (!this.search) return this.allOptions;
+            return this.allOptions.filter(o => 
+                o.label.toLowerCase().includes(this.search.toLowerCase())
+            );
+        },
         get selectedLabel() {
-            const option = this.options.find(o => o.value == this.selected);
+            const option = this.allOptions.find(o => o.value == this.selected);
             return option ? option.label : '{{ $placeholder }}';
         },
         select(val) {
             this.selected = val;
             this.open = false;
-            // Despachar evento personalizado para evitar conflictos con 'change' nativo si fuera un input real, 
-            // aunque aquí está bien, aseguramos que burbujee correctamente.
+            this.search = '';
             this.$dispatch('option-selected', val);
-            this.$dispatch('change', val); // Mantener compatibility
+            this.$dispatch('change', val);
         }
      }"
-     @click.away="open = false"
+     @click.away="open = false; search = ''"
      @set-selected-{{ str_replace('_', '-', $name) }}.window="selected = $event.detail">
     
     @if($label)
@@ -41,7 +48,7 @@
         <!-- Input Simulado -->
         <button 
             type="button"
-            @click="open = !open"
+            @click="open = !open; if(open) setTimeout(() => $refs.searchInput.focus(), 100)"
             class="relative w-full flex items-center {{ $icon ? 'pl-11' : 'pl-5' }} pr-12 py-4 {{ $label ? 'h-14' : 'h-12' }} bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 rounded-2xl text-left text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20 transition-all duration-300 shadow-sm dark:shadow-none hover:bg-gray-50 dark:hover:bg-[#222] cursor-pointer"
             :class="{'ring-2 ring-brand-purple/20 bg-gray-50 dark:bg-[#222]': open}"
         >
@@ -73,8 +80,24 @@
             class="absolute z-50 w-full mt-2 bg-white dark:bg-[#1a1a1a] border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl overflow-hidden"
             style="display: none;"
         >
+            @if($searchable)
+                <div class="p-3 border-b border-gray-100 dark:border-white/5">
+                    <div class="relative">
+                        <x-mary-icon name="o-magnifying-glass" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input 
+                            x-ref="searchInput"
+                            x-model="search"
+                            type="text" 
+                            placeholder="Buscar..."
+                            class="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-dark-900/50 border-none rounded-xl text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-purple/20 transition-all font-medium"
+                            @click.stop
+                        >
+                    </div>
+                </div>
+            @endif
+
             <div class="max-h-60 overflow-y-auto py-2 custom-scrollbar">
-                <template x-for="option in options" :key="option.value">
+                <template x-for="option in filteredOptions" :key="option.value">
                     <button 
                         type="button"
                         @click="select(option.value)"
@@ -94,9 +117,9 @@
                     </button>
                 </template>
 
-                <div x-show="options.length === 0" class="px-4 py-8 text-center text-gray-500">
+                <div x-show="filteredOptions.length === 0" class="px-4 py-8 text-center text-gray-500">
                     <x-mary-icon name="o-inbox" class="w-8 h-8 mx-auto mb-2 opacity-20" />
-                    <p class="text-[10px] uppercase tracking-widest">Sin opciones</p>
+                    <p class="text-[10px] uppercase tracking-widest">Sin resultados para "<span x-text="search"></span>"</p>
                 </div>
             </div>
         </div>

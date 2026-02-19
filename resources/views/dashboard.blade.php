@@ -151,8 +151,11 @@
                                         <div class="text-[10px] text-gray-500 font-bold uppercase">{{ $op->estatusActa?->nombre }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="text-sm font-black text-gray-900 dark:text-white">{{ $op->numero_bien }}</div>
-                                        <div class="text-[10px] text-gray-500 font-bold truncate max-w-[150px] uppercase">{{ $op->nombre_bien }}</div>
+                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}" 
+                                           class="group block hover:opacity-75 transition-opacity">
+                                            <div class="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand-purple transition-colors">{{ $op->numero_bien }}</div>
+                                            <div class="text-[10px] text-gray-500 font-bold truncate max-w-[150px] uppercase">{{ $op->nombre_bien }}</div>
+                                        </a>
                                     </td>
                                     <td class="px-6 py-4">
                                         @if($op->tipo_operacion === 'Transferencia')
@@ -172,9 +175,15 @@
                                             {{ $op->dias_transcurridos }}d
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
+                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}" 
+                                           class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-sky-500 hover:text-white rounded-lg transition-all inline-block"
+                                           title="Ver en listado general">
+                                            <x-mary-icon name="o-list-bullet" class="w-4 h-4" />
+                                        </a>
                                         <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.show', $op) : route('transferencias-internas.show', $op) }}" 
-                                           class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-brand-purple hover:text-white rounded-lg transition-all inline-block">
+                                           class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-brand-purple hover:text-white rounded-lg transition-all inline-block"
+                                           title="Ver detalle del acta">
                                             <x-mary-icon name="o-eye" class="w-4 h-4" />
                                         </a>
                                     </td>
