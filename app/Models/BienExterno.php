@@ -23,7 +23,15 @@ class BienExterno extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Bien Externo \"{$this->equipo}\" (N° {$this->numero_bien}) fue {$eventName}")
+            ->setDescriptionForEvent(function(string $eventName) {
+                $eventTranslated = match($eventName) {
+                    'created' => 'creado',
+                    'updated' => 'actualizado',
+                    'deleted' => 'eliminado',
+                    default   => $eventName,
+                };
+                return "Bien Externo \"{$this->equipo}\" (N° {$this->numero_bien}) fue {$eventTranslated}";
+            })
             ->useLogName('bienes-externos');
     }
 

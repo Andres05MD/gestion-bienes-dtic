@@ -23,7 +23,15 @@ class DistribucionDireccion extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Distribución N° {$this->numero_bien} fue {$eventName}")
+            ->setDescriptionForEvent(function(string $eventName) {
+                $eventTranslated = match($eventName) {
+                    'created' => 'creada',
+                    'updated' => 'actualizada',
+                    'deleted' => 'eliminada',
+                    default   => $eventName,
+                };
+                return "Distribución N° {$this->numero_bien} fue {$eventTranslated}";
+            })
             ->useLogName('distribuciones');
     }
 

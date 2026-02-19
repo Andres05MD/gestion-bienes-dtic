@@ -23,7 +23,15 @@ class TransferenciaInterna extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Transferencia N° {$this->numero_bien} fue {$eventName}")
+            ->setDescriptionForEvent(function(string $eventName) {
+                $eventTranslated = match($eventName) {
+                    'created' => 'creada',
+                    'updated' => 'actualizada',
+                    'deleted' => 'eliminada',
+                    default   => $eventName,
+                };
+                return "Transferencia N° {$this->numero_bien} fue {$eventTranslated}";
+            })
             ->useLogName('transferencias');
     }
 

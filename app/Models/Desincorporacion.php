@@ -23,7 +23,15 @@ class Desincorporacion extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Desincorporación N° {$this->numero_bien} fue {$eventName}")
+            ->setDescriptionForEvent(function(string $eventName) {
+                $eventTranslated = match($eventName) {
+                    'created' => 'creada',
+                    'updated' => 'actualizada',
+                    'deleted' => 'eliminada',
+                    default   => $eventName,
+                };
+                return "Desincorporación N° {$this->numero_bien} fue {$eventTranslated}";
+            })
             ->useLogName('desincorporaciones');
     }
 
