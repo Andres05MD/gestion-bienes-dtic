@@ -63,7 +63,7 @@
                                 <x-input-premium
                                     name="marca"
                                     label="Marca"
-                                    :value="$bien->marca"
+                                    :value="old('marca', $bien->marca ?? 'S/M')"
                                     placeholder="Ej: Phillips"
                                     icon="o-tag"
                                 />
@@ -71,7 +71,7 @@
                                 <x-input-premium
                                     name="modelo"
                                     label="Modelo"
-                                    :value="$bien->modelo"
+                                    :value="old('modelo', $bien->modelo ?? 'S/M')"
                                     placeholder="Ej: IntelliVue MX400"
                                     icon="o-cube"
                                 />
@@ -79,7 +79,7 @@
                                 <x-input-premium
                                     name="serial"
                                     label="Número de Serie"
-                                    :value="$bien->serial"
+                                    :value="old('serial', $bien->serial ?? 'S/N')"
                                     placeholder="S/N: USX1234567"
                                     icon="o-qr-code"
                                 />

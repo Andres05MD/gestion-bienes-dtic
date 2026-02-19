@@ -59,6 +59,7 @@
                                 <x-input-premium
                                     name="marca"
                                     label="Marca"
+                                    :value="old('marca', 'S/M')"
                                     placeholder="Ej: Lenovo"
                                     icon="o-tag"
                                 />
@@ -66,6 +67,7 @@
                                 <x-input-premium
                                     name="modelo"
                                     label="Modelo"
+                                    :value="old('modelo', 'S/M')"
                                     placeholder="Ej: ThinkPad X1 Carbon"
                                     icon="o-cube"
                                 />
@@ -73,6 +75,7 @@
                                 <x-input-premium
                                     name="serial"
                                     label="Número de Serie"
+                                    :value="old('serial', 'S/N')"
                                     placeholder="S/N: USX1234567"
                                     icon="o-qr-code"
                                 />
