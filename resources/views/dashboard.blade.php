@@ -196,7 +196,7 @@
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <!-- Card Inventario Total (Destacada) -->
-                    <div class="col-span-2 md:col-span-3 lg:col-span-2 bg-linear-to-br from-brand-purple to-purple-700 rounded-3xl p-6 shadow-xl shadow-brand-purple/20 relative overflow-hidden group">
+                    <div class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-brand-purple to-purple-700 rounded-3xl p-6 shadow-xl shadow-brand-purple/20 relative overflow-hidden group">
                         <div class="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
                             <x-mary-icon name="o-rectangle-group" class="w-36 h-36 text-white" />
                         </div>
@@ -204,10 +204,35 @@
                         <h3 class="text-5xl font-black text-white tracking-tighter leading-none">{{ number_format($totalBienes) }}</h3>
                         <div class="mt-4 flex items-center gap-2 flex-wrap">
                             <span class="text-[9px] font-bold text-white/70 uppercase tracking-widest px-2.5 py-1 bg-white/15 rounded-full backdrop-blur-sm">
-                                DTIC: {{ number_format($totalBienesDTIC) }}
+                                Resumen Global
                             </span>
+                        </div>
+                    </div>
+
+                    <!-- Card Bienes DTIC -->
+                    <div class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-blue-600 to-blue-800 rounded-3xl p-6 shadow-xl shadow-blue-500/20 relative overflow-hidden group">
+                        <div class="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                            <x-mary-icon name="o-cpu-chip" class="w-36 h-36 text-white" />
+                        </div>
+                        <p class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">Bienes DTIC</p>
+                        <h3 class="text-5xl font-black text-white tracking-tighter leading-none">{{ number_format($totalBienesDTIC) }}</h3>
+                        <div class="mt-4 flex items-center gap-2 flex-wrap">
                             <span class="text-[9px] font-bold text-white/70 uppercase tracking-widest px-2.5 py-1 bg-white/15 rounded-full backdrop-blur-sm">
-                                Ext: {{ number_format($totalBienesExternos) }}
+                                Activos Internos
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Card Bienes Externos -->
+                    <div class="col-span-2 md:col-span-1 lg:col-span-2 bg-linear-to-br from-indigo-600 to-indigo-800 rounded-3xl p-6 shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
+                        <div class="absolute -right-6 -bottom-6 opacity-10 group-hover:scale-110 transition-transform duration-700">
+                            <x-mary-icon name="o-building-office" class="w-36 h-36 text-white" />
+                        </div>
+                        <p class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mb-1">Bienes Externos</p>
+                        <h3 class="text-5xl font-black text-white tracking-tighter leading-none">{{ number_format($totalBienesExternos) }}</h3>
+                        <div class="mt-4 flex items-center gap-2 flex-wrap">
+                            <span class="text-[9px] font-bold text-white/70 uppercase tracking-widest px-2.5 py-1 bg-white/15 rounded-full backdrop-blur-sm">
+                                Activos Fuera de DTIC
                             </span>
                         </div>
                     </div>
