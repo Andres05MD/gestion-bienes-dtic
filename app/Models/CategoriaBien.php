@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUpperCaseAttributes;
 
 class CategoriaBien extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUpperCaseAttributes;
 
     protected $table = 'categoria_bienes';
     

@@ -7,12 +7,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasUpperCaseAttributes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class BienExterno extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory, LogsActivity, HasUpperCaseAttributes;
 
     /**
      * Configuración del registro de actividad.
