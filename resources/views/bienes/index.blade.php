@@ -4,12 +4,18 @@
             <h2 class="font-black text-3xl text-gray-800 dark:text-white leading-tight tracking-tight drop-shadow-md">
                 {{ __('Bienes DTIC') }}
             </h2>
-            @can('crear bienes')
-                <a href="{{ route('bienes.create') }}" class="inline-flex items-center px-5 py-2.5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-150 shadow-lg shadow-brand-purple/20">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                    {{ __('Nuevo Bien DTIC') }}
-                </a>
-            @endcan
+            <div class="flex gap-2" x-data="{}">
+                @can('crear bienes')
+                    <button @click="$dispatch('open-modal', 'import-bienes')" class="inline-flex items-center px-5 py-2.5 bg-dark-800 border border-dark-700 rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-dark-700 active:scale-95 transition-all duration-150 shadow-lg">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        {{ __('Importar') }}
+                    </button>
+                    <a href="{{ route('bienes.create') }}" class="inline-flex items-center px-5 py-2.5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-150 shadow-lg shadow-brand-purple/20">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                        {{ __('Nuevo Bien DTIC') }}
+                    </a>
+                @endcan
+            </div>
         </div>
     </x-slot>
 
@@ -89,8 +95,8 @@
                                 @forelse ($bienes as $bien)
                                     <tr class="hover:bg-dark-800/30 transition-all duration-300">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
-                                            <div class="font-bold">{{ $bien->numero_bien }}</div>
-                                            <div class="text-[10px] font-medium text-dark-text uppercase">{{ $bien->categoria?->nombre ?? 'N/A' }}</div>
+                                            <div class="font-bold">{{ $bien->numero_visible }}</div>
+                                            <div class="text-[10px] font-medium text-dark-text uppercase">{{ $bien->categoria?->nombre ?? 'PENDIENTE POR CATEGORIA' }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                                             <div class="font-bold text-base">{{ $bien->equipo }}</div>
@@ -99,7 +105,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">
                                             <span class="font-medium text-white/90">{{ $bien->marca }}</span> <span class="text-xs opacity-50 ml-1">{{ $bien->modelo }}</span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">
                                             {{ $bien->area?->nombre ?? 'N/A' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
@@ -164,4 +170,50 @@
 
     <!-- Success Modal -->
 
+    <!-- Import Modal -->
+    <x-modal name="import-bienes" maxWidth="lg">
+        <div class="p-8 bg-dark-850 relative overflow-hidden">
+            <!-- Decoration Glow -->
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-brand-purple/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <form action="{{ route('bienes.import-preview') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 class="text-2xl font-black text-white leading-tight uppercase tracking-tight">Importar Bienes</h3>
+                            <div class="h-1 w-12 bg-brand-purple rounded-full mt-2"></div>
+                        </div>
+                        <button type="button" @click="$dispatch('close-modal', 'import-bienes')" class="p-2 text-gray-500 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                            <x-mary-icon name="o-x-mark" class="w-6 h-6" />
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <p class="text-gray-400 font-medium">Selecciona tu archivo de inventario (ODS, XLS, XLSX). Procesaremos categorías y áreas automáticamente.</p>
+                        
+                        <div class="relative group">
+                            <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/10 rounded-3xl cursor-pointer bg-white/[0.02] hover:bg-brand-purple/[0.03] hover:border-brand-purple/50 transition-all duration-500">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <div class="p-4 bg-brand-purple/10 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                                        <x-mary-icon name="o-cloud-arrow-up" class="w-8 h-8 text-brand-lila" />
+                                    </div>
+                                    <p class="mb-2 text-sm text-gray-300"><span class="font-bold text-white">Haz clic</span> o arrastra el archivo</p>
+                                    <span id="file-name-import" class="text-[10px] text-brand-neon font-black uppercase tracking-[0.2em]">Esperando archivo...</span>
+                                </div>
+                                <input type="file" name="archivo" id="archivo" accept=".ods,.xls,.xlsx" class="hidden" @change="document.getElementById('file-name-import').innerText = $event.target.files[0].name" required />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row-reverse gap-3">
+                        <x-button-premium type="submit" text="Procesar Archivo" icon="o-rocket-launch" color="purple" class="w-full sm:w-auto" />
+                        <button type="button" @click="$dispatch('close-modal', 'import-bienes')" class="flex-1 inline-flex justify-center items-center px-6 py-4 bg-dark-800 border border-transparent rounded-xl font-bold text-xs text-gray-400 uppercase tracking-widest hover:bg-dark-700 hover:text-white active:scale-95 transition-all duration-150">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </x-modal>
 </x-app-layout>

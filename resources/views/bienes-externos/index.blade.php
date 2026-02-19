@@ -97,7 +97,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">
                                             <span class="font-medium text-white/90">{{ $bien->marca }}</span> <span class="text-xs opacity-50 ml-1">{{ $bien->modelo }}</span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">
                                             {{ $bien->departamento?->nombre ?? 'N/A' }}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">

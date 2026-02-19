@@ -105,8 +105,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">{{ $transferencia->numero_bien }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ $transferencia->descripcion }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->serial ?? '—' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->procedencia?->nombre ?? 'DTIC' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->destino?->nombre ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $transferencia->procedencia?->nombre ?? 'DTIC' }}</td>
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $transferencia->destino?->nombre ?? 'N/A' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->fecha->format('d/m/Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-3 py-1 inline-flex text-[10px] leading-4 font-black rounded-lg bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200 shadow-sm uppercase">

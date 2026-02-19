@@ -16,6 +16,17 @@ class Bien extends Model
     use HasFactory, LogsActivity, HasUpperCaseAttributes;
 
     /**
+     * Devuelve 'S/N' si el número de bien comienza con 'S/N-', de lo contrario devuelve el número original.
+     */
+    public function getNumeroVisibleAttribute(): string
+    {
+        if (\Illuminate\Support\Str::startsWith($this->numero_bien, 'S/N-')) {
+            return 'S/N';
+        }
+        return (string) $this->numero_bien;
+    }
+
+    /**
      * Configuración del registro de actividad.
      */
     public function getActivitylogOptions(): LogOptions

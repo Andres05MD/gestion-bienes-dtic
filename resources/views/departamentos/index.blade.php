@@ -41,7 +41,7 @@
                                 <tbody class="divide-y divide-dark-800">
                                     @foreach ($departamentos as $departamento)
                                         <tr class="hover:bg-dark-800/30 transition-all duration-300">
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
+                                            <td class="px-6 py-4 whitespace-normal text-sm font-bold text-white min-w-[200px]">
                                                 {{ $departamento->nombre }}
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">

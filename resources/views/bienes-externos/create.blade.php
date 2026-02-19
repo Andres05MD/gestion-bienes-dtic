@@ -134,13 +134,14 @@
                                     placeholder="Seleccione una categoría"
                                     icon="o-bookmark"
                                     :options="$categorias->map(fn($c) => ['value' => $c->id, 'label' => $c->nombre])->toArray()"
-                                    :value="old('categoria_bien_id')"
+                                    :value="old('categoria_bien_id', $categoriaPendiente->id)"
                                 />
 
                                 <!-- Número de Bien -->
                                 <x-input-premium
                                     name="numero_bien"
                                     label="Número de Bien"
+                                    :value="old('numero_bien', 'S/N')"
                                     placeholder="Ej: 12345"
                                     icon="o-hashtag"
                                 />

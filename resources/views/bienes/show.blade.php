@@ -108,13 +108,13 @@
                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-2">Categoría</p>
                                         <div class="inline-flex items-center px-4 py-2 rounded-xl bg-dark-800 border border-white/5 text-sm font-bold text-white shadow-inner">
                                             <span class="w-1.5 h-1.5 rounded-full bg-brand-lila mr-2 shadow-[0_0_8px_currentColor]"></span>
-                                            {{ $bien->categoria?->nombre ?? 'N/A' }}
+                                            {{ $bien->categoria?->nombre ?? 'PENDIENTE POR CATEGORIA' }}
                                         </div>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Número de Bien</p>
                                         <p class="text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-brand-lila to-white tracking-tighter drop-shadow-lg">
-                                            {{ $bien->numero_bien }}
+                                            {{ $bien->numero_visible }}
                                         </p>
                                     </div>
                                 </div>

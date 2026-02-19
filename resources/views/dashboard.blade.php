@@ -7,7 +7,7 @@
                 </div>
                 <div>
                     <h2 class="font-black text-4xl text-gray-900 dark:text-white leading-tight tracking-tighter">
-                        {{ __('Dashboard') }}
+                        {{ __('Pantalla Principal') }}
                     </h2>
                     <p class="text-sm font-bold text-gray-400 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-brand-neon animate-pulse"></span>
@@ -157,13 +157,13 @@
                                     <td class="px-6 py-4">
                                         @if($op->tipo_operacion === 'Transferencia')
                                             <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-tighter">
-                                                <span class="text-gray-700 dark:text-gray-300">{{ $op->procedencia?->nombre ?? 'N/A' }}</span>
+                                                <span class="text-gray-700 dark:text-gray-300">{{ $op->procedencia?->nombre ?? 'DTIC' }}</span>
                                                 <x-mary-icon name="o-arrow-right" class="w-3 h-3 text-brand-lila shrink-0" />
                                                 <span class="text-brand-lila">{{ $op->destino?->nombre ?? 'N/A' }}</span>
                                             </div>
                                         @else
                                             <div class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-tighter">
-                                                {{ $op->procedencia?->nombre ?? 'N/A' }}
+                                                {{ $op->procedencia?->nombre ?? 'DTIC' }}
                                             </div>
                                         @endif
                                     </td>

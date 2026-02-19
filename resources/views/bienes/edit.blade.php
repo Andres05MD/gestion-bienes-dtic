@@ -9,7 +9,7 @@
                     {{ __('Editar Bien') }}
                 </h2>
                 <p class="text-sm font-medium text-gray-500 dark:text-dark-text uppercase tracking-widest mt-1">
-                    Activo: <span class="text-brand-lila">#{{ $bien->numero_bien }}</span>
+                    Activo: <span class="text-brand-lila">#{{ $bien->numero_visible }}</span>
                 </p>
             </div>
         </div>
@@ -146,7 +146,7 @@
                                 <x-input-premium
                                     name="numero_bien"
                                     label="Número de Patrimonio"
-                                    :value="$bien->numero_bien"
+                                    :value="$bien->numero_visible"
                                     placeholder="Ej: DTIC-2024-001"
                                     icon="o-hashtag"
                                 />

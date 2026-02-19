@@ -3,7 +3,7 @@
         x-data="{ 
             show: true,
             type: '{{ session('error') ? 'error' : (session('warning') ? 'warning' : (session('info') ? 'info' : 'success')) }}',
-            message: '{{ session('error') ?? session('warning') ?? session('info') ?? session('success') }}',
+            message: @js(session('error') ?? session('warning') ?? session('info') ?? session('success')),
             init() {
                 setTimeout(() => {
                     this.show = false;

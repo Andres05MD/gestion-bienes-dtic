@@ -18,6 +18,7 @@ class CategoriaBienSeeder extends Seeder
             'Bien de Terceros', 
             'Comodato',
             'Bien Menor',
+            'PENDIENTE POR CATEGORIA',
         ];
 
         foreach ($categorias as $categoria) {

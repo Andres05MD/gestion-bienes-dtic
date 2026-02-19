@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::get('api/bienes/buscar', BienSearchController::class)->name('api.bienes.buscar');
 
     // Rutas para la gestión de bienes (DTIC)
+    Route::match(['get', 'post'], 'bienes/import-preview', [BienController::class, 'previewImport'])->name('bienes.import-preview');
+    Route::post('bienes/import', [BienController::class, 'import'])->name('bienes.import');
     Route::resource('bienes', BienController::class)
         ->parameters(['bienes' => 'bien']);
 

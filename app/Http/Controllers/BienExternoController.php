@@ -66,7 +66,13 @@ class BienExternoController extends Controller
         $categorias = CategoriaBien::orderBy('nombre')->get();
         $departamentos = Departamento::orderBy('nombre')->get();
 
-        return view('bienes-externos.create', compact('estados', 'categorias', 'departamentos'));
+        // Asegurar que exista la categoría "PENDIENTE POR CATEGORIA"
+        $categoriaPendiente = CategoriaBien::firstOrCreate(
+            ['nombre' => 'PENDIENTE POR CATEGORIA'],
+            ['descripcion' => 'Categoría por defecto para bienes sin clasificar']
+        );
+
+        return view('bienes-externos.create', compact('estados', 'categorias', 'departamentos', 'categoriaPendiente'));
     }
 
     /**
