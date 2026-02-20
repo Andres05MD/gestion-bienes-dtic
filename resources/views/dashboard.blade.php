@@ -15,7 +15,7 @@
                     </p>
                 </div>
             </div>
-            
+
             <div class="flex items-center gap-3">
                 {{-- Filtro de período --}}
                 <div x-data="{ open: false }" class="relative">
@@ -23,32 +23,32 @@
                         <x-mary-icon name="o-calendar-days" class="w-4 h-4 text-brand-lila" />
                         <span>
                             @switch($periodoActual)
-                                @case('hoy') Hoy @break
-                                @case('semana') Última semana @break
-                                @case('mes') Último mes @break
-                                @case('trimestre') Último trimestre @break
-                                @default Todo el tiempo
+                            @case('hoy') Hoy @break
+                            @case('semana') Última semana @break
+                            @case('mes') Último mes @break
+                            @case('trimestre') Último trimestre @break
+                            @default Todo el tiempo
                             @endswitch
                         </span>
                         <x-mary-icon name="o-chevron-down" class="w-3 h-3 transition-transform" ::class="open && 'rotate-180'" />
                     </button>
                     <div x-show="open" @click.away="open = false" x-transition
-                         class="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-dark-850 rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/20 z-50 overflow-hidden py-2">
+                        class="absolute right-0 top-full mt-2 w-52 bg-white dark:bg-dark-850 rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/20 z-50 overflow-hidden py-2">
                         @foreach([
-                            ['all', 'Todo el tiempo', 'o-clock'],
-                            ['hoy', 'Hoy', 'o-sun'],
-                            ['semana', 'Última semana', 'o-calendar'],
-                            ['mes', 'Último mes', 'o-calendar-days'],
-                            ['trimestre', 'Último trimestre', 'o-chart-bar'],
+                        ['all', 'Todo el tiempo', 'o-clock'],
+                        ['hoy', 'Hoy', 'o-sun'],
+                        ['semana', 'Última semana', 'o-calendar'],
+                        ['mes', 'Último mes', 'o-calendar-days'],
+                        ['trimestre', 'Último trimestre', 'o-chart-bar'],
                         ] as [$val, $label, $icon])
-                            <a href="{{ route('dashboard', ['periodo' => $val]) }}" 
-                               class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all {{ $periodoActual === $val ? 'bg-brand-purple/10 text-brand-lila' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5' }}">
-                                <x-mary-icon name="{{ $icon }}" class="w-4 h-4" />
-                                {{ $label }}
-                                @if($periodoActual === $val)
-                                    <x-mary-icon name="o-check" class="w-4 h-4 ml-auto text-brand-neon" />
-                                @endif
-                            </a>
+                        <a href="{{ route('dashboard', ['periodo' => $val]) }}"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold transition-all {{ $periodoActual === $val ? 'bg-brand-purple/10 text-brand-lila' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5' }}">
+                            <x-mary-icon name="{{ $icon }}" class="w-4 h-4" />
+                            {{ $label }}
+                            @if($periodoActual === $val)
+                            <x-mary-icon name="o-check" class="w-4 h-4 ml-auto text-brand-neon" />
+                            @endif
+                        </a>
                         @endforeach
                     </div>
                 </div>
@@ -107,7 +107,7 @@
                 </a>
                 @endcan
             </section>
-            
+
             <!-- 1. ALERTAS CRÍTICAS (Solo si hay pendientes) -->
             @if($operacionesPendientes->count() > 0)
             <section>
@@ -116,7 +116,7 @@
                     <h3 class="text-xs font-black text-amber-500 uppercase tracking-[0.3em]">Atención Requerida</h3>
                     <span class="px-2 py-0.5 bg-amber-500/10 text-amber-500 rounded-full text-[10px] font-bold">{{ $operacionesPendientes->count() }}</span>
                 </div>
-                
+
                 <div class="bg-white/40 dark:bg-dark-850/40 backdrop-blur-xl rounded-3xl border border-amber-500/20 overflow-hidden shadow-2xl shadow-amber-500/5">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
@@ -136,11 +136,11 @@
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-2">
                                             @if($op->nivel_urgencia === 'critico')
-                                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                                                <span class="text-[10px] font-black text-rose-500 uppercase">Crítico</span>
+                                            <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                                            <span class="text-[10px] font-black text-rose-500 uppercase">Crítico</span>
                                             @else
-                                                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                                <span class="text-[10px] font-black text-amber-500 uppercase">Pendiente</span>
+                                            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                            <span class="text-[10px] font-black text-amber-500 uppercase">Pendiente</span>
                                             @endif
                                         </div>
                                     </td>
@@ -151,23 +151,23 @@
                                         <div class="text-[10px] text-gray-500 font-bold uppercase">{{ $op->estatusActa?->nombre }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}" 
-                                           class="group block hover:opacity-75 transition-opacity">
+                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}"
+                                            class="group block hover:opacity-75 transition-opacity">
                                             <div class="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand-purple transition-colors">{{ $op->numero_bien }}</div>
                                             <div class="text-[10px] text-gray-500 font-bold truncate max-w-[150px] uppercase">{{ $op->nombre_bien }}</div>
                                         </a>
                                     </td>
                                     <td class="px-6 py-4">
                                         @if($op->tipo_operacion === 'Transferencia')
-                                            <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-tighter">
-                                                <span class="text-gray-700 dark:text-gray-300">{{ $op->procedencia?->nombre ?? 'DTIC' }}</span>
-                                                <x-mary-icon name="o-arrow-right" class="w-3 h-3 text-brand-lila shrink-0" />
-                                                <span class="text-brand-lila">{{ $op->destino?->nombre ?? 'N/A' }}</span>
-                                            </div>
+                                        <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-tighter">
+                                            <span class="text-gray-700 dark:text-gray-300">{{ $op->procedencia?->nombre ?? 'DTIC' }}</span>
+                                            <x-mary-icon name="o-arrow-right" class="w-3 h-3 text-brand-lila shrink-0" />
+                                            <span class="text-brand-lila">{{ $op->destino?->nombre ?? 'DTIC' }}</span>
+                                        </div>
                                         @else
-                                            <div class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-tighter">
-                                                {{ $op->procedencia?->nombre ?? 'DTIC' }}
-                                            </div>
+                                        <div class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-tighter">
+                                            {{ $op->procedencia?->nombre ?? 'DTIC' }}
+                                        </div>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
@@ -176,14 +176,14 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 text-right flex items-center justify-end gap-2">
-                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}" 
-                                           class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-sky-500 hover:text-white rounded-lg transition-all inline-block"
-                                           title="Ver en listado general">
+                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}"
+                                            class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-sky-500 hover:text-white rounded-lg transition-all inline-block"
+                                            title="Ver en listado general">
                                             <x-mary-icon name="o-list-bullet" class="w-4 h-4" />
                                         </a>
-                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.show', $op) : route('transferencias-internas.show', $op) }}" 
-                                           class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-brand-purple hover:text-white rounded-lg transition-all inline-block"
-                                           title="Ver detalle del acta">
+                                        <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.show', $op) : route('transferencias-internas.show', $op) }}"
+                                            class="p-2 bg-gray-100 dark:bg-white/5 hover:bg-brand-purple hover:text-white rounded-lg transition-all inline-block"
+                                            title="Ver detalle del acta">
                                             <x-mary-icon name="o-eye" class="w-4 h-4" />
                                         </a>
                                     </td>
@@ -247,76 +247,76 @@
                     </a>
 
                     @php
-                        // Mapa de colores hardcodeados para evitar problemas de purge en Tailwind
-                        $estadoStyles = [
-                            'Bueno' => [
-                                'icon' => 'o-check-circle',
-                                'bg' => 'bg-emerald-500/10',
-                                'text' => 'text-emerald-500',
-                                'border' => 'border-emerald-500/20',
-                                'iconBg' => 'bg-emerald-500/15',
-                            ],
-                            'Regular' => [
-                                'icon' => 'o-exclamation-circle',
-                                'bg' => 'bg-amber-500/10',
-                                'text' => 'text-amber-500',
-                                'border' => 'border-amber-500/20',
-                                'iconBg' => 'bg-amber-500/15',
-                            ],
-                            'Malo' => [
-                                'icon' => 'o-x-circle',
-                                'bg' => 'bg-rose-500/10',
-                                'text' => 'text-rose-500',
-                                'border' => 'border-rose-500/20',
-                                'iconBg' => 'bg-rose-500/15',
-                            ],
-                            'En Reparación' => [
-                                'icon' => 'o-wrench-screwdriver',
-                                'bg' => 'bg-blue-500/10',
-                                'text' => 'text-blue-500',
-                                'border' => 'border-blue-500/20',
-                                'iconBg' => 'bg-blue-500/15',
-                            ],
-                            'Desincorporado' => [
-                                'icon' => 'o-trash',
-                                'bg' => 'bg-gray-500/10',
-                                'text' => 'text-gray-500',
-                                'border' => 'border-gray-500/20',
-                                'iconBg' => 'bg-gray-500/15',
-                            ],
-                        ];
-                        $defaultStyle = [
-                            'icon' => 'o-question-mark-circle',
-                            'bg' => 'bg-brand-purple/10',
-                            'text' => 'text-brand-lila',
-                            'border' => 'border-brand-purple/20',
-                            'iconBg' => 'bg-brand-purple/15',
-                        ];
+                    // Mapa de colores hardcodeados para evitar problemas de purge en Tailwind
+                    $estadoStyles = [
+                    'Bueno' => [
+                    'icon' => 'o-check-circle',
+                    'bg' => 'bg-emerald-500/10',
+                    'text' => 'text-emerald-500',
+                    'border' => 'border-emerald-500/20',
+                    'iconBg' => 'bg-emerald-500/15',
+                    ],
+                    'Regular' => [
+                    'icon' => 'o-exclamation-circle',
+                    'bg' => 'bg-amber-500/10',
+                    'text' => 'text-amber-500',
+                    'border' => 'border-amber-500/20',
+                    'iconBg' => 'bg-amber-500/15',
+                    ],
+                    'Malo' => [
+                    'icon' => 'o-x-circle',
+                    'bg' => 'bg-rose-500/10',
+                    'text' => 'text-rose-500',
+                    'border' => 'border-rose-500/20',
+                    'iconBg' => 'bg-rose-500/15',
+                    ],
+                    'En Reparación' => [
+                    'icon' => 'o-wrench-screwdriver',
+                    'bg' => 'bg-blue-500/10',
+                    'text' => 'text-blue-500',
+                    'border' => 'border-blue-500/20',
+                    'iconBg' => 'bg-blue-500/15',
+                    ],
+                    'Desincorporado' => [
+                    'icon' => 'o-trash',
+                    'bg' => 'bg-gray-500/10',
+                    'text' => 'text-gray-500',
+                    'border' => 'border-gray-500/20',
+                    'iconBg' => 'bg-gray-500/15',
+                    ],
+                    ];
+                    $defaultStyle = [
+                    'icon' => 'o-question-mark-circle',
+                    'bg' => 'bg-brand-purple/10',
+                    'text' => 'text-brand-lila',
+                    'border' => 'border-brand-purple/20',
+                    'iconBg' => 'bg-brand-purple/15',
+                    ];
                     @endphp
 
                     <!-- Cards de Estado Dinámicas (desde $porEstado del controller) -->
                     @foreach($porEstado as $estadoData)
-                        @php
-                            $estadoNombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
-                            $estadoCount = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
-                            $style = $estadoStyles[$estadoNombre] ?? $defaultStyle;
-                            $porcentaje = $totalBienes > 0 ? round(($estadoCount / $totalBienes) * 100, 1) : 0;
-                        @endphp
-                        @php
-                            $estadoId = \App\Models\Estado::where('nombre', $estadoNombre)->first()?->id;
-                        @endphp
-                        <a href="{{ route('bienes.index', ['estado_id' => $estadoId]) }}" class="bg-white dark:bg-dark-850 p-5 rounded-3xl border {{ $style['border'] }} shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="p-2.5 {{ $style['iconBg'] }} rounded-xl {{ $style['text'] }}">
-                                    <x-mary-icon name="{{ $style['icon'] }}" class="w-5 h-5" />
-                                </div>
-                                <span class="text-[10px] font-bold {{ $style['text'] }} px-2 py-0.5 {{ $style['bg'] }} rounded-full">
-                                    {{ $porcentaje }}%
-                                </span>
+                    @php
+                    $estadoNombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
+                    $estadoCount = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
+                    $style = $estadoStyles[$estadoNombre] ?? $defaultStyle;
+                    $porcentaje = $totalBienes > 0 ? round(($estadoCount / $totalBienes) * 100, 1) : 0;
+                    @endphp
+                    @php
+                    $estadoId = \App\Models\Estado::where('nombre', $estadoNombre)->first()?->id;
+                    @endphp
+                    <a href="{{ route('bienes.index', ['estado_id' => $estadoId]) }}" class="bg-white dark:bg-dark-850 p-5 rounded-3xl border {{ $style['border'] }} shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="p-2.5 {{ $style['iconBg'] }} rounded-xl {{ $style['text'] }}">
+                                <x-mary-icon name="{{ $style['icon'] }}" class="w-5 h-5" />
                             </div>
-                            <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">{{ $estadoNombre }}</p>
-                            <h3 class="text-3xl font-black text-gray-900 dark:text-white tabular-nums tracking-tighter leading-none">{{ $estadoCount }}</h3>
-                        </a>
+                            <span class="text-[10px] font-bold {{ $style['text'] }} px-2 py-0.5 {{ $style['bg'] }} rounded-full">
+                                {{ $porcentaje }}%
+                            </span>
+                        </div>
+                        <p class="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-0.5">{{ $estadoNombre }}</p>
+                        <h3 class="text-3xl font-black text-gray-900 dark:text-white tabular-nums tracking-tighter leading-none">{{ $estadoCount }}</h3>
+                    </a>
                     @endforeach
                 </div>
             </section>
@@ -328,89 +328,89 @@
                     <h3 class="text-xs font-black text-brand-neon uppercase tracking-[0.3em]">Análisis & Gestión Operativa</h3>
                     <div class="flex-1 h-px bg-linear-to-r from-brand-neon/20 to-transparent"></div>
                 </div>
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                <!-- Salud del Inventario (Donut) -->
-                <div class="lg:col-span-5 bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm flex flex-col">
-                    <div class="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Salud del Inventario</h3>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Estado de Activos</p>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                    <!-- Salud del Inventario (Donut) -->
+                    <div class="lg:col-span-5 bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm flex flex-col">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Salud del Inventario</h3>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Estado de Activos</p>
+                            </div>
+                            <div class="p-2 bg-brand-neon/10 rounded-xl text-brand-neon">
+                                <x-mary-icon name="o-heart" class="w-5 h-5 shadow-[0_0_15px_rgba(216,180,254,0.4)]" />
+                            </div>
                         </div>
-                        <div class="p-2 bg-brand-neon/10 rounded-xl text-brand-neon">
-                            <x-mary-icon name="o-heart" class="w-5 h-5 shadow-[0_0_15px_rgba(216,180,254,0.4)]" />
+                        <div class="relative flex-1 min-h-[300px] flex items-center justify-center">
+                            <canvas id="estadoChart"></canvas>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span class="text-4xl font-black text-gray-900 dark:text-white">{{ number_format($totalBienes) }}</span>
+                                <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="relative flex-1 min-h-[300px] flex items-center justify-center">
-                        <canvas id="estadoChart"></canvas>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span class="text-4xl font-black text-gray-900 dark:text-white">{{ number_format($totalBienes) }}</span>
-                            <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total</span>
-                        </div>
-                    </div>
-                    <!-- Leyenda del donut -->
-                    <div class="mt-4 grid grid-cols-2 gap-2">
-                        @foreach($porEstado as $estadoData)
+                        <!-- Leyenda del donut -->
+                        <div class="mt-4 grid grid-cols-2 gap-2">
+                            @foreach($porEstado as $estadoData)
                             @php
-                                $nombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
-                                $cnt = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
-                                $s = $estadoStyles[$nombre] ?? $defaultStyle;
+                            $nombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
+                            $cnt = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
+                            $s = $estadoStyles[$nombre] ?? $defaultStyle;
                             @endphp
                             <div class="flex items-center gap-2 px-2 py-1">
                                 <div class="w-2.5 h-2.5 rounded-full {{ $s['bg'] }} {{ $s['border'] }} border"></div>
                                 <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider truncate">{{ $nombre }}</span>
                                 <span class="text-[10px] font-black text-gray-900 dark:text-white ml-auto">{{ $cnt }}</span>
                             </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Gestión Operativa (Vertical Stats & Quick Links) -->
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <!-- Card Desincorporaciones -->
+                            <div class="bg-linear-to-br from-rose-500/5 to-rose-600/10 dark:from-rose-500/10 dark:to-transparent p-6 rounded-3xl border border-rose-500/20 group hover:border-rose-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-rose-500/5">
+                                <div class="p-3 bg-rose-500/20 text-rose-500 rounded-2xl w-fit mb-4">
+                                    <x-mary-icon name="o-archive-box-x-mark" class="w-6 h-6" />
+                                </div>
+                                <h4 class="text-4xl font-black text-gray-900 dark:text-white mb-1 tabular-nums">{{ number_format($totalDesincorporaciones) }}</h4>
+                                <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest">Desincorporaciones</p>
+                            </div>
+
+                            <!-- Card Transferencias -->
+                            <div class="bg-linear-to-br from-blue-500/5 to-blue-600/10 dark:from-blue-500/10 dark:to-transparent p-6 rounded-3xl border border-blue-500/20 group hover:border-blue-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5">
+                                <div class="p-3 bg-blue-500/20 text-blue-500 rounded-2xl w-fit mb-4">
+                                    <x-mary-icon name="o-arrows-right-left" class="w-6 h-6" />
+                                </div>
+                                <h4 class="text-4xl font-black text-gray-900 dark:text-white mb-1 tabular-nums">{{ number_format($totalTransferencias) }}</h4>
+                                <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Transferencias</p>
+                            </div>
+
+                            <!-- Card Distribuciones -->
+                            <div class="bg-linear-to-br from-brand-purple/5 to-brand-purple/10 dark:from-brand-purple/10 dark:to-transparent p-6 rounded-3xl border border-brand-purple/20 group hover:border-brand-purple/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-purple/5">
+                                <div class="p-3 bg-brand-purple/20 text-brand-lila rounded-2xl w-fit mb-4">
+                                    <x-mary-icon name="o-truck" class="w-6 h-6" />
+                                </div>
+                                <h4 class="text-4xl font-black text-gray-900 dark:text-white mb-1 tabular-nums">{{ number_format($totalDistribuciones) }}</h4>
+                                <p class="text-[10px] font-black text-brand-lila uppercase tracking-widest">Distribuciones</p>
+                            </div>
+                        </div>
+
+                        <!-- Analytics: Estatus de Trámites -->
+                        <div class="bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Estado de Trámites</h3>
+                                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administrativos</p>
+                                </div>
+                                <span class="px-3 py-1 bg-brand-purple/10 text-brand-lila rounded-full text-[10px] font-black uppercase tracking-widest">Eficiencia</span>
+                            </div>
+                            <div class="h-64">
+                                <canvas id="tramiteChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Gestión Operativa (Vertical Stats & Quick Links) -->
-                <div class="lg:col-span-7 space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <!-- Card Desincorporaciones -->
-                        <div class="bg-linear-to-br from-rose-500/5 to-rose-600/10 dark:from-rose-500/10 dark:to-transparent p-6 rounded-3xl border border-rose-500/20 group hover:border-rose-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-rose-500/5">
-                            <div class="p-3 bg-rose-500/20 text-rose-500 rounded-2xl w-fit mb-4">
-                                <x-mary-icon name="o-archive-box-x-mark" class="w-6 h-6" />
-                            </div>
-                            <h4 class="text-4xl font-black text-gray-900 dark:text-white mb-1 tabular-nums">{{ number_format($totalDesincorporaciones) }}</h4>
-                            <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest">Desincorporaciones</p>
-                        </div>
-                        
-                        <!-- Card Transferencias -->
-                        <div class="bg-linear-to-br from-blue-500/5 to-blue-600/10 dark:from-blue-500/10 dark:to-transparent p-6 rounded-3xl border border-blue-500/20 group hover:border-blue-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5">
-                            <div class="p-3 bg-blue-500/20 text-blue-500 rounded-2xl w-fit mb-4">
-                                <x-mary-icon name="o-arrows-right-left" class="w-6 h-6" />
-                            </div>
-                            <h4 class="text-4xl font-black text-gray-900 dark:text-white mb-1 tabular-nums">{{ number_format($totalTransferencias) }}</h4>
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Transferencias</p>
-                        </div>
-
-                        <!-- Card Distribuciones -->
-                        <div class="bg-linear-to-br from-brand-purple/5 to-brand-purple/10 dark:from-brand-purple/10 dark:to-transparent p-6 rounded-3xl border border-brand-purple/20 group hover:border-brand-purple/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-purple/5">
-                            <div class="p-3 bg-brand-purple/20 text-brand-lila rounded-2xl w-fit mb-4">
-                                <x-mary-icon name="o-truck" class="w-6 h-6" />
-                            </div>
-                            <h4 class="text-4xl font-black text-gray-900 dark:text-white mb-1 tabular-nums">{{ number_format($totalDistribuciones) }}</h4>
-                            <p class="text-[10px] font-black text-brand-lila uppercase tracking-widest">Distribuciones</p>
-                        </div>
-                    </div>
-
-                    <!-- Analytics: Estatus de Trámites -->
-                    <div class="bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Estado de Trámites</h3>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Administrativos</p>
-                            </div>
-                            <span class="px-3 py-1 bg-brand-purple/10 text-brand-lila rounded-full text-[10px] font-black uppercase tracking-widest">Eficiencia</span>
-                        </div>
-                        <div class="h-64">
-                            <canvas id="tramiteChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
             </section>
 
             <!-- 4. ACTIVIDAD RECIENTE & CATEGORÍAS -->
@@ -420,50 +420,50 @@
                     <h3 class="text-xs font-black text-emerald-500 uppercase tracking-[0.3em]">Historial & Distribución</h3>
                     <div class="flex-1 h-px bg-linear-to-r from-emerald-500/20 to-transparent"></div>
                 </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
-                <!-- Timeline de Actividad -->
-                <div class="bg-white dark:bg-dark-850 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
-                    <div class="p-8 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Actividad Reciente</h3>
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Últimas acciones del sistema</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+                    <!-- Timeline de Actividad -->
+                    <div class="bg-white dark:bg-dark-850 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm overflow-hidden">
+                        <div class="p-8 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Actividad Reciente</h3>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Últimas acciones del sistema</p>
+                            </div>
+                            @can('gestionar usuarios')
+                            <a href="{{ route('activity-log.index') }}" class="p-2 hover:bg-brand-purple/10 text-gray-400 hover:text-brand-lila rounded-xl transition-all" title="Ver todo el historial">
+                                <x-mary-icon name="o-arrow-top-right-on-square" class="w-5 h-5" />
+                            </a>
+                            @endcan
                         </div>
-                        @can('gestionar usuarios')
-                        <a href="{{ route('activity-log.index') }}" class="p-2 hover:bg-brand-purple/10 text-gray-400 hover:text-brand-lila rounded-xl transition-all" title="Ver todo el historial">
-                            <x-mary-icon name="o-arrow-top-right-on-square" class="w-5 h-5" />
-                        </a>
-                        @endcan
-                    </div>
-                    <div class="p-6 space-y-0">
-                        @forelse($actividadesRecientes as $activity)
+                        <div class="p-6 space-y-0">
+                            @forelse($actividadesRecientes as $activity)
                             @php
-                                $eventIcon = match($activity->event) {
-                                    'created' => 'o-plus-circle',
-                                    'updated' => 'o-pencil-square',
-                                    'deleted' => 'o-trash',
-                                    default => 'o-information-circle',
-                                };
-                                $eventColor = match($activity->event) {
-                                    'created' => 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
-                                    'updated' => 'bg-amber-500/15 text-amber-500 border-amber-500/30',
-                                    'deleted' => 'bg-rose-500/15 text-rose-500 border-rose-500/30',
-                                    default => 'bg-gray-500/15 text-gray-500 border-gray-500/30',
-                                };
-                                $eventLineColor = match($activity->event) {
-                                    'created' => 'bg-emerald-500/30',
-                                    'updated' => 'bg-amber-500/30',
-                                    'deleted' => 'bg-rose-500/30',
-                                    default => 'bg-gray-500/30',
-                                };
-                                $moduleColor = match($activity->log_name) {
-                                    'bienes' => 'bg-brand-purple/10 text-brand-lila',
-                                    'bienes-externos' => 'bg-amber-500/10 text-amber-400',
-                                    'transferencias' => 'bg-blue-500/10 text-blue-400',
-                                    'desincorporaciones' => 'bg-rose-500/10 text-rose-400',
-                                    'distribuciones' => 'bg-emerald-500/10 text-emerald-400',
-                                    default => 'bg-gray-500/10 text-gray-400',
-                                };
+                            $eventIcon = match($activity->event) {
+                            'created' => 'o-plus-circle',
+                            'updated' => 'o-pencil-square',
+                            'deleted' => 'o-trash',
+                            default => 'o-information-circle',
+                            };
+                            $eventColor = match($activity->event) {
+                            'created' => 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
+                            'updated' => 'bg-amber-500/15 text-amber-500 border-amber-500/30',
+                            'deleted' => 'bg-rose-500/15 text-rose-500 border-rose-500/30',
+                            default => 'bg-gray-500/15 text-gray-500 border-gray-500/30',
+                            };
+                            $eventLineColor = match($activity->event) {
+                            'created' => 'bg-emerald-500/30',
+                            'updated' => 'bg-amber-500/30',
+                            'deleted' => 'bg-rose-500/30',
+                            default => 'bg-gray-500/30',
+                            };
+                            $moduleColor = match($activity->log_name) {
+                            'bienes' => 'bg-brand-purple/10 text-brand-lila',
+                            'bienes-externos' => 'bg-amber-500/10 text-amber-400',
+                            'transferencias' => 'bg-blue-500/10 text-blue-400',
+                            'desincorporaciones' => 'bg-rose-500/10 text-rose-400',
+                            'distribuciones' => 'bg-emerald-500/10 text-emerald-400',
+                            default => 'bg-gray-500/10 text-gray-400',
+                            };
                             @endphp
                             <div class="flex gap-4 group">
                                 {{-- Línea vertical + ícono --}}
@@ -472,7 +472,7 @@
                                         <x-mary-icon name="{{ $eventIcon }}" class="w-4 h-4" />
                                     </div>
                                     @if(!$loop->last)
-                                        <div class="w-px flex-1 min-h-[24px] {{ $eventLineColor }}"></div>
+                                    <div class="w-px flex-1 min-h-[24px] {{ $eventLineColor }}"></div>
                                     @endif
                                 </div>
                                 {{-- Contenido --}}
@@ -490,34 +490,34 @@
                                     </div>
                                 </div>
                             </div>
-                        @empty
+                            @empty
                             <div class="flex flex-col items-center justify-center py-12 text-center">
                                 <div class="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-3">
                                     <x-mary-icon name="o-clock" class="w-6 h-6 text-gray-400" />
                                 </div>
                                 <p class="text-sm font-bold text-gray-400">Sin actividad registrada aún</p>
                             </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Bienes por Categoría Chart -->
-                <div class="bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
-                    <div class="flex items-center justify-between mb-8">
-                        <div>
-                            <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Bienes por Categoría</h3>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Distribución del Inventario</p>
-                        </div>
-                        <div class="p-2 bg-brand-purple/10 text-brand-lila rounded-xl">
-                            <x-mary-icon name="o-tag" class="w-5 h-5" />
+                            @endforelse
                         </div>
                     </div>
-                    <div class="h-[340px]">
-                        <canvas id="categoriaChart"></canvas>
-                    </div>
-                </div>
 
-            </div>
+                    <!-- Bienes por Categoría Chart -->
+                    <div class="bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
+                        <div class="flex items-center justify-between mb-8">
+                            <div>
+                                <h3 class="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Bienes por Categoría</h3>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">Distribución del Inventario</p>
+                            </div>
+                            <div class="p-2 bg-brand-purple/10 text-brand-lila rounded-xl">
+                                <x-mary-icon name="o-tag" class="w-5 h-5" />
+                            </div>
+                        </div>
+                        <div class="h-[340px]">
+                            <canvas id="categoriaChart"></canvas>
+                        </div>
+                    </div>
+
+                </div>
             </section>
         </div>
     </div>
@@ -531,10 +531,10 @@
             Chart.register(ChartDataLabels);
 
             // Global Chart Defaults
-            Chart.defaults.color = '#71717a'; 
+            Chart.defaults.color = '#71717a';
             Chart.defaults.font.family = "'Outfit', sans-serif";
             Chart.defaults.font.weight = 'bold';
-            
+
             // Colores para el chart de estado (alineados con las cards)
             const estadoColorMap = {
                 'Bueno': '#10b981',
@@ -543,8 +543,12 @@
                 'En Reparación': '#3b82f6',
                 'Desincorporado': '#71717a'
             };
-            const estadoLabels = {!! json_encode($porEstado->pluck('estado')) !!};
-            const estadoData = {!! json_encode($porEstado->pluck('count')) !!};
+            const estadoLabels = {
+                !!json_encode($porEstado - > pluck('estado')) !!
+            };
+            const estadoData = {
+                !!json_encode($porEstado - > pluck('count')) !!
+            };
             const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
             const totalBienes = estadoData.reduce((a, b) => a + b, 0);
 
@@ -567,12 +571,21 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
-                        datalabels: { display: false },
+                        legend: {
+                            display: false
+                        },
+                        datalabels: {
+                            display: false
+                        },
                         tooltip: {
                             backgroundColor: '#18181b',
-                            titleFont: { size: 13, weight: 'black' },
-                            bodyFont: { size: 12 },
+                            titleFont: {
+                                size: 13,
+                                weight: 'black'
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
                             padding: 14,
                             cornerRadius: 12,
                             displayColors: true,
@@ -599,10 +612,14 @@
             new Chart(ctxCategoria, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($porCategoria->pluck('categoria')) !!},
+                    labels: {
+                        !!json_encode($porCategoria - > pluck('categoria')) !!
+                    },
                     datasets: [{
                         label: 'Bienes por Categoría',
-                        data: {!! json_encode($porCategoria->pluck('count')) !!},
+                        data: {
+                            !!json_encode($porCategoria - > pluck('count')) !!
+                        },
                         backgroundColor: catGradient,
                         borderRadius: 12,
                         barThickness: 28,
@@ -612,16 +629,39 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        y: { beginAtZero: true, grid: { display: false }, ticks: { display: false } },
-                        x: { grid: { display: false }, ticks: { font: { size: 10 }, color: '#94a3b8' } }
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                display: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                },
+                                color: '#94a3b8'
+                            }
+                        }
                     },
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false
+                        },
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
                             color: '#c084fc',
-                            font: { size: 11, weight: 'bold' },
+                            font: {
+                                size: 11,
+                                weight: 'bold'
+                            },
                             formatter: (value) => value > 0 ? value : ''
                         },
                         tooltip: {
@@ -642,24 +682,34 @@
             // 3. Chart Trámites
             const ctxTramite = document.getElementById('tramiteChart').getContext('2d');
             @php
-                $tramiteLabels = $porEstatusTramite->pluck('estatus');
-                $estatusActaColors = \App\Models\EstatusActa::pluck('color', 'nombre');
-                $tramiteColors = $porEstatusTramite->pluck('estatus')->map(function($nombre) use ($estatusActaColors) {
-                    return $estatusActaColors[$nombre] ?? '#71717a';
-                });
-                $totalTramites = $porEstatusTramite->sum('count');
+            $tramiteLabels = $porEstatusTramite - > pluck('estatus');
+            $estatusActaColors = \App\ Models\ EstatusActa::pluck('color', 'nombre');
+            $tramiteColors = $porEstatusTramite - > pluck('estatus') - > map(function($nombre) use($estatusActaColors) {
+                return $estatusActaColors[$nombre] ?? '#71717a';
+            });
+            $totalTramites = $porEstatusTramite - > sum('count');
             @endphp
 
-            const totalTramites = {{ $totalTramites }};
+            const totalTramites = {
+                {
+                    $totalTramites
+                }
+            };
 
             new Chart(ctxTramite, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($tramiteLabels) !!},
+                    labels: {
+                        !!json_encode($tramiteLabels) !!
+                    },
                     datasets: [{
                         label: 'Trámites por estatus',
-                        data: {!! json_encode($porEstatusTramite->pluck('count')) !!},
-                        backgroundColor: {!! json_encode($tramiteColors) !!},
+                        data: {
+                            !!json_encode($porEstatusTramite - > pluck('count')) !!
+                        },
+                        backgroundColor: {
+                            !!json_encode($tramiteColors) !!
+                        },
                         borderRadius: 50,
                         barThickness: 14,
                     }]
@@ -669,16 +719,39 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: { grid: { display: false }, ticks: { display: false } },
-                        y: { grid: { display: false }, ticks: { font: { size: 11, weight: 'black' }, color: '#94a3b8' } }
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 11,
+                                    weight: 'black'
+                                },
+                                color: '#94a3b8'
+                            }
+                        }
                     },
                     plugins: {
-                        legend: { display: false },
+                        legend: {
+                            display: false
+                        },
                         datalabels: {
                             anchor: 'end',
                             align: 'right',
                             color: '#e2e8f0',
-                            font: { size: 11, weight: 'bold' },
+                            font: {
+                                size: 11,
+                                weight: 'bold'
+                            },
                             formatter: (value) => {
                                 const pct = totalTramites > 0 ? ((value / totalTramites) * 100).toFixed(0) : 0;
                                 return `${value} (${pct}%)`;
