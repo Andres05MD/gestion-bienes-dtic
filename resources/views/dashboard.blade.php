@@ -559,12 +559,10 @@
                 'En Reparación': '#3b82f6',
                 'Desincorporado': '#71717a'
             };
-            const estadoLabels = {
-                !!json_encode($estadoLabels) !!
-            };
-            const estadoData = {
-                !!json_encode($estadoCounts) !!
-            };
+            const estadoLabels = {!! json_encode($estadoLabels) !!};
+
+            const estadoData = {!! json_encode($estadoCounts) !!};
+
             const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
             const totalBienes = estadoData.reduce((a, b) => a + b, 0);
 
@@ -628,14 +626,12 @@
             new Chart(ctxCategoria, {
                 type: 'bar',
                 data: {
-                    labels: {
-                        !!json_encode($categoriaLabels) !!
-                    },
+                    labels: {!! json_encode($categoriaLabels) !!},
+
                     datasets: [{
                         label: 'Bienes por Categoría',
-                        data: {
-                            !!json_encode($categoriaCounts) !!
-                        },
+                        data: {!! json_encode($categoriaCounts) !!},
+
                         backgroundColor: catGradient,
                         borderRadius: 12,
                         barThickness: 28,
@@ -697,26 +693,20 @@
 
             // 3. Chart Trámites
             const ctxTramite = document.getElementById('tramiteChart').getContext('2d');
-            const totalTramites = {
-                {
-                    $totalTramitesCount
-                }
-            };
+            const totalTramites = {{ $totalTramitesCount }};
+
 
             new Chart(ctxTramite, {
                 type: 'bar',
                 data: {
-                    labels: {
-                        !!json_encode($tramiteLabels) !!
-                    },
+                    labels: {!! json_encode($tramiteLabels) !!},
+
                     datasets: [{
                         label: 'Trámites por estatus',
-                        data: {
-                            !!json_encode($tramiteCounts) !!
-                        },
-                        backgroundColor: {
-                            !!json_encode($tramiteColors) !!
-                        },
+                        data: {!! json_encode($tramiteCounts) !!},
+
+                        backgroundColor: {!! json_encode($tramiteColors) !!},
+
                         borderRadius: 50,
                         barThickness: 14,
                     }]
