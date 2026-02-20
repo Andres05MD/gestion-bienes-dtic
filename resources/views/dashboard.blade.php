@@ -120,7 +120,7 @@
                 <div class="bg-white/40 dark:bg-dark-850/40 backdrop-blur-xl rounded-3xl border border-amber-500/20 overflow-hidden shadow-2xl shadow-amber-500/5">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
-                            <thead class="bg-amber-500/5 text-[10px] uppercase text-amber-600/70 dark:text-amber-400/50 font-black tracking-widest">
+                            <thead class="bg-amber-500/5 text-xs uppercase text-amber-600/70 dark:text-amber-400/50 font-black tracking-widest">
                                 <tr>
                                     <th class="px-6 py-4">Prioridad</th>
                                     <th class="px-6 py-4">Operación</th>
@@ -137,41 +137,41 @@
                                         <div class="flex items-center gap-2">
                                             @if($op->nivel_urgencia === 'critico')
                                             <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                                            <span class="text-[10px] font-black text-rose-500 uppercase">Crítico</span>
+                                            <span class="text-xs font-black text-rose-500 uppercase">Crítico</span>
                                             @else
                                             <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                                            <span class="text-[10px] font-black text-amber-500 uppercase">Pendiente</span>
+                                            <span class="text-xs font-black text-amber-500 uppercase">Pendiente</span>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                                        <div class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-tight">
                                             {{ $op->tipo_operacion }}
                                         </div>
-                                        <div class="text-[10px] text-gray-500 font-bold uppercase">{{ $op->estatusActa?->nombre }}</div>
+                                        <div class="text-xs text-gray-500 font-bold uppercase">{{ $op->estatusActa?->nombre }}</div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <a href="{{ $op->tipo_operacion === 'Desincorporación' ? route('desincorporaciones.index', ['buscar' => $op->numero_bien]) : route('transferencias-internas.index', ['buscar' => $op->numero_bien]) }}"
                                             class="group block hover:opacity-75 transition-opacity">
-                                            <div class="text-sm font-black text-gray-900 dark:text-white group-hover:text-brand-purple transition-colors">{{ $op->numero_bien }}</div>
-                                            <div class="text-[10px] text-gray-500 font-bold truncate max-w-[150px] uppercase">{{ $op->nombre_bien }}</div>
+                                            <div class="text-base font-black text-gray-900 dark:text-white group-hover:text-brand-purple transition-colors">{{ $op->numero_bien }}</div>
+                                            <div class="text-xs text-gray-500 font-bold truncate max-w-[150px] uppercase">{{ $op->nombre_bien }}</div>
                                         </a>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 min-w-[200px]">
                                         @if($op->tipo_operacion === 'Transferencia')
-                                        <div class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-tighter">
+                                        <div class="flex flex-wrap items-center gap-1.5 text-xs font-black uppercase whitespace-normal leading-relaxed">
                                             <span class="text-gray-700 dark:text-gray-300">{{ $op->procedencia?->nombre ?? 'DTIC' }}</span>
                                             <x-mary-icon name="o-arrow-right" class="w-3 h-3 text-brand-lila shrink-0" />
                                             <span class="text-brand-lila">{{ $op->destino?->nombre ?? 'DTIC' }}</span>
                                         </div>
                                         @else
-                                        <div class="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-tighter">
+                                        <div class="text-xs font-black text-gray-700 dark:text-gray-300 uppercase whitespace-normal leading-relaxed">
                                             {{ $op->procedencia?->nombre ?? 'DTIC' }}
                                         </div>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4">
-                                        <span class="text-xs font-black {{ $op->nivel_urgencia === 'critico' ? 'text-rose-500' : 'text-amber-500' }}">
+                                        <span class="text-sm font-black {{ $op->nivel_urgencia === 'critico' ? 'text-rose-500' : 'text-amber-500' }}">
                                             {{ $op->dias_transcurridos }}d
                                         </span>
                                     </td>
@@ -523,6 +523,22 @@
     </div>
 
     <!-- Chart.js and Data Orchestration -->
+    @php
+    $estadoLabels = $porEstado->pluck('estado');
+    $estadoCounts = $porEstado->pluck('count');
+
+    $categoriaLabels = $porCategoria->pluck('categoria');
+    $categoriaCounts = $porCategoria->pluck('count');
+
+    $tramiteLabels = $porEstatusTramite->pluck('estatus');
+    $estatusActaColors = \App\Models\EstatusActa::pluck('color', 'nombre');
+    $tramiteColors = $porEstatusTramite->pluck('estatus')->map(function($nombre) use ($estatusActaColors) {
+    return $estatusActaColors[$nombre] ?? '#71717a';
+    });
+    $totalTramitesCount = $porEstatusTramite->sum('count');
+    $tramiteCounts = $porEstatusTramite->pluck('count');
+    @endphp
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
@@ -544,10 +560,10 @@
                 'Desincorporado': '#71717a'
             };
             const estadoLabels = {
-                !!json_encode($porEstado - > pluck('estado')) !!
+                !!json_encode($estadoLabels) !!
             };
             const estadoData = {
-                !!json_encode($porEstado - > pluck('count')) !!
+                !!json_encode($estadoCounts) !!
             };
             const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
             const totalBienes = estadoData.reduce((a, b) => a + b, 0);
@@ -613,12 +629,12 @@
                 type: 'bar',
                 data: {
                     labels: {
-                        !!json_encode($porCategoria - > pluck('categoria')) !!
+                        !!json_encode($categoriaLabels) !!
                     },
                     datasets: [{
                         label: 'Bienes por Categoría',
                         data: {
-                            !!json_encode($porCategoria - > pluck('count')) !!
+                            !!json_encode($categoriaCounts) !!
                         },
                         backgroundColor: catGradient,
                         borderRadius: 12,
@@ -681,18 +697,9 @@
 
             // 3. Chart Trámites
             const ctxTramite = document.getElementById('tramiteChart').getContext('2d');
-            @php
-            $tramiteLabels = $porEstatusTramite - > pluck('estatus');
-            $estatusActaColors = \App\ Models\ EstatusActa::pluck('color', 'nombre');
-            $tramiteColors = $porEstatusTramite - > pluck('estatus') - > map(function($nombre) use($estatusActaColors) {
-                return $estatusActaColors[$nombre] ?? '#71717a';
-            });
-            $totalTramites = $porEstatusTramite - > sum('count');
-            @endphp
-
             const totalTramites = {
                 {
-                    $totalTramites
+                    $totalTramitesCount
                 }
             };
 
@@ -705,7 +712,7 @@
                     datasets: [{
                         label: 'Trámites por estatus',
                         data: {
-                            !!json_encode($porEstatusTramite - > pluck('count')) !!
+                            !!json_encode($tramiteCounts) !!
                         },
                         backgroundColor: {
                             !!json_encode($tramiteColors) !!
@@ -749,8 +756,7 @@
                             align: 'right',
                             color: '#e2e8f0',
                             font: {
-                                size: 11,
-                                weight: 'bold'
+                                size: 11
                             },
                             formatter: (value) => {
                                 const pct = totalTramites > 0 ? ((value / totalTramites) * 100).toFixed(0) : 0;

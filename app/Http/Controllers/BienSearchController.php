@@ -42,6 +42,7 @@ class BienSearchController extends Controller
             })
             ->limit(15)
             ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo'])
+            ->toBase()
             ->map(fn($b) => [...$b->toArray(), 'tipo' => 'dtic']);
 
         $externos = BienExterno::query()
@@ -58,6 +59,7 @@ class BienSearchController extends Controller
             })
             ->limit(15)
             ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'departamento_id'])
+            ->toBase()
             ->map(fn($b) => [...$b->toArray(), 'tipo' => 'externo']);
 
         return response()->json($bienes->merge($externos)->take(20)->values());
