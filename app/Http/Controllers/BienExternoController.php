@@ -28,13 +28,13 @@ class BienExternoController extends Controller
             $buscar = $request->input('buscar');
             $query->where(function ($q) use ($buscar) {
                 $q->where('equipo', 'like', "%{$buscar}%")
-                  ->orWhere('numero_bien', 'like', "%{$buscar}%")
-                  ->orWhere('marca', 'like', "%{$buscar}%")
-                  ->orWhere('modelo', 'like', "%{$buscar}%")
-                  ->orWhere('serial', 'like', "%{$buscar}%")
-                  ->orWhereHas('departamento', function ($qDep) use ($buscar) {
-                      $qDep->where('nombre', 'like', "%{$buscar}%");
-                  });
+                    ->orWhere('numero_bien', 'like', "%{$buscar}%")
+                    ->orWhere('marca', 'like', "%{$buscar}%")
+                    ->orWhere('modelo', 'like', "%{$buscar}%")
+                    ->orWhere('serial', 'like', "%{$buscar}%")
+                    ->orWhereHas('departamento', function ($qDep) use ($buscar) {
+                        $qDep->where('nombre', 'like', "%{$buscar}%");
+                    });
             });
         }
 
@@ -80,8 +80,14 @@ class BienExternoController extends Controller
      */
     public function store(StoreBienExternoRequest $request): RedirectResponse
     {
+        $data = $request->validated();
+
+        if (isset($data['numero_bien']) && strtoupper(trim($data['numero_bien'])) === 'S/N') {
+            $data['numero_bien'] = \App\Models\BienExterno::generarNumeroSN();
+        }
+
         BienExterno::create([
-            ...$request->validated(),
+            ...$data,
             'user_id' => auth()->id(),
         ]);
 
@@ -115,7 +121,17 @@ class BienExternoController extends Controller
      */
     public function update(UpdateBienExternoRequest $request, BienExterno $bienExterno): RedirectResponse
     {
-        $bienExterno->update($request->validated());
+        $data = $request->validated();
+
+        if (isset($data['numero_bien']) && strtoupper(trim($data['numero_bien'])) === 'S/N') {
+            if (\Illuminate\Support\Str::startsWith($bienExterno->numero_bien, 'S/N-')) {
+                unset($data['numero_bien']);
+            } else {
+                $data['numero_bien'] = \App\Models\BienExterno::generarNumeroSN();
+            }
+        }
+
+        $bienExterno->update($data);
 
         return redirect()->route('bienes-externos.index')
             ->with('success', 'Bien Externo actualizado exitosamente.');

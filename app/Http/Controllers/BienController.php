@@ -32,13 +32,13 @@ class BienController extends Controller
             $buscar = $request->input('buscar');
             $query->where(function ($q) use ($buscar) {
                 $q->where('equipo', 'like', "%{$buscar}%")
-                  ->orWhere('numero_bien', 'like', "%{$buscar}%")
-                  ->orWhere('marca', 'like', "%{$buscar}%")
-                  ->orWhere('modelo', 'like', "%{$buscar}%")
-                  ->orWhere('serial', 'like', "%{$buscar}%")
-                  ->orWhereHas('area', function ($qArea) use ($buscar) {
-                      $qArea->where('nombre', 'like', "%{$buscar}%");
-                  });
+                    ->orWhere('numero_bien', 'like', "%{$buscar}%")
+                    ->orWhere('marca', 'like', "%{$buscar}%")
+                    ->orWhere('modelo', 'like', "%{$buscar}%")
+                    ->orWhere('serial', 'like', "%{$buscar}%")
+                    ->orWhereHas('area', function ($qArea) use ($buscar) {
+                        $qArea->where('nombre', 'like', "%{$buscar}%");
+                    });
             });
         }
 
@@ -73,7 +73,7 @@ class BienController extends Controller
         $estados = Estado::orderBy('nombre')->get();
         $categorias = CategoriaBien::orderBy('nombre')->get();
         $areas = Area::orderBy('nombre')->get();
-        
+
         // Asegurar que exista la categoría "PENDIENTE POR CATEGORIA"
         $categoriaPendiente = CategoriaBien::firstOrCreate(
             ['nombre' => 'PENDIENTE POR CATEGORIA'],
@@ -88,8 +88,14 @@ class BienController extends Controller
      */
     public function store(StoreBienRequest $request): RedirectResponse
     {
+        $data = $request->validated();
+
+        if (isset($data['numero_bien']) && strtoupper(trim($data['numero_bien'])) === 'S/N') {
+            $data['numero_bien'] = \App\Models\Bien::generarNumeroSN();
+        }
+
         Bien::create([
-            ...$request->validated(),
+            ...$data,
             'user_id' => auth()->id(),
         ]);
 
@@ -132,7 +138,7 @@ class BienController extends Controller
                 unset($data['numero_bien']);
             } else {
                 // Si se está cambiando de un número real a S/N, generamos un nuevo código interno único
-                $data['numero_bien'] = 'S/N-' . strtoupper(uniqid());
+                $data['numero_bien'] = \App\Models\Bien::generarNumeroSN();
             }
         }
 
@@ -159,7 +165,7 @@ class BienController extends Controller
         ]);
 
         try {
-            
+
             $file = $request->file('archivo');
             // Usamos una instancia específica para el preview que no cree registros
             // Limitamos a 300 para asegurar que el usuario pueda ver los "al menos 200" que pidió
@@ -175,7 +181,7 @@ class BienController extends Controller
                 // Filtrar filas vacías o que solo contienen el número de índice (menos de 2 campos con datos)
                 $filteredRow = array_filter($row, fn($value) => !empty(trim((string)$value)));
                 if (count($filteredRow) < 2) continue;
-                
+
                 $processedCount++;
                 if ($count < $maxPreviewRows) {
                     $previewData[] = $importInstance->processRow($row);
@@ -199,20 +205,20 @@ class BienController extends Controller
     {
         ini_set('memory_limit', '2048M');
         ini_set('max_execution_time', '1200');
-        
+
         $bienesJson = $request->input('bienes_json');
 
         \Illuminate\Support\Facades\Log::info('Iniciando importación final', [
             'json_size' => $bienesJson ? strlen((string)$bienesJson) : 0,
             'is_empty' => empty($bienesJson)
         ]);
-        
+
         if (empty($bienesJson)) {
             return redirect()->route('bienes.index')->with('error', 'No se recibieron datos para importar o no has seleccionado ningún bien.');
         }
 
         $data = json_decode($bienesJson, true);
-        
+
         if (json_last_error() !== JSON_ERROR_NONE) {
             \Illuminate\Support\Facades\Log::error('Error decodificando JSON de importación', [
                 'error' => json_last_error_msg()
@@ -227,13 +233,15 @@ class BienController extends Controller
 
         \Illuminate\Support\Facades\Log::info('Procesando ' . count($data) . ' registros');
 
+        $snGeneradosTemporales = [];
+
         DB::beginTransaction();
         try {
             foreach ($data as $bienData) {
                 // Crear Categoría si no existe o asignar "PENDIENTE POR CATEGORIA"
                 if (empty($bienData['categoria_bien_id'])) {
-                    $nombreCategoria = !empty($bienData['categoria_nombre']) 
-                        ? \Illuminate\Support\Str::upper($bienData['categoria_nombre']) 
+                    $nombreCategoria = !empty($bienData['categoria_nombre'])
+                        ? \Illuminate\Support\Str::upper($bienData['categoria_nombre'])
                         : 'PENDIENTE POR CATEGORIA';
 
                     $categoria = CategoriaBien::firstOrCreate(
@@ -254,9 +262,14 @@ class BienController extends Controller
 
                 // Manejo de duplicados para S/N
                 if (isset($bienData['numero_bien']) && strtoupper(trim($bienData['numero_bien'])) === 'S/N') {
-                    // Generar un identificador único para permitir múltiples ingresos "Sin Número"
-                    // ya que la base de datos tiene una restricción UNIQUE en este campo.
-                    $bienData['numero_bien'] = 'S/N-' . strtoupper(uniqid());
+                    $nuevoSn = \App\Models\Bien::generarNumeroSN();
+                    // Evitar choques en la misma importación masiva
+                    while (in_array($nuevoSn, $snGeneradosTemporales)) {
+                        $partes = explode('-', $nuevoSn);
+                        $nuevoSn = 'S/N-' . str_pad((string)((int)$partes[1] + 1), 3, '0', STR_PAD_LEFT);
+                    }
+                    $snGeneradosTemporales[] = $nuevoSn;
+                    $bienData['numero_bien'] = $nuevoSn;
                 }
 
                 // Limpiar campos temporales

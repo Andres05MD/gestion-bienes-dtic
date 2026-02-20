@@ -98,7 +98,7 @@ Registra los bienes que han sido desincorporados (dados de baja).
 | `serial` | String | Sí | Número de serie. |
 | `procedencia_id` | BigInt (FK) | No | Departamento de procedencia → `departamentos`. |
 | `fecha` | Date | No | Fecha de la desincorporación. |
-| `numero_informe` | String | No | Número de informe (formato: "00-00-00"). |
+| `numero_informe` | String | Sí | Número de informe (formato: "00-00-00"). |
 | `estatus` | String (Enum) | No | Estado del acta (Actas Listas / Acta Firmada falta Copia / Pendiente). |
 | `observaciones` | Text | Sí | Notas adicionales. |
 | `bien_id` | BigInt (FK) | Sí | Bien DTIC importado → `bienes`. |
@@ -196,7 +196,7 @@ Registra las distribuciones de bienes realizadas por la Dirección.
 
 ## Diagrama de Relaciones
 
-```
+```text
 users ─────────────┬─── bienes (user_id)
                    ├─── bienes_externos (user_id)
                    ├─── transferencias_internas (user_id)

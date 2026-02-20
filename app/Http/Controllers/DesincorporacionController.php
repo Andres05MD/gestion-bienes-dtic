@@ -15,9 +15,12 @@ use App\Models\Desincorporacion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Services\BienMovimientoService;
 
 class DesincorporacionController extends Controller
 {
+    public function __construct(private BienMovimientoService $movimientoService) {}
+
     /**
      * Muestra el listado de desincorporaciones con búsqueda y filtros.
      */
@@ -82,13 +85,15 @@ class DesincorporacionController extends Controller
      */
     public function store(StoreDesincorporacionRequest $request): RedirectResponse
     {
-        $desincorporacion = Desincorporacion::create([
-            ...$request->validated(),
-            'user_id' => auth()->id(),
-        ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
+            $desincorporacion = Desincorporacion::create([
+                ...$request->validated(),
+                'user_id' => auth()->id(),
+            ]);
 
-        // Marcar el bien como desincorporado
-        $this->marcarBienDesincorporado($desincorporacion);
+            // Marcar el bien como desincorporado usando el servicio
+            $this->movimientoService->marcarBienDesincorporado($desincorporacion);
+        });
 
         return redirect()->route('desincorporaciones.index')
             ->with('success', 'Desincorporación creada exitosamente.');
@@ -138,21 +143,11 @@ class DesincorporacionController extends Controller
      */
     public function destroy(Desincorporacion $desincorporacione): RedirectResponse
     {
-        $desincorporacione->forceDelete();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($desincorporacione) {
+            $desincorporacione->forceDelete();
+        });
 
         return redirect()->route('desincorporaciones.index')
             ->with('success', 'Desincorporación eliminada exitosamente.');
-    }
-
-    /**
-     * Elimina el bien vinculado de la base de datos (Bienes/Bienes Externos).
-     */
-    private function marcarBienDesincorporado(Desincorporacion $desincorporacion): void
-    {
-        if ($desincorporacion->bien_id) {
-            Bien::where('id', $desincorporacion->bien_id)->delete();
-        } elseif ($desincorporacion->bien_externo_id) {
-            BienExterno::where('id', $desincorporacion->bien_externo_id)->delete();
-        }
     }
 }

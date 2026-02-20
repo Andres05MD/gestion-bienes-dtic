@@ -559,9 +559,19 @@
                 'En Reparación': '#3b82f6',
                 'Desincorporado': '#71717a'
             };
-            const estadoLabels = {!! json_encode($estadoLabels) !!};
+            const estadoLabels = {
+                {
+                    \
+                    Illuminate\ Support\ Js::from($estadoLabels)
+                }
+            };
 
-            const estadoData = {!! json_encode($estadoCounts) !!};
+            const estadoData = {
+                {
+                    \
+                    Illuminate\ Support\ Js::from($estadoCounts)
+                }
+            };
 
             const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
             const totalBienes = estadoData.reduce((a, b) => a + b, 0);
@@ -626,11 +636,21 @@
             new Chart(ctxCategoria, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($categoriaLabels) !!},
+                    labels: {
+                        {
+                            \
+                            Illuminate\ Support\ Js::from($categoriaLabels)
+                        }
+                    },
 
                     datasets: [{
                         label: 'Bienes por Categoría',
-                        data: {!! json_encode($categoriaCounts) !!},
+                        data: {
+                            {
+                                \
+                                Illuminate\ Support\ Js::from($categoriaCounts)
+                            }
+                        },
 
                         backgroundColor: catGradient,
                         borderRadius: 12,
@@ -693,19 +713,38 @@
 
             // 3. Chart Trámites
             const ctxTramite = document.getElementById('tramiteChart').getContext('2d');
-            const totalTramites = {{ $totalTramitesCount }};
+            const totalTramites = {
+                {
+                    $totalTramitesCount
+                }
+            };
 
 
             new Chart(ctxTramite, {
                 type: 'bar',
                 data: {
-                    labels: {!! json_encode($tramiteLabels) !!},
+                    labels: {
+                        {
+                            \
+                            Illuminate\ Support\ Js::from($tramiteLabels)
+                        }
+                    },
 
                     datasets: [{
                         label: 'Trámites por estatus',
-                        data: {!! json_encode($tramiteCounts) !!},
+                        data: {
+                            {
+                                \
+                                Illuminate\ Support\ Js::from($tramiteCounts)
+                            }
+                        },
 
-                        backgroundColor: {!! json_encode($tramiteColors) !!},
+                        backgroundColor: {
+                            {
+                                \
+                                Illuminate\ Support\ Js::from($tramiteColors)
+                            }
+                        },
 
                         borderRadius: 50,
                         barThickness: 14,

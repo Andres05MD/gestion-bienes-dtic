@@ -15,15 +15,31 @@ class Bien extends Model
 {
     use HasFactory, LogsActivity, HasUpperCaseAttributes;
 
-    /**
-     * Devuelve 'S/N' si el número de bien comienza con 'S/N-', de lo contrario devuelve el número original.
-     */
     public function getNumeroVisibleAttribute(): string
     {
-        if (\Illuminate\Support\Str::startsWith($this->numero_bien, 'S/N-')) {
-            return 'S/N';
-        }
         return (string) $this->numero_bien;
+    }
+
+    /**
+     * Genera el siguiente número S/N secuencial disponible (ej: S/N-001)
+     */
+    public static function generarNumeroSN(): string
+    {
+        $bienesSN = self::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
+
+        $maxNumero = 0;
+        foreach ($bienesSN as $numero) {
+            $partes = explode('-', $numero);
+            if (isset($partes[1]) && is_numeric($partes[1])) {
+                $num = (int)$partes[1];
+                if ($num > $maxNumero) {
+                    $maxNumero = $num;
+                }
+            }
+        }
+
+        $nuevoNumero = $maxNumero + 1;
+        return 'S/N-' . str_pad((string)$nuevoNumero, 3, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -34,8 +50,8 @@ class Bien extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(function(string $eventName) {
-                $eventTranslated = match($eventName) {
+            ->setDescriptionForEvent(function (string $eventName) {
+                $eventTranslated = match ($eventName) {
                     'created' => 'creado',
                     'updated' => 'actualizado',
                     'deleted' => 'eliminado',

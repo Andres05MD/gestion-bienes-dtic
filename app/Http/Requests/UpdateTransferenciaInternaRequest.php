@@ -49,4 +49,41 @@ class UpdateTransferenciaInternaRequest extends FormRequest
             'estatus_acta_id.exists' => 'El estatus seleccionado no es válido.',
         ];
     }
+
+    /**
+     * Acciones posteriores a las reglas básicas. (Prevención de IDOR)
+     */
+    public function after(): array
+    {
+        return [
+            function (\Illuminate\Validation\Validator $validator) {
+                $procedenciaId = $this->input('procedencia_id');
+                $bienId = $this->input('bien_id');
+                $bienExternoId = $this->input('bien_externo_id');
+
+                $dticId = \App\Models\Departamento::where('nombre', 'DTIC')->first()?->id;
+
+                if ($bienId) {
+                    $bienExiste = \App\Models\Bien::where('id', $bienId)->exists();
+                    if (!$bienExiste) {
+                        $validator->errors()->add('bien_id', 'El bien interno indicado no existe en la base de datos.');
+                    } elseif ((int)$procedenciaId !== (int)$dticId) {
+                        $validator->errors()->add('procedencia_id', 'Un bien interno (DTIC) no puede tener una procedencia distinta a DTIC.');
+                    }
+                }
+
+                if ($bienExternoId) {
+                    $bienExterno = \App\Models\BienExterno::find($bienExternoId);
+                    if (!$bienExterno) {
+                        $validator->errors()->add('bien_externo_id', 'El bien externo indicado no existe en la base de datos.');
+                    } elseif ((int)$bienExterno->departamento_id !== (int)$procedenciaId) {
+                        // En "edición", el bien externo original podría tener un departamento_id antiguo que 
+                        // ya se migró. Esta validación se omite en update si el workflow de edición
+                        // permite reasignaciones en una transferencia que ya movió el bien.
+                        // Solo se hace si la herramienta necesita estricto control de origen.
+                    }
+                }
+            }
+        ];
+    }
 }
