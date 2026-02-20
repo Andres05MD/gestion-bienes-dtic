@@ -46,6 +46,7 @@ class TransferenciaInterna extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'codigo_acta',
         'numero_bien',
         'descripcion',
         'serial',

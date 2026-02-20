@@ -28,23 +28,23 @@ class TransferenciaInternaLocationTest extends TestCase
         $estatus = EstatusActa::factory()->create();
 
         $response = $this->post(route('transferencias-internas.store'), [
-            'numero_bien' => '123',
-            'descripcion' => 'Test Bien',
+            'bienes' => [
+                [
+                    'id' => $bien->id,
+                    'tipo' => 'dtic',
+                    'numero_bien' => '123',
+                    'descripcion' => 'Test Bien',
+                    'serial' => null,
+                ]
+            ],
             'fecha' => now()->toDateString(),
             'estatus_acta_id' => $estatus->id,
-            'bien_id' => $bien->id,
             'procedencia_id' => null, // DTIC origen
             'destino_id' => $departamentoDestino->id,
         ]);
 
         $response->assertRedirect(route('transferencias-internas.index'));
-
-        // Verify Area was created
-        $newArea = Area::where('nombre', 'Departamento Destino')->first();
-        $this->assertNotNull($newArea);
-        
-        // Verify Bien area updated
-        $this->assertEquals($newArea->id, $bien->refresh()->area_id);
+        $this->assertEquals($departamentoDestino->nombre, $bien->refresh()->area->nombre ?? null);
     }
 
     public function test_transfer_internal_asset_to_dtic_updates_area()
@@ -52,7 +52,7 @@ class TransferenciaInternaLocationTest extends TestCase
         $user = User::factory()->create();
         $this->actingAs($user);
 
-        $areaOrigen = Area::factory()->create(['nombre' => 'Area Origen']); // Simulating external as area just for test setup
+        $areaOrigen = Area::factory()->create(['nombre' => 'Area Origen']); 
         $bien = Bien::factory()->create(['area_id' => $areaOrigen->id]);
         
         $areaDestino = Area::factory()->create(['nombre' => 'Almacén DTIC']);
@@ -60,13 +60,19 @@ class TransferenciaInternaLocationTest extends TestCase
         $departamentoProcedencia = Departamento::factory()->create();
 
         $response = $this->post(route('transferencias-internas.store'), [
-            'numero_bien' => '123',
-            'descripcion' => 'Test Bien',
+            'bienes' => [
+                [
+                    'id' => $bien->id,
+                    'tipo' => 'dtic',
+                    'numero_bien' => '123',
+                    'descripcion' => 'Test Bien',
+                    'serial' => null,
+                ]
+            ],
             'fecha' => now()->toDateString(),
             'estatus_acta_id' => $estatus->id,
-            'bien_id' => $bien->id,
             'procedencia_id' => $departamentoProcedencia->id,
-            'destino_id' => null, // DTIC Destino
+            'destino_id' => 'DTIC', // DTIC Destino => changed from null to 'DTIC' as in original logic string processing
             'area_id' => $areaDestino->id,
         ]);
 
@@ -88,11 +94,17 @@ class TransferenciaInternaLocationTest extends TestCase
         $estatus = EstatusActa::factory()->create();
 
         $response = $this->post(route('transferencias-internas.store'), [
-            'numero_bien' => '123',
-            'descripcion' => 'Test Bien Externo',
+            'bienes' => [
+                [
+                    'id' => $bienExterno->id,
+                    'tipo' => 'externo',
+                    'numero_bien' => '123',
+                    'descripcion' => 'Test Bien Externo',
+                    'serial' => null,
+                ]
+            ],
             'fecha' => now()->toDateString(),
             'estatus_acta_id' => $estatus->id,
-            'bien_externo_id' => $bienExterno->id,
             'procedencia_id' => $departamentoOrigen->id,
             'destino_id' => $departamentoDestino->id,
         ]);

@@ -349,7 +349,7 @@
                                 </div>
                                 <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Ubicación</h3>
                             </div>
-                            <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('procedencia_id', $distribucion->procedencia_id)" />
+                            <x-select-premium name="procedencia_id" label="Destino" placeholder="Depto. de destino" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('procedencia_id', $distribucion->procedencia_id)" />
                         </div>
 
                         <div class="p-2 space-y-4">

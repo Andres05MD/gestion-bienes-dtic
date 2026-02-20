@@ -91,7 +91,7 @@
                                         </div>
                                         <div>
                                             <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Destino</p>
-                                            <p class="text-lg font-bold text-white">{{ $transferencia->destino?->nombre ?? 'N/A' }}</p>
+                                            <p class="text-lg font-bold text-white">{{ $transferencia->destino?->nombre ?? 'DTIC' }}</p>
                                         </div>
                                     </div>
                                 </div>

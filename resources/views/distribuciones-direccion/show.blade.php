@@ -70,7 +70,7 @@
 
                         <div class="lg:col-span-4 space-y-6">
                             <div class="bg-dark-850 p-8 rounded-3xl border border-white/5 shadow-xl">
-                                <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Procedencia</h3>
+                                <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Destino</h3>
                                 <div class="flex items-start gap-4">
                                     <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 shrink-0">
                                         <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>

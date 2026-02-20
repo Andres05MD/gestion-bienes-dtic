@@ -100,36 +100,79 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-dark-800">
-                                @forelse ($transferencias as $transferencia)
+                                @forelse ($transferenciasAgrupadas as $codigoActa => $grupo)
+                                    @php
+                                        // Meta-datos comunes a toda el acta
+                                        $primera = $grupo->first();
+                                        $cantidad = $grupo->count();
+                                    @endphp
                                     <tr class="hover:bg-dark-800/30 transition-all duration-300">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">{{ $transferencia->numero_bien }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ $transferencia->descripcion }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->serial ?? '—' }}</td>
-                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $transferencia->procedencia?->nombre ?? 'DTIC' }}</td>
-                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $transferencia->destino?->nombre ?? 'N/A' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->fecha->format('d/m/Y') }}</td>
+                                        <!-- N° Bien Agrupado -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
+                                            @if($cantidad > 1)
+                                                <div class="flex flex-col gap-1 mt-6">
+                                                    @foreach($grupo as $t)
+                                                        <span class="text-gray-300">{{ $t->numero_bien }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                {{ $primera->numero_bien }}
+                                            @endif
+                                        </td>
+                                        
+                                        <!-- Descripción Agrupada -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                             @if($cantidad > 1)
+                                                <div class="flex flex-col gap-1 mt-6">
+                                                    @foreach($grupo as $t)
+                                                        <span class="text-gray-300 truncate max-w-[220px]" title="{{ $t->descripcion }}">{{ $t->descripcion }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                {{ $primera->descripcion }}
+                                            @endif
+                                        </td>
+                                        
+                                        <!-- Serial Agrupado -->
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">
+                                            @if($cantidad > 1)
+                                                <div class="flex flex-col gap-1 mt-6">
+                                                    @foreach($grupo as $t)
+                                                        <span class="text-gray-400 font-mono text-xs">{{ $t->serial ?? '—' }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @else
+                                                {{ $primera->serial ?? '—' }}
+                                            @endif
+                                        </td>
+
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $primera->procedencia?->nombre ?? 'DTIC' }}</td>
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $primera->destino?->nombre ?? 'DTIC' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $primera->fecha->format('d/m/Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-3 py-1 inline-flex text-[10px] leading-4 font-black rounded-lg bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200 shadow-sm uppercase">
-                                                {{ $transferencia->estatusActa?->nombre ?? 'N/A' }}
+                                                {{ $primera->estatusActa?->nombre ?? 'N/A' }}
                                             </span>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $transferencia->fecha_firma?->format('d/m/Y') ?? '—' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $primera->fecha_firma?->format('d/m/Y') ?? '—' }}</td>
+                                        
+                                        <!-- Acciones (El enlace asume que abriremos la primera, o idealmente el grupo. En este punto el view sigue igual) -->
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold flex items-center gap-3">
                                             @can('ver transferencias')
-                                                <a href="{{ route('transferencias-internas.show', $transferencia) }}" class="text-sky-400 hover:text-sky-300 transition" title="Ver detalle">
+                                                <a href="{{ route('transferencias-internas.show', $primera) }}" class="text-sky-400 hover:text-sky-300 transition" title="Ver detalle del Acta">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                 </a>
                                             @endcan
                                             @can('editar transferencias')
-                                                <a href="{{ route('transferencias-internas.edit', $transferencia) }}" class="text-amber-400 hover:text-amber-300 transition" title="Editar">
+                                                <a href="{{ route('transferencias-internas.edit', $primera) }}" class="text-amber-400 hover:text-amber-300 transition" title="Editar Estatus del Acta">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                 </a>
                                             @endcan
                                             @can('eliminar transferencias')
                                                 <button type="button"
-                                                        @click="window.dispatchEvent(new CustomEvent('open-deletion-modal', { detail: { action: '{{ route('transferencias-internas.destroy', $transferencia) }}' } }))"
+                                                        @click="window.dispatchEvent(new CustomEvent('open-deletion-modal', { detail: { action: '{{ route('transferencias-internas.destroy', $primera) }}' } }))"
                                                         class="text-rose-500 hover:text-rose-400 transition transform active:scale-90"
-                                                        title="Eliminar">
+                                                        title="Eliminar Registro (Si un acta tiene múltiples, eliminar una por aquí borrará solo esa individual si el DestroyController no se ajusta, a reverenciar)">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                 </button>
                                             @endcan
@@ -156,7 +199,7 @@
                     </div>
 
                     <div class="mt-4">
-                        {{ $transferencias->links() }}
+                        {{ $transferenciasPaginadas->links() }}
                     </div>
                 </div>
             </div>
@@ -164,8 +207,8 @@
     </div>
 
     <x-confirm-deletion
-        title="¿Eliminar Transferencia?"
-        message="¿Estás seguro de que deseas eliminar esta transferencia interna? Esta acción es irreversible."
+        title="¿Eliminar Registro?"
+        message="¿Estás seguro de que deseas eliminar este registro de la transferencia interna?"
     />
 
 

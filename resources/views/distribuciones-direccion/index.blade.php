@@ -47,7 +47,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             <x-select-premium
                                 name="procedencia_id"
-                                placeholder="Procedencia"
+                                placeholder="Destino"
                                 icon="o-building-office-2"
                                 :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()"
                                 :value="request('procedencia_id')"
@@ -75,7 +75,7 @@
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Descripción</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Marca</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Serial</th>
-                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Procedencia</th>
+                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Destino</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Fecha</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest border-r-0">Acciones</th>
                                 </tr>
@@ -87,7 +87,7 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">{{ $distribucion->descripcion }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $distribucion->marca ?? '—' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $distribucion->serial ?? '—' }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $distribucion->procedencia?->nombre ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4 whitespace-normal text-sm text-dark-text min-w-[200px]">{{ $distribucion->procedencia?->nombre ?? 'N/A' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $distribucion->fecha->format('d/m/Y') }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold flex items-center gap-3">
                                             @can('ver distribuciones')

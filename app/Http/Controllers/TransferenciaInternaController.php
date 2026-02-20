@@ -14,6 +14,7 @@ use App\Models\TransferenciaInterna;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class TransferenciaInternaController extends Controller
 {
@@ -60,11 +61,25 @@ class TransferenciaInternaController extends Controller
             $query->whereDate('fecha', '<=', $request->fecha_hasta);
         }
 
-        $transferencias = $query->latest()->paginate(10)->withQueryString();
+        // Paginador Base
+        $transferenciasPaginadas = $query->latest('id')->paginate(15)->withQueryString();
+
+        // Agrupación visual en una Collection por codigo_acta para la UI
+        $transferenciasAgrupadas = collect($transferenciasPaginadas->items())->groupBy(function ($item) {
+            // Si el item usa el nuevo sistema agrupado (uuid), agrupa por él. Sino usa su id crudo como único.
+            return $item->codigo_acta ?? 'legacy_' . $item->id;
+        });
+
+        // Retornamos el paginador original (links) y la data agrupada separadamente
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
 
-        return view('transferencias-internas.index', compact('transferencias', 'departamentos', 'estatuses'));
+        return view('transferencias-internas.index', [
+            'transferenciasPaginadas' => $transferenciasPaginadas,
+            'transferenciasAgrupadas' => $transferenciasAgrupadas,
+            'departamentos' => $departamentos,
+            'estatuses' => $estatuses,
+        ]);
     }
 
     /**
@@ -84,16 +99,36 @@ class TransferenciaInternaController extends Controller
      */
     public function store(StoreTransferenciaInternaRequest $request): RedirectResponse
     {
-        $transferencia = TransferenciaInterna::create([
-            ...$request->validated(),
-            'user_id' => auth()->id(),
-        ]);
+        $validated = $request->validated();
 
-        // Actualizar ubicación del bien transferido
-        $this->actualizarUbicacionBien($transferencia, $request->input('area_id'));
+        $codigoActa = Str::uuid()->toString();
+
+        $commonData = [
+            'codigo_acta' => $codigoActa,
+            'procedencia_id' => $validated['procedencia_id'],
+            'destino_id' => $validated['destino_id'],
+            'fecha' => $validated['fecha'],
+            'estatus_acta_id' => $validated['estatus_acta_id'],
+            'fecha_firma' => $validated['fecha_firma'] ?? null,
+            'user_id' => auth()->id(),
+        ];
+
+        foreach ($validated['bienes'] as $bienData) {
+            $transferencia = TransferenciaInterna::create([
+                ...$commonData,
+                'numero_bien' => $bienData['numero_bien'],
+                'descripcion' => $bienData['descripcion'],
+                'serial' => $bienData['serial'] ?? null,
+                'bien_id' => $bienData['tipo'] === 'dtic' ? $bienData['id'] : null,
+                'bien_externo_id' => $bienData['tipo'] === 'externo' ? $bienData['id'] : null,
+            ]);
+
+            // Actualizar ubicación del bien transferido
+            $this->actualizarUbicacionBien($transferencia, $request->input('area_id'));
+        }
 
         return redirect()->route('transferencias-internas.index')
-            ->with('success', 'Transferencia interna creada exitosamente.');
+            ->with('success', 'Transferencias registradas exitosamente.');
     }
 
     /**
