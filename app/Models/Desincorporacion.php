@@ -23,8 +23,8 @@ class Desincorporacion extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(function(string $eventName) {
-                $eventTranslated = match($eventName) {
+            ->setDescriptionForEvent(function (string $eventName) {
+                $eventTranslated = match ($eventName) {
                     'created' => 'creada',
                     'updated' => 'actualizada',
                     'deleted' => 'eliminada',
@@ -50,6 +50,7 @@ class Desincorporacion extends Model
         'descripcion',
         'serial',
         'procedencia_id',
+        'destino_id',
         'fecha',
         'numero_informe',
         'estatus_acta_id',
@@ -85,6 +86,14 @@ class Desincorporacion extends Model
     public function procedencia(): BelongsTo
     {
         return $this->belongsTo(Departamento::class, 'procedencia_id');
+    }
+
+    /**
+     * Relación: departamento de destino.
+     */
+    public function destino(): BelongsTo
+    {
+        return $this->belongsTo(Departamento::class, 'destino_id');
     }
 
     /**

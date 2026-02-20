@@ -30,9 +30,9 @@ class DesincorporacionController extends Controller
             $buscar = $request->input('buscar');
             $query->where(function ($q) use ($buscar) {
                 $q->where('numero_bien', 'like', "%{$buscar}%")
-                  ->orWhere('descripcion', 'like', "%{$buscar}%")
-                  ->orWhere('serial', 'like', "%{$buscar}%")
-                  ->orWhere('numero_informe', 'like', "%{$buscar}%");
+                    ->orWhere('descripcion', 'like', "%{$buscar}%")
+                    ->orWhere('serial', 'like', "%{$buscar}%")
+                    ->orWhere('numero_informe', 'like', "%{$buscar}%");
             });
         }
 
@@ -69,7 +69,10 @@ class DesincorporacionController extends Controller
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
 
-        return view('desincorporaciones.create', compact('departamentos', 'estatuses'));
+        // Buscar el destino predeterminado
+        $destinoPredeterminadoId = Departamento::where('nombre', 'Administración - Bienes y Materias')->first()?->id;
+
+        return view('desincorporaciones.create', compact('departamentos', 'estatuses', 'destinoPredeterminadoId'));
     }
 
     /**

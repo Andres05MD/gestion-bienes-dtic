@@ -24,6 +24,7 @@ class UpdateDesincorporacionRequest extends FormRequest
             'descripcion' => ['required', 'string', 'max:255'],
             'serial' => ['nullable', 'string', 'max:255'],
             'procedencia_id' => ['required', 'exists:departamentos,id'],
+            'destino_id' => ['required', 'exists:departamentos,id'],
             'fecha' => ['required', 'date'],
             'numero_informe' => ['required', 'string', 'max:255', 'regex:/^\d{2}-\d{2}-\d{2}$/'],
             'estatus_acta_id' => ['required', 'exists:estatus_actas,id'],
