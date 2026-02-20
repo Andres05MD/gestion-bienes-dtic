@@ -87,7 +87,7 @@
                                 @forelse ($bienes as $bien)
                                     <tr class="hover:bg-dark-800/30 transition-all duration-300">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
-                                            <div class="font-bold">{{ $bien->numero_bien }}</div>
+                                            <div class="font-bold">{{ $bien->numero_visible }}</div>
                                             <div class="text-[10px] font-medium text-dark-text uppercase">{{ $bien->categoria?->nombre ?? 'N/A' }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white">

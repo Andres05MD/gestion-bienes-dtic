@@ -39,30 +39,42 @@ class ActualizarBienesSinDatos extends Command
         // Actualizar Bienes DTIC
         $this->info('Actualizando Bienes DTIC...');
         
-        // Número de bien
-        $bienesSinNumero = \App\Models\Bien::where(function($q) {
+        // Número de bien - Iterar para generar IDs únicos y evitar restricción UNIQUE
+        $bienesSinNumeroCount = 0;
+        \App\Models\Bien::where(function($q) {
             $q->whereNull('numero_bien')->orWhere('numero_bien', '');
-        })->update(['numero_bien' => 'S/N']);
+        })->chunkById(100, function($bienes) use (&$bienesSinNumeroCount) {
+            foreach ($bienes as $bien) {
+                $bien->update(['numero_bien' => 'S/N-' . strtoupper(uniqid())]);
+                $bienesSinNumeroCount++;
+            }
+        });
 
-        // Categoría
+        // Categoría - Esto sí puede ser masivo
         $bienesSinCategoria = \App\Models\Bien::whereNull('categoria_bien_id')
             ->update(['categoria_bien_id' => $categoriaId]);
 
-        $this->line("Bienes DTIC: {$bienesSinNumero} números actualizados, {$bienesSinCategoria} categorías actualizadas.");
+        $this->line("Bienes DTIC: {$bienesSinNumeroCount} números actualizados, {$bienesSinCategoria} categorías actualizadas.");
 
         // Actualizar Bienes Externos
         $this->info('Actualizando Bienes Externos...');
 
-        // Número de bien
-        $externosSinNumero = \App\Models\BienExterno::where(function($q) {
+        // Número de bien - Iterar para generar IDs únicos
+        $externosSinNumeroCount = 0;
+        \App\Models\BienExterno::where(function($q) {
             $q->whereNull('numero_bien')->orWhere('numero_bien', '');
-        })->update(['numero_bien' => 'S/N']);
+        })->chunkById(100, function($externos) use (&$externosSinNumeroCount) {
+            foreach ($externos as $externo) {
+                $externo->update(['numero_bien' => 'S/N-' . strtoupper(uniqid())]);
+                $externosSinNumeroCount++;
+            }
+        });
 
         // Categoría
         $externosSinCategoria = \App\Models\BienExterno::whereNull('categoria_bien_id')
             ->update(['categoria_bien_id' => $categoriaId]);
 
-        $this->line("Bienes Externos: {$externosSinNumero} números actualizados, {$externosSinCategoria} categorías actualizadas.");
+        $this->line("Bienes Externos: {$externosSinNumeroCount} números actualizados, {$externosSinCategoria} categorías actualizadas.");
 
         $this->info('Estandarización completada con éxito.');
         

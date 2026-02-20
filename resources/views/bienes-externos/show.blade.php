@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-black text-3xl text-gray-800 dark:text-white leading-tight tracking-tight drop-shadow-md">
-                {{ __('Detalle del Bien Externo') }} <span class="text-brand-lila">#{{ $bienExterno->numero_bien }}</span>
+                {{ __('Detalle del Bien Externo') }} <span class="text-brand-lila">#{{ $bienExterno->numero_visible }}</span>
             </h2>
             <div class="flex items-center gap-3">
                 @can('editar bienes externos')
@@ -114,7 +114,7 @@
                                     <div>
                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Número de Bien</p>
                                         <p class="text-5xl font-black text-transparent bg-clip-text bg-linear-to-r from-brand-lila to-white tracking-tighter drop-shadow-lg">
-                                            {{ $bienExterno->numero_bien }}
+                                            {{ $bienExterno->numero_visible }}
                                         </p>
                                     </div>
                                 </div>
