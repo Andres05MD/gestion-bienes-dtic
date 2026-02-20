@@ -35,23 +35,78 @@
             }
         },
 
-        toggleCalendar() {
-            if (!this.show) {
-                // Calcular espacio disponible
+        toggleCalendar(forceOpen = false) {
+            if (!this.show || forceOpen) {
                 const rect = this.$el.getBoundingClientRect();
                 const windowHeight = window.innerHeight;
-                const calendarHeight = 420; // Altura aproximada del calendario con p-4 y mt-2
+                const calendarHeight = 420;
                 
-                // Si el espacio abajo es menor a la altura del calendario, desplegar hacia arriba
-                this.isUp = (windowHeight - rect.bottom) < calendarHeight;
+                this.isUp = (windowHeight - rect.bottom) < calendarHeight && rect.top > (windowHeight - rect.bottom);
             }
-            this.show = !this.show;
+            if(!forceOpen) {
+                this.show = !this.show;
+            }
         },
 
         formatDateForDisplay() {
-            if (!this.selectedDate) return;
-            let date = new Date(this.selectedDate + 'T00:00:00');
-            this.displayText = date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+            if (!this.selectedDate) {
+                this.displayText = '';
+                return;
+            }
+            let dateParts = this.selectedDate.split('-');
+            if(dateParts.length === 3) {
+                this.displayText = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            }
+        },
+
+        handleInput(e) {
+            let val = e.target.value;
+            if (e.inputType === 'insertText' || e.inputType === 'insertFromPaste') {
+                if (/^\d{2}$/.test(val)) val += '/';
+                if (/^\d{2}\/\d{2}$/.test(val)) val += '/';
+            }
+            this.displayText = val;
+            
+            let day, month, year;
+            if (val.length === 8 && !val.includes('/') && !val.includes('-')) {
+                day = parseInt(val.substring(0, 2));
+                month = parseInt(val.substring(2, 4));
+                year = parseInt(val.substring(4, 8));
+            } else {
+                let parts = val.split(/[\/\-]/);
+                if (parts.length === 3 && parts[2].length === 4) {
+                    day = parseInt(parts[0]);
+                    month = parseInt(parts[1]);
+                    year = parseInt(parts[2]);
+                }
+            }
+            
+            if (day && month && year) {
+                let d = new Date(year, month - 1, day);
+                if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+                    this.selectedDate = year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                    this.month = month - 1;
+                    this.year = year;
+                    this.getNoOfDays();
+                } else {
+                    this.selectedDate = '';
+                }
+            } else {
+                this.selectedDate = '';
+            }
+        },
+
+        onBlur() {
+            setTimeout(() => { 
+                if(!this.$el.contains(document.activeElement)) {
+                    if(this.selectedDate) {
+                        this.formatDateForDisplay();
+                    } else {
+                        this.displayText = '';
+                    }
+                    this.show = false;
+                }
+            }, 100);
         },
 
         isToday(date) {
@@ -126,16 +181,25 @@
 
         <input type="hidden" name="{{ $name }}" x-model="selectedDate" @if($required) required @endif>
         
-        <div 
-            @click="toggleCalendar()"
-            class="block w-full cursor-pointer {{ $icon ? 'pl-11' : 'pl-4' }} pr-4 py-4 h-14 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 rounded-2xl text-gray-900 dark:text-white transition-all duration-300 shadow-sm dark:shadow-none relative flex items-center"
-            :class="show ? 'ring-2 ring-brand-purple/20 bg-gray-50 dark:bg-[#222]' : 'hover:bg-gray-50 dark:hover:bg-[#222]'"
-        >
-            <span x-text="displayText || '{{ $placeholder }}'" :class="!displayText && 'text-gray-400 dark:text-gray-500'" class="text-sm font-medium"></span>
+        <div class="w-full relative flex items-center">
+            <input 
+                x-ref="dateInput"
+                type="text"
+                x-model="displayText"
+                @input="handleInput($event)"
+                @focus="show = true; toggleCalendar(true)"
+                @blur="onBlur()"
+                @keydown.escape="show = false; $refs.dateInput.blur()"
+                @keydown.enter.prevent="show = false; onBlur()"
+                class="w-full h-14 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 rounded-2xl text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-purple/20 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-300 shadow-sm dark:shadow-none {{ $icon ? 'pl-11' : 'pl-4' }} pr-12"
+                :class="show ? 'ring-2 ring-brand-purple/20 bg-gray-50 dark:bg-[#222]' : 'hover:bg-gray-50 dark:hover:bg-[#222]'"
+                placeholder="{{ $placeholder }}"
+                autocomplete="off"
+            >
             
-            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-transform duration-300" :class="show && 'rotate-180 text-brand-purple'">
+            <button type="button" @click="show = !show; if(show) { toggleCalendar(true); $refs.dateInput.focus(); }" tabindex="-1" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition-transform duration-300 hover:text-brand-purple focus:outline-none cursor-pointer" :class="show && 'rotate-180 text-brand-purple'">
                 <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
-            </div>
+            </button>
         </div>
 
         <!-- Calendario Popover -->

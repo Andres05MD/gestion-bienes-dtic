@@ -149,7 +149,7 @@
                                             @input="buscarGlobal()"
                                             @focus="openGlobal = true"
                                             class="w-full pl-5 pr-20 py-4 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 placeholder-gray-400 dark:placeholder-gray-600 transition-all duration-300 shadow-sm dark:shadow-none hover:bg-gray-50 dark:hover:bg-[#222]"
-                                            placeholder="Escriba N° de bien o nombre del equipo para buscar en DTIC y Externos..."
+                                            placeholder="Escriba N° de bien, equipo, serial, marca o modelo para buscar..."
                                         >
                                         <button 
                                             x-show="globalSearch" 
@@ -188,7 +188,8 @@
                                                                 x-text="b.tipo === 'dtic' ? 'DTIC' : 'Externo'"
                                                             ></span>
                                                         </div>
-                                                        <span class="text-[11px] text-gray-500 uppercase font-medium line-clamp-1" x-text="b.equipo"></span>
+                                                        <span class="text-[11px] text-gray-500 uppercase font-medium line-clamp-1" x-text="`${b.equipo}${b.marca ? ' - ' + b.marca : ''}${b.modelo ? ' - ' + b.modelo : ''}`"></span>
+                                                        <span class="text-[9px] text-gray-400 font-bold uppercase mt-0.5 block" x-show="b.serial" x-text="'SN: ' + b.serial"></span>
                                                     </div>
                                                     <x-mary-icon name="o-arrow-right" class="w-4 h-4 text-gray-300 dark:text-gray-700 group-hover:text-brand-purple group-hover:translate-x-1 transition-all" />
                                                 </button>
@@ -292,7 +293,8 @@
                                                             <div x-show="bienId == b.id" class="absolute left-0 w-1 h-6 bg-brand-purple rounded-r-full"></div>
                                                             <div class="flex flex-col items-start ml-2">
                                                                 <span class="font-bold tracking-wider" :class="{'text-brand-purple': bienId == b.id}" x-text="b.numero_bien"></span>
-                                                                <span class="text-[10px] text-gray-500 uppercase font-medium" x-text="b.equipo"></span>
+                                                                <span class="text-[10px] text-gray-500 uppercase font-medium" x-text="`${b.equipo}${b.marca ? ' - ' + b.marca : ''}${b.modelo ? ' - ' + b.modelo : ''}`"></span>
+                                                                <span class="text-[9px] text-gray-400 font-bold uppercase mt-0.5 block" x-show="b.serial" x-text="'SN: ' + b.serial"></span>
                                                             </div>
                                                             <x-mary-icon x-show="bienId == b.id" name="o-check" class="ml-auto w-4 h-4 text-brand-purple" />
                                                         </button>
@@ -349,7 +351,7 @@
                     </div>
 
                     <div class="space-y-8">
-                        <div class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative z-20">
+                        <div class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative z-10">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                                     <x-mary-icon name="o-building-office-2" class="w-6 h-6 text-brand-lila" />
@@ -359,7 +361,7 @@
                             <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('procedencia_id', $desincorporacion->procedencia_id)" />
                         </div>
 
-                        <div class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative z-10">
+                        <div class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative z-20">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                                     <x-mary-icon name="o-shield-check" class="w-6 h-6 text-brand-lila" />

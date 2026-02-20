@@ -148,7 +148,7 @@
                                             @input="buscarGlobal()"
                                             @focus="openGlobal = true"
                                             class="w-full pl-5 pr-20 py-4 bg-white dark:bg-[#1a1a1a] border border-gray-200 dark:border-white/5 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-purple/20 placeholder-gray-400 dark:placeholder-gray-600 transition-all duration-300 shadow-sm dark:shadow-none hover:bg-gray-50 dark:hover:bg-[#222]"
-                                            placeholder="Escriba N° de bien o nombre del equipo para buscar en DTIC y Externos..."
+                                            placeholder="Escriba N° de bien, equipo, serial, marca o modelo para buscar..."
                                         >
                                         <button 
                                             x-show="globalSearch" 
@@ -187,7 +187,8 @@
                                                                 x-text="b.tipo === 'dtic' ? 'DTIC' : 'Externo'"
                                                             ></span>
                                                         </div>
-                                                        <span class="text-[11px] text-gray-500 uppercase font-medium line-clamp-1" x-text="b.equipo"></span>
+                                                        <span class="text-[11px] text-gray-500 uppercase font-medium line-clamp-1" x-text="`${b.equipo}${b.marca ? ' - ' + b.marca : ''}${b.modelo ? ' - ' + b.modelo : ''}`"></span>
+                                                        <span class="text-[9px] text-gray-400 font-bold uppercase mt-0.5 block" x-show="b.serial" x-text="'SN: ' + b.serial"></span>
                                                     </div>
                                                     <x-mary-icon name="o-arrow-right" class="w-4 h-4 text-gray-300 dark:text-gray-700 group-hover:text-brand-purple group-hover:translate-x-1 transition-all" />
                                                 </button>
@@ -291,7 +292,8 @@
                                                             <div x-show="bienId == b.id" class="absolute left-0 w-1 h-6 bg-brand-purple rounded-r-full"></div>
                                                             <div class="flex flex-col items-start ml-2">
                                                                 <span class="font-bold tracking-wider" :class="{'text-brand-purple': bienId == b.id}" x-text="b.numero_bien"></span>
-                                                                <span class="text-[10px] text-gray-500 uppercase font-medium" x-text="b.equipo"></span>
+                                                                <span class="text-[10px] text-gray-500 uppercase font-medium" x-text="`${b.equipo}${b.marca ? ' - ' + b.marca : ''}${b.modelo ? ' - ' + b.modelo : ''}`"></span>
+                                                                <span class="text-[9px] text-gray-400 font-bold uppercase mt-0.5 block" x-show="b.serial" x-text="'SN: ' + b.serial"></span>
                                                             </div>
                                                             <x-mary-icon x-show="bienId == b.id" name="o-check" class="ml-auto w-4 h-4 text-brand-purple" />
                                                         </button>
