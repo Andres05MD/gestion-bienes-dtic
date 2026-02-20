@@ -24,11 +24,14 @@ class StoreDistribucionDireccionRequest extends FormRequest
             'marca' => ['nullable', 'string', 'max:255'],
             'serial' => ['nullable', 'string', 'max:255'],
             'procedencia_id' => ['required', 'exists:departamentos,id'],
+            'area_id' => ['nullable', 'exists:areas,id'],
             'fecha' => ['required', 'date'],
             'bien_id' => ['nullable', 'exists:bienes,id'],
             'bien_externo_id' => ['nullable', 'exists:bienes_externos,id'],
         ];
     }
+
+
 
     public function messages(): array
     {

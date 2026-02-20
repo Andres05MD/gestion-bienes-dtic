@@ -125,12 +125,21 @@
                                     if (this.tipoBien === 'dtic') {
                                         document.getElementById('bien_id').value = bien.id;
                                         document.getElementById('bien_externo_id').value = '';
-                                        this.$dispatch('set-selected-procedencia-id', 'DTIC');
+                                        this.$dispatch('set-selected-procedencia-id', {{ $dticId }});
+                                        if (bien.area_id) {
+                                            setTimeout(() => this.$dispatch('set-selected-area-procedencia-id', bien.area_id), 100);
+                                        }
                                     } else {
                                         document.getElementById('bien_externo_id').value = bien.id;
                                         document.getElementById('bien_id').value = '';
                                         if (bien.departamento_id) {
                                             this.$dispatch('set-selected-procedencia-id', bien.departamento_id);
+                                            if (bien.area_id) {
+                                                setTimeout(() => this.$dispatch('set-selected-area-procedencia-id', bien.area_id), 100);
+                                            }
+                                        } else if (bien.area_id) {
+                                            this.$dispatch('set-selected-procedencia-id', {{ $dticId }});
+                                            setTimeout(() => this.$dispatch('set-selected-area-procedencia-id', bien.area_id), 100);
                                         }
                                     }
                                 },
@@ -349,9 +358,31 @@
                             </div>
 
                             <div class="space-y-6" x-data="{
-                                destino: @js(old('destino_id', $transferencia->destino_id ?? 'DTIC'))
-                            }">
-                                <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="array_merge([['value' => 'DTIC', 'label' => 'DTIC']], $departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray())" :value="old('procedencia_id', $transferencia->procedencia_id ?? 'DTIC')" />
+                                procedenciaSeleccionada: @js(old('procedencia_id', $transferencia->procedencia_id ?? $dticId)),
+                                destino: @js(old('destino_id', $transferencia->destino_id ?? $dticId))
+                            }" @set-selected-procedencia-id.window="procedenciaSeleccionada = $event.detail">
+                                <div class="space-y-6">
+                                    <x-select-premium
+                                        name="procedencia_id"
+                                        label="Procedencia"
+                                        placeholder="Depto. de origen"
+                                        required
+                                        icon="o-building-office-2"
+                                        :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()"
+                                        :value="old('procedencia_id', $transferencia->procedencia_id ?? $dticId)"
+                                        @option-selected="procedenciaSeleccionada = $event.detail" />
+
+                                    <div x-show="procedenciaSeleccionada == {{ $dticId }}" x-transition>
+                                        <x-select-premium
+                                            name="area_procedencia_id"
+                                            label="Ubicación en DTIC (Área Origen)"
+                                            placeholder="Seleccione Área de origen"
+                                            icon="o-map-pin"
+                                            :options="$areas->map(fn($a) => ['value' => $a->id, 'label' => $a->nombre])->toArray()"
+                                            :value="old('area_procedencia_id', $transferencia->bien?->area_id)"
+                                            :required="false" />
+                                    </div>
+                                </div>
 
                                 <div class="space-y-6">
                                     <x-select-premium
@@ -360,11 +391,11 @@
                                         placeholder="Depto. de destino"
                                         required
                                         icon="o-building-office-2"
-                                        :options="array_merge([['value' => 'DTIC', 'label' => 'DTIC']], $departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray())"
-                                        :value="old('destino_id', $transferencia->destino_id ?? 'DTIC')"
+                                        :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()"
+                                        :value="old('destino_id', $transferencia->destino_id ?? $dticId)"
                                         @option-selected="destino = $event.detail" />
 
-                                    <div x-show="destino === 'DTIC'" x-transition>
+                                    <div x-show="destino == {{ $dticId }}" x-transition>
                                         <x-select-premium
                                             name="area_id"
                                             label="Ubicación en DTIC (Área)"

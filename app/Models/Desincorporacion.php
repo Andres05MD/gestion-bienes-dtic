@@ -57,6 +57,8 @@ class Desincorporacion extends Model
         'observaciones',
         'bien_id',
         'bien_externo_id',
+        'area_id',
+        'area_procedencia_id',
         'user_id',
     ];
 
@@ -110,6 +112,22 @@ class Desincorporacion extends Model
     public function bienExterno(): BelongsTo
     {
         return $this->belongsTo(BienExterno::class);
+    }
+
+    /**
+     * Relación: área de destino en DTIC.
+     */
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class, 'area_id');
+    }
+
+    /**
+     * Relación: área de procedencia en DTIC.
+     */
+    public function areaProcedencia(): BelongsTo
+    {
+        return $this->belongsTo(Area::class, 'area_procedencia_id');
     }
 
     /**

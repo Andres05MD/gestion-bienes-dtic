@@ -24,11 +24,11 @@ class StoreTransferenciaInternaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'procedencia_id' => ['nullable', 'exists:departamentos,id'],
-            'destino_id'     => ['nullable', 'exists:departamentos,id'],
-            'area_id'        => ['nullable', 'exists:areas,id', 'required_without:destino_id'],
+            'procedencia_id' => ['required', 'exists:departamentos,id'],
+            'destino_id'     => ['required', 'exists:departamentos,id'],
+            'area_id'        => ['nullable', 'exists:areas,id'],
             'fecha'          => ['required', 'date'],
-            'estatus_acta_id'=> ['required', 'exists:estatus_actas,id'],
+            'estatus_acta_id' => ['required', 'exists:estatus_actas,id'],
             'fecha_firma'    => ['nullable', 'date'],
 
             // Validación para múltiples bienes
@@ -41,13 +41,7 @@ class StoreTransferenciaInternaRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'procedencia_id' => $this->procedencia_id === 'DTIC' ? null : $this->procedencia_id,
-            'destino_id'     => $this->destino_id === 'DTIC' ? null : $this->destino_id,
-        ]);
-    }
+
 
     /**
      * Mensajes de error personalizados en español.

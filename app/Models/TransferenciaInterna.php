@@ -23,8 +23,8 @@ class TransferenciaInterna extends Model
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->setDescriptionForEvent(function(string $eventName) {
-                $eventTranslated = match($eventName) {
+            ->setDescriptionForEvent(function (string $eventName) {
+                $eventTranslated = match ($eventName) {
                     'created' => 'creada',
                     'updated' => 'actualizada',
                     'deleted' => 'eliminada',
@@ -57,6 +57,8 @@ class TransferenciaInterna extends Model
         'fecha_firma',
         'bien_id',
         'bien_externo_id',
+        'area_id',
+        'area_procedencia_id',
         'user_id',
     ];
 
@@ -111,6 +113,22 @@ class TransferenciaInterna extends Model
     public function bienExterno(): BelongsTo
     {
         return $this->belongsTo(BienExterno::class);
+    }
+
+    /**
+     * Relación: área de destino en DTIC.
+     */
+    public function area(): BelongsTo
+    {
+        return $this->belongsTo(Area::class, 'area_id');
+    }
+
+    /**
+     * Relación: área de procedencia en DTIC.
+     */
+    public function areaProcedencia(): BelongsTo
+    {
+        return $this->belongsTo(Area::class, 'area_procedencia_id');
     }
 
     /**

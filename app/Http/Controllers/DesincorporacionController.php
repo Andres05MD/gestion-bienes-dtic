@@ -68,11 +68,13 @@ class DesincorporacionController extends Controller
     {
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
 
         // Buscar el destino predeterminado
         $destinoPredeterminadoId = Departamento::where('nombre', 'Administración - Bienes y Materias')->first()?->id;
+        $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
-        return view('desincorporaciones.create', compact('departamentos', 'estatuses', 'destinoPredeterminadoId'));
+        return view('desincorporaciones.create', compact('departamentos', 'estatuses', 'destinoPredeterminadoId', 'areas', 'dticId'));
     }
 
     /**
@@ -108,11 +110,15 @@ class DesincorporacionController extends Controller
     {
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
+        $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
         return view('desincorporaciones.edit', [
             'desincorporacion' => $desincorporacione,
             'departamentos' => $departamentos,
             'estatuses' => $estatuses,
+            'areas' => $areas,
+            'dticId' => $dticId,
         ]);
     }
 
@@ -139,19 +145,14 @@ class DesincorporacionController extends Controller
     }
 
     /**
-     * Marca el bien vinculado con el estado "Desincorporado".
+     * Elimina el bien vinculado de la base de datos (Bienes/Bienes Externos).
      */
     private function marcarBienDesincorporado(Desincorporacion $desincorporacion): void
     {
-        $estadoDesincorporado = Estado::where('nombre', 'Desincorporado')->first();
-        if (!$estadoDesincorporado) return;
-
         if ($desincorporacion->bien_id) {
-            Bien::where('id', $desincorporacion->bien_id)
-                ->update(['estado_id' => $estadoDesincorporado->id]);
+            Bien::where('id', $desincorporacion->bien_id)->delete();
         } elseif ($desincorporacion->bien_externo_id) {
-            BienExterno::where('id', $desincorporacion->bien_externo_id)
-                ->update(['estado_id' => $estadoDesincorporado->id]);
+            BienExterno::where('id', $desincorporacion->bien_externo_id)->delete();
         }
     }
 }

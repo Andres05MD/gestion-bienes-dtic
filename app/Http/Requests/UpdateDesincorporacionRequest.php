@@ -25,14 +25,18 @@ class UpdateDesincorporacionRequest extends FormRequest
             'serial' => ['nullable', 'string', 'max:255'],
             'procedencia_id' => ['required', 'exists:departamentos,id'],
             'destino_id' => ['required', 'exists:departamentos,id'],
+            'area_id' => ['nullable', 'exists:areas,id'],
+            'area_procedencia_id' => ['nullable', 'exists:areas,id'],
             'fecha' => ['required', 'date'],
-            'numero_informe' => ['required', 'string', 'max:255', 'regex:/^\d{2}-\d{2}-\d{2}$/'],
+            'numero_informe' => ['nullable', 'string', 'max:255', 'regex:/^\d{2}-\d{2}-\d{2}$/'],
             'estatus_acta_id' => ['required', 'exists:estatus_actas,id'],
             'observaciones' => ['nullable', 'string'],
             'bien_id' => ['nullable', 'exists:bienes,id'],
             'bien_externo_id' => ['nullable', 'exists:bienes_externos,id'],
         ];
     }
+
+
 
     public function messages(): array
     {

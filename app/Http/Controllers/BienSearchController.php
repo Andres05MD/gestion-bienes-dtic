@@ -41,7 +41,7 @@ class BienSearchController extends Controller
                 }
             })
             ->limit(15)
-            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo'])
+            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'area_id'])
             ->toBase()
             ->map(fn($b) => [...$b->toArray(), 'tipo' => 'dtic']);
 
@@ -58,7 +58,7 @@ class BienSearchController extends Controller
                 }
             })
             ->limit(15)
-            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'departamento_id'])
+            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'departamento_id', 'area_id'])
             ->toBase()
             ->map(fn($b) => [...$b->toArray(), 'tipo' => 'externo']);
 

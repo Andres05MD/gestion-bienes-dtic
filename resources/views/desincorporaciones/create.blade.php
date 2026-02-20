@@ -118,9 +118,22 @@
                                     if (this.tipoBien === 'dtic') {
                                         document.getElementById('bien_id').value = bien.id;
                                         document.getElementById('bien_externo_id').value = '';
+                                        this.$dispatch('set-selected-procedencia-id', {{ $dticId }});
+                                        if (bien.area_id) {
+                                            setTimeout(() => this.$dispatch('set-selected-area-procedencia-id', bien.area_id), 100);
+                                        }
                                     } else {
                                         document.getElementById('bien_externo_id').value = bien.id;
                                         document.getElementById('bien_id').value = '';
+                                        if (bien.departamento_id) {
+                                            this.$dispatch('set-selected-procedencia-id', bien.departamento_id);
+                                            if (bien.area_id) {
+                                                setTimeout(() => this.$dispatch('set-selected-area-procedencia-id', bien.area_id), 100);
+                                            }
+                                        } else if (bien.area_id) {
+                                            this.$dispatch('set-selected-procedencia-id', {{ $dticId }});
+                                            setTimeout(() => this.$dispatch('set-selected-area-procedencia-id', bien.area_id), 100);
+                                        }
                                     }
                                 },
 
@@ -341,7 +354,7 @@
                     </div>
 
                     <div class="space-y-8">
-                        <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-40'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
+                        <div x-data="{ activeCard: false, procedenciaSeleccionada: '{{ old('procedencia_id') }}', destinoSeleccionado: '{{ old('destino_id', $destinoPredeterminadoId) }}' }" @set-selected-procedencia-id.window="procedenciaSeleccionada = $event.detail" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-40'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                                     <x-mary-icon name="o-building-office-2" class="w-6 h-6 text-brand-lila" />
@@ -349,8 +362,33 @@
                                 <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Ubicación</h3>
                             </div>
                             <div class="space-y-6">
-                                <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('procedencia_id')" />
-                                <x-select-premium name="destino_id" label="Destino" placeholder="Depto. de destino" required icon="o-map-pin" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('destino_id', $destinoPredeterminadoId)" />
+                                <div class="space-y-6">
+                                    <x-select-premium name="procedencia_id" label="Procedencia" placeholder="Depto. de origen" required icon="o-building-office-2" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('procedencia_id')" @option-selected="procedenciaSeleccionada = $event.detail" />
+                                    <div x-show="procedenciaSeleccionada == {{ $dticId }}" x-transition>
+                                        <x-select-premium
+                                            name="area_procedencia_id"
+                                            label="Ubicación en DTIC (Área Origen)"
+                                            placeholder="Seleccione Área de origen"
+                                            icon="o-map-pin"
+                                            :options="$areas->map(fn($a) => ['value' => $a->id, 'label' => $a->nombre])->toArray()"
+                                            :value="old('area_procedencia_id')"
+                                            :required="false" />
+                                    </div>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <x-select-premium name="destino_id" label="Destino" placeholder="Depto. de destino" required icon="o-map-pin" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('destino_id', $destinoPredeterminadoId)" @option-selected="destinoSeleccionado = $event.detail" />
+                                    <div x-show="destinoSeleccionado == {{ $dticId }}" x-transition>
+                                        <x-select-premium
+                                            name="area_id"
+                                            label="Ubicación en DTIC (Área Destino)"
+                                            placeholder="Seleccione Área de destino"
+                                            icon="o-map-pin"
+                                            :options="$areas->map(fn($a) => ['value' => $a->id, 'label' => $a->nombre])->toArray()"
+                                            :value="old('area_id')"
+                                            :required="false" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -362,7 +400,7 @@
                                 <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Estado</h3>
                             </div>
                             <div class="space-y-6">
-                                <x-input-premium name="numero_informe" label="N° Informe" placeholder="00-00-00" required icon="o-document-text" />
+                                <x-input-premium name="numero_informe" label="N° Informe" placeholder="00-00-00" icon="o-document-text" />
                                 <x-select-premium name="estatus_acta_id" label="Estatus" placeholder="Seleccione estatus" required icon="o-clock" :options="$estatuses->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()" :value="old('estatus_acta_id')" />
                             </div>
                         </div>

@@ -28,9 +28,9 @@ class DistribucionDireccionController extends Controller
             $buscar = $request->input('buscar');
             $query->where(function ($q) use ($buscar) {
                 $q->where('numero_bien', 'like', "%{$buscar}%")
-                  ->orWhere('descripcion', 'like', "%{$buscar}%")
-                  ->orWhere('serial', 'like', "%{$buscar}%")
-                  ->orWhere('marca', 'like', "%{$buscar}%");
+                    ->orWhere('descripcion', 'like', "%{$buscar}%")
+                    ->orWhere('serial', 'like', "%{$buscar}%")
+                    ->orWhere('marca', 'like', "%{$buscar}%");
             });
         }
 
@@ -59,8 +59,10 @@ class DistribucionDireccionController extends Controller
     public function create(): View
     {
         $departamentos = Departamento::orderBy('nombre')->get();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
+        $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
-        return view('distribuciones-direccion.create', compact('departamentos'));
+        return view('distribuciones-direccion.create', compact('departamentos', 'areas', 'dticId'));
     }
 
     /**
@@ -95,10 +97,14 @@ class DistribucionDireccionController extends Controller
     public function edit(DistribucionDireccion $distribuciones_direccion): View
     {
         $departamentos = Departamento::orderBy('nombre')->get();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
+        $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
         return view('distribuciones-direccion.edit', [
             'distribucion' => $distribuciones_direccion,
             'departamentos' => $departamentos,
+            'areas' => $areas,
+            'dticId' => $dticId,
         ]);
     }
 
