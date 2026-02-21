@@ -522,7 +522,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
+        // Datos inyectados desde PHP para los gráficos
+        window.__dashboardData = @json([
+            'estadoLabels' => $estadoLabels,
+            'estadoCounts' => $estadoCounts,
+            'categoriaLabels' => $categoriaLabels,
+            'categoriaCounts' => $categoriaCounts,
+            'tramiteLabels' => $tramiteLabels,
+            'tramiteCounts' => $tramiteCounts,
+            'tramiteColors' => $tramiteColors,
+            'totalBienes' => $totalBienes ? : 0,
+            'totalTramites' => $totalTramitesCount ? : 0,
+        ]);
+
         document.addEventListener('DOMContentLoaded', function() {
+            const data = window.__dashboardData;
             Chart.register(ChartDataLabels);
 
             Chart.defaults.color = 'rgb(156 163 175)';
@@ -537,10 +551,10 @@
                 'Desincorporado': '#71717a'
             };
 
-            const estadoLabels = @json($estadoLabels);
-            const estadoData = @json($estadoCounts);
+            const estadoLabels = data.estadoLabels;
+            const estadoData = data.estadoCounts;
             const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
-            const totalBienes = @json($totalBienes ? : 0);
+            const totalBienes = data.totalBienes;
 
             // 1. Chart Estado (Donut)
             const ctxEstado = document.getElementById('estadoChart').getContext('2d');
@@ -608,10 +622,10 @@
             new Chart(ctxCategoria, {
                 type: 'bar',
                 data: {
-                    labels: @json($categoriaLabels),
+                    labels: data.categoriaLabels,
                     datasets: [{
                         label: 'Bienes',
-                        data: @json($categoriaCounts),
+                        data: data.categoriaCounts,
                         backgroundColor: catGradient,
                         hoverBackgroundColor: '#a855f7',
                         borderRadius: 14,
@@ -682,16 +696,16 @@
 
             // 3. Chart Trámites (Horizontal Bar)
             const ctxTramite = document.getElementById('tramiteChart').getContext('2d');
-            const totalTramites = @json($totalTramitesCount ? : 0);
+            const totalTramites = data.totalTramites;
 
             new Chart(ctxTramite, {
                 type: 'bar',
                 data: {
-                    labels: @json($tramiteLabels),
+                    labels: data.tramiteLabels,
                     datasets: [{
                         label: 'Trámites',
-                        data: @json($tramiteCounts),
-                        backgroundColor: @json($tramiteColors),
+                        data: data.tramiteCounts,
+                        backgroundColor: data.tramiteColors,
                         borderRadius: 50,
                         barThickness: 16,
                         hoverOffset: 4
