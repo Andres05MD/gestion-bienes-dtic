@@ -23,11 +23,13 @@ class StoreDistribucionDireccionRequest extends FormRequest
             'descripcion' => ['required', 'string', 'max:255'],
             'marca' => ['nullable', 'string', 'max:255'],
             'serial' => ['nullable', 'string', 'max:255'],
+            'modelo' => ['nullable', 'string', 'max:255'],
+            'color' => ['nullable', 'string', 'max:255'],
+            'categoria_bien_id' => ['required', 'exists:categoria_bienes,id'],
+            'estado_id' => ['required', 'exists:estados,id'],
             'procedencia_id' => ['required', 'exists:departamentos,id'],
             'area_id' => ['nullable', 'exists:areas,id'],
             'fecha' => ['required', 'date'],
-            'bien_id' => ['nullable', 'exists:bienes,id'],
-            'bien_externo_id' => ['nullable', 'exists:bienes_externos,id'],
         ];
     }
 

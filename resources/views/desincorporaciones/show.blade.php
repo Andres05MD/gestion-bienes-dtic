@@ -2,14 +2,21 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-black text-3xl text-gray-800 dark:text-white leading-tight tracking-tight drop-shadow-md">
-                {{ __('Detalle de Desincorporación') }} <span class="text-brand-lila">#{{ $desincorporacion->numero_bien }}</span>
+                {{ __('Detalle de Desincorporación') }}
+                @if($bienesGrupo->count() > 1)
+                <span class="text-brand-lila">Grupo ({{ $bienesGrupo->count() }} ítems)</span>
+                @else
+                <span class="text-brand-lila">#{{ $desincorporacion->numero_bien }}</span>
+                @endif
             </h2>
             <div class="flex items-center gap-3">
                 @can('editar desincorporaciones')
-                    <a href="{{ route('desincorporaciones.edit', $desincorporacion) }}" class="inline-flex items-center px-5 py-2.5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-150 shadow-lg shadow-brand-purple/20">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        {{ __('Editar') }}
-                    </a>
+                <a href="{{ route('desincorporaciones.edit', $desincorporacion) }}" class="inline-flex items-center px-5 py-2.5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-150 shadow-lg shadow-brand-purple/20">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    {{ __('Editar') }}
+                </a>
                 @endcan
                 <a href="{{ route('desincorporaciones.index') }}" class="text-sm font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest text-[10px]">
                     {{ __('← Volver') }}
@@ -35,7 +42,7 @@
                                             <div class="w-10 h-10 rounded-xl bg-brand-purple/20 flex items-center justify-center text-brand-lila shadow-lg shadow-brand-purple/10">
                                                 <x-mary-icon name="o-trash" class="w-5 h-5" />
                                             </div>
-                                            Datos del Bien
+                                            Datos de la Desincorporación
                                         </h3>
                                         <span class="px-4 py-1.5 inline-flex text-[10px] bg-dark-800 border border-white/5 rounded-full uppercase font-bold tracking-widest text-white">
                                             {{ $desincorporacion->estatusActa?->nombre ?? 'N/A' }}
@@ -44,34 +51,34 @@
 
                                     <div class="space-y-10">
                                         <div>
-                                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Descripción</p>
-                                            <p class="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">{{ $desincorporacion->descripcion }}</p>
+                                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Bienes involucrados</p>
+                                            @foreach($bienesGrupo as $bg)
+                                            <div class="mb-4 pb-4 border-b border-white/5 last:border-0">
+                                                <p class="text-xl lg:text-2xl font-black text-white leading-tight tracking-tight">{{ $bg->descripcion }}</p>
+                                                <div class="flex gap-4 mt-3">
+                                                    <code class="text-sm font-mono text-brand-lila bg-brand-lila/5 px-2 py-1 rounded-lg border border-brand-lila/10 inline-block">{{ $bg->numero_bien }}</code>
+                                                    <span class="text-sm font-bold text-gray-200">SN: {{ $bg->serial ?: 'S/N' }}</span>
+                                                </div>
+                                            </div>
+                                            @endforeach
                                         </div>
 
                                         <div class="grid grid-cols-2 gap-8 pt-8 border-t border-white/5">
-                                            <div class="space-y-2">
-                                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">N° Bien</p>
-                                                <code class="text-sm font-mono text-brand-lila bg-brand-lila/5 px-3 py-1 rounded-lg border border-brand-lila/10 inline-block">{{ $desincorporacion->numero_bien }}</code>
-                                            </div>
-                                            <div class="space-y-2">
-                                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Serial</p>
-                                                <p class="text-base font-bold text-gray-200">{{ $desincorporacion->serial ?? '—' }}</p>
-                                            </div>
                                             <div class="space-y-2">
                                                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Fecha</p>
                                                 <p class="text-base font-bold text-gray-200">{{ $desincorporacion->fecha->format('d/m/Y') }}</p>
                                             </div>
                                             <div class="space-y-2">
                                                 <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">N° Informe</p>
-                                                <code class="text-sm font-mono text-amber-400 bg-amber-400/5 px-3 py-1 rounded-lg border border-amber-400/10 inline-block">{{ $desincorporacion->numero_informe }}</code>
+                                                <code class="text-sm font-mono text-amber-400 bg-amber-400/5 px-3 py-1 rounded-lg border border-amber-400/10 inline-block">{{ $desincorporacion->numero_informe ?? 'N/A' }}</code>
                                             </div>
                                         </div>
 
                                         @if($desincorporacion->observaciones)
-                                            <div class="pt-8 border-t border-white/5">
-                                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Observaciones</p>
-                                                <p class="text-sm text-gray-300 leading-relaxed">{{ $desincorporacion->observaciones }}</p>
-                                            </div>
+                                        <div class="pt-8 border-t border-white/5">
+                                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Observaciones</p>
+                                            <p class="text-sm text-gray-300 leading-relaxed">{{ $desincorporacion->observaciones }}</p>
+                                        </div>
                                         @endif
                                     </div>
                                 </div>
@@ -83,7 +90,9 @@
                                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Procedencia</h3>
                                 <div class="flex items-start gap-4">
                                     <div class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center border border-rose-500/20 shrink-0">
-                                        <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                                        <svg class="w-5 h-5 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
                                     </div>
                                     <div>
                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-1">Departamento</p>

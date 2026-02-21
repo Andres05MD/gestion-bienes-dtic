@@ -11,6 +11,9 @@ use App\Traits\HasUpperCaseAttributes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
+/**
+ * @property int $id
+ */
 class BienExterno extends Model
 {
     use HasFactory, LogsActivity, HasUpperCaseAttributes;

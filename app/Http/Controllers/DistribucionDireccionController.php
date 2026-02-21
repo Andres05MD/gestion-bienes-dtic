@@ -65,21 +65,37 @@ class DistribucionDireccionController extends Controller
         return view('distribuciones-direccion.create', compact('departamentos', 'areas', 'dticId'));
     }
 
-    /**
-     * Almacena una nueva distribución de dirección.
-     */
     public function store(StoreDistribucionDireccionRequest $request): RedirectResponse
     {
-        $distribucion = DistribucionDireccion::create([
-            ...$request->validated(),
+        $validated = $request->validated();
+
+        $bienExterno = BienExterno::create([
+            'numero_bien' => $validated['numero_bien'],
+            'equipo' => $validated['descripcion'],
+            'marca' => $validated['marca'] ?? null,
+            'serial' => $validated['serial'] ?? null,
+            'modelo' => $validated['modelo'] ?? null,
+            'color' => $validated['color'] ?? null,
+            'categoria_bien_id' => $validated['categoria_bien_id'],
+            'estado_id' => $validated['estado_id'],
+            'departamento_id' => $validated['procedencia_id'],
             'user_id' => auth()->id(),
         ]);
 
-        // Actualizar ubicación del bien distribuido
-        $this->actualizarUbicacionBien($distribucion);
+        $distribucion = DistribucionDireccion::create([
+            'fecha' => $validated['fecha'],
+            'numero_bien' => $validated['numero_bien'],
+            'descripcion' => $validated['descripcion'],
+            'marca' => $validated['marca'] ?? null,
+            'serial' => $validated['serial'] ?? null,
+            'procedencia_id' => $validated['procedencia_id'],
+            'area_id' => $validated['area_id'] ?? null,
+            'bien_externo_id' => $bienExterno->id,
+            'user_id' => auth()->id(),
+        ]);
 
         return redirect()->route('distribuciones-direccion.index')
-            ->with('success', 'Distribución de dirección creada exitosamente.');
+            ->with('success', 'Distribución de dirección creada exitosamente. El bien ha sido registrado.');
     }
 
     /**

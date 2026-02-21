@@ -8,6 +8,7 @@ use App\Models\Bien;
 use App\Models\BienExterno;
 use App\Models\Departamento;
 use App\Models\Desincorporacion;
+use App\Models\Mantenimiento;
 use App\Models\TransferenciaInterna;
 
 class BienMovimientoService
@@ -15,7 +16,7 @@ class BienMovimientoService
     /**
      * Actualiza la ubicación y la tabla del bien (DTIC <-> Externo) basado en una transferencia.
      */
-    public function actualizarUbicacionBien(TransferenciaInterna $transferencia, ?string $areaId = null): void
+    public function actualizarUbicacionBien(TransferenciaInterna|Mantenimiento $transferencia, int|string|null $areaId = null): void
     {
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 

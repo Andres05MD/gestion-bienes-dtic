@@ -23,7 +23,7 @@
                 o.label.toLowerCase().includes(this.search.toLowerCase())
             );
         },
-        get selectedLabel() {
+        selectedLabel() {
             const option = this.allOptions.find(o => o.value == this.selected);
             return option ? option.label : '{{ $placeholder }}';
         },
@@ -57,15 +57,15 @@
             </div>
             @endif
 
-            <span class="flex-1 min-w-0 block truncate font-medium text-sm" :class="{'text-gray-400 dark:text-gray-500': !selected, 'text-gray-900 dark:text-white': selected}" x-text="selectedLabel"></span>
+            <span class="flex-1 min-w-0 block truncate font-medium text-sm" :class="{'text-gray-400 dark:text-gray-500': !selected, 'text-gray-900 dark:text-white': selected}" x-text="selectedLabel()"></span>
 
             <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none transition-transform duration-300" :class="{'rotate-180': open}">
                 <x-mary-icon name="o-chevron-down" class="w-4 h-4 text-gray-400" />
             </span>
         </button>
 
-        <!-- Input oculto para el formulario -->
-        <input type="hidden" name="{{ $name }}" :value="selected" @if($required) required @endif>
+        <!-- Input oculto para validación nativa del formulario -->
+        <input type="text" name="{{ $name }}" :value="selected" class="absolute w-0 h-0 opacity-0 pointer-events-none" tabindex="-1" @if($required) required @endif>
 
         <!-- Dropdown Panel -->
         <div

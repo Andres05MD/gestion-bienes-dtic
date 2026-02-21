@@ -29,6 +29,7 @@ class BienSearchController extends Controller
         $terminos = array_filter($terminos, fn($t) => trim($t) !== '');
 
         $bienes = Bien::query()
+            ->with(['categoria', 'estado', 'area'])
             ->where(function ($query) use ($terminos) {
                 foreach ($terminos as $termino) {
                     $query->where(function ($qTerm) use ($termino) {
@@ -41,11 +42,18 @@ class BienSearchController extends Controller
                 }
             })
             ->limit(15)
-            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'area_id'])
-            ->toBase()
-            ->map(fn($b) => [...$b->toArray(), 'tipo' => 'dtic']);
+            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'color', 'categoria_bien_id', 'estado_id', 'area_id'])
+            ->map(function ($b) {
+                $data = $b->toArray();
+                $data['tipo'] = 'dtic';
+                $data['categoria'] = $b->categoria ? $b->categoria->nombre : 'Sin Categoría';
+                $data['estado_nombre'] = $b->estado ? $b->estado->nombre : 'Sin Estado';
+                $data['area_nombre'] = $b->area ? $b->area->nombre : 'Sin Área';
+                return $data;
+            });
 
         $externos = BienExterno::query()
+            ->with(['categoria', 'estado', 'departamento'])
             ->where(function ($query) use ($terminos) {
                 foreach ($terminos as $termino) {
                     $query->where(function ($qTerm) use ($termino) {
@@ -58,9 +66,15 @@ class BienSearchController extends Controller
                 }
             })
             ->limit(15)
-            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'departamento_id', 'area_id'])
-            ->toBase()
-            ->map(fn($b) => [...$b->toArray(), 'tipo' => 'externo']);
+            ->get(['id', 'numero_bien', 'equipo', 'serial', 'marca', 'modelo', 'color', 'categoria_bien_id', 'estado_id', 'departamento_id', 'area_id'])
+            ->map(function ($b) {
+                $data = $b->toArray();
+                $data['tipo'] = 'externo';
+                $data['categoria'] = $b->categoria ? $b->categoria->nombre : 'Sin Categoría';
+                $data['estado_nombre'] = $b->estado ? $b->estado->nombre : 'Sin Estado';
+                $data['departamento_nombre'] = $b->departamento ? $b->departamento->nombre : 'Sin Departamento';
+                return $data;
+            });
 
         return response()->json($bienes->merge($externos)->take(20)->values());
     }

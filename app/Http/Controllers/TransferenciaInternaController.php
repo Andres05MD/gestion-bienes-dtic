@@ -164,7 +164,14 @@ class TransferenciaInternaController extends Controller
     public function show(TransferenciaInterna $transferencias_interna): View
     {
         $transferencias_interna->load(['procedencia', 'destino', 'bien', 'bienExterno', 'user', 'estatusActa']);
-        return view('transferencias-internas.show', ['transferencia' => $transferencias_interna]);
+        $bienesGrupo = $transferencias_interna->codigo_acta
+            ? TransferenciaInterna::where('codigo_acta', $transferencias_interna->codigo_acta)->get()
+            : collect([$transferencias_interna]);
+
+        return view('transferencias-internas.show', [
+            'transferencia' => $transferencias_interna,
+            'bienesGrupo' => $bienesGrupo
+        ]);
     }
 
     /**
@@ -177,8 +184,13 @@ class TransferenciaInternaController extends Controller
         $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
+        $bienesGrupo = $transferencias_interna->codigo_acta
+            ? TransferenciaInterna::where('codigo_acta', $transferencias_interna->codigo_acta)->get()
+            : collect([$transferencias_interna]);
+
         return view('transferencias-internas.edit', [
             'transferencia' => $transferencias_interna,
+            'bienesGrupo' => $bienesGrupo,
             'departamentos' => $departamentos,
             'estatuses' => $estatuses,
             'areas' => $areas,
@@ -191,11 +203,29 @@ class TransferenciaInternaController extends Controller
      */
     public function update(UpdateTransferenciaInternaRequest $request, TransferenciaInterna $transferencias_interna): RedirectResponse
     {
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $transferencias_interna) {
-            $transferencias_interna->update($request->validated());
+        $validated = $request->validated();
 
-            // Actualizar ubicación del bien transferido usando el servicio
-            $this->movimientoService->actualizarUbicacionBien($transferencias_interna, $request->input('area_id'));
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $request, $transferencias_interna) {
+            $commonData = [
+                'procedencia_id' => $validated['procedencia_id'],
+                'destino_id' => $validated['destino_id'],
+                'fecha' => $validated['fecha'],
+                'fecha_firma' => $validated['fecha_firma'] ?? null,
+                'estatus_acta_id' => $validated['estatus_acta_id'],
+            ];
+
+            if ($transferencias_interna->codigo_acta) {
+                TransferenciaInterna::where('codigo_acta', $transferencias_interna->codigo_acta)->update($commonData);
+
+                // Actualizar ubicación en base a todas las actas de este grupo
+                $grupo = TransferenciaInterna::where('codigo_acta', $transferencias_interna->codigo_acta)->get();
+                foreach ($grupo as $t) {
+                    $this->movimientoService->actualizarUbicacionBien($t, $request->input('area_id'));
+                }
+            } else {
+                $transferencias_interna->update($commonData);
+                $this->movimientoService->actualizarUbicacionBien($transferencias_interna, $request->input('area_id'));
+            }
         });
 
         return redirect()->route('transferencias-internas.index')

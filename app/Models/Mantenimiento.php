@@ -11,7 +11,7 @@ use App\Traits\HasUpperCaseAttributes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Desincorporacion extends Model
+class Mantenimiento extends Model
 {
     use HasFactory, LogsActivity, HasUpperCaseAttributes;
 
@@ -30,15 +30,15 @@ class Desincorporacion extends Model
                     'deleted' => 'eliminada',
                     default   => $eventName,
                 };
-                return "Desincorporación N° {$this->numero_bien} fue {$eventTranslated}";
+                return "Mantenimiento N° {$this->numero_bien} fue {$eventTranslated}";
             })
-            ->useLogName('desincorporaciones');
+            ->useLogName('mantenimientos');
     }
 
     /**
      * La tabla asociada al modelo.
      */
-    protected $table = 'desincorporaciones';
+    protected $table = 'mantenimientos';
 
     /**
      * Los atributos que son asignables.
@@ -46,20 +46,21 @@ class Desincorporacion extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'codigo_acta',
         'numero_bien',
         'descripcion',
         'serial',
         'procedencia_id',
         'destino_id',
-        'fecha',
-        'numero_informe',
-        'estatus_acta_id',
-        'observaciones',
-        'bien_id',
-        'bien_externo_id',
         'area_id',
         'area_procedencia_id',
+        'fecha',
+        'estatus_acta_id',
+        'fecha_firma',
+        'n_orden_acta',
+        'fecha_acta',
+        'tipo_movimiento',
+        'bien_id',
+        'bien_externo_id',
         'user_id',
     ];
 
@@ -72,6 +73,8 @@ class Desincorporacion extends Model
     {
         return [
             'fecha' => 'date',
+            'fecha_firma' => 'date',
+            'fecha_acta' => 'date',
         ];
     }
 
@@ -132,7 +135,7 @@ class Desincorporacion extends Model
     }
 
     /**
-     * Relación: usuario que registró la desincorporación.
+     * Relación: usuario que registró el mantenimiento.
      */
     public function user(): BelongsTo
     {

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+<body>
+<div x-data="{ parentMethod() { this.$dispatch('custom-event', 'hello details'); } }">
+    <button id="btn" @click="parentMethod()">Click Dispatch</button>
+    <div x-data="{ msg: 'waiting' }" @custom-event.window="msg = $event.detail">
+        <span id="output" x-text="msg"></span>
+    </div>
+</div>
+<script>
+setTimeout(() => {
+    document.getElementById('btn').click();
+    setTimeout(() => {
+        console.log("Result: " + document.getElementById('output').innerText);
+    }, 500);
+}, 500);
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ use App\Http\Controllers\CategoriaBienController;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\EstatusActaController;
 use App\Http\Controllers\TransferenciaInternaController;
+use App\Http\Controllers\MantenimientoController;
 use App\Http\Controllers\DesincorporacionController;
 use App\Http\Controllers\DistribucionDireccionController;
 use App\Http\Controllers\BienSearchController;
@@ -50,6 +51,14 @@ Route::middleware('auth')->group(function () {
         ->parameters(['transferencias-internas' => 'transferencias_interna'])
         ->middleware('can:ver transferencias');
 
+    // Mantenimientos
+    Route::get('mantenimientos/{mantenimiento}/devolver', [MantenimientoController::class, 'devolver'])
+        ->name('mantenimientos.devolver')
+        ->middleware('can:crear transferencias');
+    Route::resource('mantenimientos', MantenimientoController::class)
+        ->parameters(['mantenimientos' => 'mantenimiento'])
+        ->middleware('can:ver transferencias');
+
     // Desincorporaciones
     Route::resource('desincorporaciones', DesincorporacionController::class)
         ->parameters(['desincorporaciones' => 'desincorporacione'])
@@ -82,4 +91,4 @@ Route::middleware('auth')->group(function () {
     Route::resource('estatus-actas', EstatusActaController::class)->middleware('can:ver estatus actas');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

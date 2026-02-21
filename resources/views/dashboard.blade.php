@@ -247,7 +247,6 @@
                     </a>
 
                     @php
-                    // Mapa de colores hardcodeados para evitar problemas de purge en Tailwind
                     $estadoStyles = [
                     'Bueno' => [
                     'icon' => 'o-check-circle',
@@ -294,15 +293,12 @@
                     ];
                     @endphp
 
-                    <!-- Cards de Estado Dinámicas (desde $porEstado del controller) -->
                     @foreach($porEstado as $estadoData)
                     @php
                     $estadoNombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
                     $estadoCount = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
                     $style = $estadoStyles[$estadoNombre] ?? $defaultStyle;
                     $porcentaje = $totalBienes > 0 ? round(($estadoCount / $totalBienes) * 100, 1) : 0;
-                    @endphp
-                    @php
                     $estadoId = \App\Models\Estado::where('nombre', $estadoNombre)->first()?->id;
                     @endphp
                     <a href="{{ route('bienes.index', ['estado_id' => $estadoId]) }}" class="bg-white dark:bg-dark-850 p-5 rounded-3xl border {{ $style['border'] }} shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
@@ -348,7 +344,6 @@
                                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total</span>
                             </div>
                         </div>
-                        <!-- Leyenda del donut -->
                         <div class="mt-4 grid grid-cols-2 gap-2">
                             @foreach($porEstado as $estadoData)
                             @php
@@ -368,7 +363,6 @@
                     <!-- Gestión Operativa (Vertical Stats & Quick Links) -->
                     <div class="lg:col-span-7 space-y-6">
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <!-- Card Desincorporaciones -->
                             <div class="bg-linear-to-br from-rose-500/5 to-rose-600/10 dark:from-rose-500/10 dark:to-transparent p-6 rounded-3xl border border-rose-500/20 group hover:border-rose-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-rose-500/5">
                                 <div class="p-3 bg-rose-500/20 text-rose-500 rounded-2xl w-fit mb-4">
                                     <x-mary-icon name="o-archive-box-x-mark" class="w-6 h-6" />
@@ -377,7 +371,6 @@
                                 <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest">Desincorporaciones</p>
                             </div>
 
-                            <!-- Card Transferencias -->
                             <div class="bg-linear-to-br from-blue-500/5 to-blue-600/10 dark:from-blue-500/10 dark:to-transparent p-6 rounded-3xl border border-blue-500/20 group hover:border-blue-500/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/5">
                                 <div class="p-3 bg-blue-500/20 text-blue-500 rounded-2xl w-fit mb-4">
                                     <x-mary-icon name="o-arrows-right-left" class="w-6 h-6" />
@@ -386,7 +379,6 @@
                                 <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Transferencias</p>
                             </div>
 
-                            <!-- Card Distribuciones -->
                             <div class="bg-linear-to-br from-brand-purple/5 to-brand-purple/10 dark:from-brand-purple/10 dark:to-transparent p-6 rounded-3xl border border-brand-purple/20 group hover:border-brand-purple/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-brand-purple/5">
                                 <div class="p-3 bg-brand-purple/20 text-brand-lila rounded-2xl w-fit mb-4">
                                     <x-mary-icon name="o-truck" class="w-6 h-6" />
@@ -396,7 +388,6 @@
                             </div>
                         </div>
 
-                        <!-- Analytics: Estatus de Trámites -->
                         <div class="bg-white dark:bg-dark-850 p-8 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm">
                             <div class="flex items-center justify-between mb-6">
                                 <div>
@@ -450,12 +441,6 @@
                             'deleted' => 'bg-rose-500/15 text-rose-500 border-rose-500/30',
                             default => 'bg-gray-500/15 text-gray-500 border-gray-500/30',
                             };
-                            $eventLineColor = match($activity->event) {
-                            'created' => 'bg-emerald-500/30',
-                            'updated' => 'bg-amber-500/30',
-                            'deleted' => 'bg-rose-500/30',
-                            default => 'bg-gray-500/30',
-                            };
                             $moduleColor = match($activity->log_name) {
                             'bienes' => 'bg-brand-purple/10 text-brand-lila',
                             'bienes-externos' => 'bg-amber-500/10 text-amber-400',
@@ -466,16 +451,14 @@
                             };
                             @endphp
                             <div class="flex gap-4 group">
-                                {{-- Línea vertical + ícono --}}
                                 <div class="flex flex-col items-center">
                                     <div class="w-8 h-8 rounded-xl {{ $eventColor }} border flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                                         <x-mary-icon name="{{ $eventIcon }}" class="w-4 h-4" />
                                     </div>
                                     @if(!$loop->last)
-                                    <div class="w-px flex-1 min-h-[24px] {{ $eventLineColor }}"></div>
+                                    <div class="w-px flex-1 min-h-[24px] bg-gray-200 dark:bg-white/5"></div>
                                     @endif
                                 </div>
-                                {{-- Contenido --}}
                                 <div class="pb-5 flex-1 min-w-0">
                                     <p class="text-xs font-bold text-gray-900 dark:text-white leading-snug truncate">{{ $activity->description }}</p>
                                     <div class="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -516,7 +499,6 @@
                             <canvas id="categoriaChart"></canvas>
                         </div>
                     </div>
-
                 </div>
             </section>
         </div>
@@ -524,34 +506,29 @@
 
     <!-- Chart.js and Data Orchestration -->
     @php
-    $estadoLabels = $porEstado->pluck('estado');
-    $estadoCounts = $porEstado->pluck('count');
-
-    $categoriaLabels = $porCategoria->pluck('categoria');
-    $categoriaCounts = $porCategoria->pluck('count');
-
-    $tramiteLabels = $porEstatusTramite->pluck('estatus');
+    $estadoLabels = $porEstado->pluck('estado')->values();
+    $estadoCounts = $porEstado->pluck('count')->values();
+    $categoriaLabels = $porCategoria->pluck('categoria')->values();
+    $categoriaCounts = $porCategoria->pluck('count')->values();
+    $tramiteLabels = $porEstatusTramite->pluck('estatus')->values();
     $estatusActaColors = \App\Models\EstatusActa::pluck('color', 'nombre');
     $tramiteColors = $porEstatusTramite->pluck('estatus')->map(function($nombre) use ($estatusActaColors) {
     return $estatusActaColors[$nombre] ?? '#71717a';
-    });
+    })->values();
     $totalTramitesCount = $porEstatusTramite->sum('count');
-    $tramiteCounts = $porEstatusTramite->pluck('count');
+    $tramiteCounts = $porEstatusTramite->pluck('count')->values();
     @endphp
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Registrar plugin de datalabels
             Chart.register(ChartDataLabels);
 
-            // Global Chart Defaults
-            Chart.defaults.color = '#71717a';
-            Chart.defaults.font.family = "'Outfit', sans-serif";
-            Chart.defaults.font.weight = 'bold';
+            Chart.defaults.color = 'rgb(156 163 175)';
+            Chart.defaults.font.family = "'Outfit', 'Inter', sans-serif";
+            Chart.defaults.font.weight = '600';
 
-            // Colores para el chart de estado (alineados con las cards)
             const estadoColorMap = {
                 'Bueno': '#10b981',
                 'Regular': '#f59e0b',
@@ -559,22 +536,11 @@
                 'En Reparación': '#3b82f6',
                 'Desincorporado': '#71717a'
             };
-            const estadoLabels = {
-                {
-                    \
-                    Illuminate\ Support\ Js::from($estadoLabels)
-                }
-            };
 
-            const estadoData = {
-                {
-                    \
-                    Illuminate\ Support\ Js::from($estadoCounts)
-                }
-            };
-
+            const estadoLabels = @json($estadoLabels);
+            const estadoData = @json($estadoCounts);
             const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
-            const totalBienes = estadoData.reduce((a, b) => a + b, 0);
+            const totalBienes = @json($totalBienes ? : 0);
 
             // 1. Chart Estado (Donut)
             const ctxEstado = document.getElementById('estadoChart').getContext('2d');
@@ -585,15 +551,19 @@
                     datasets: [{
                         data: estadoData,
                         backgroundColor: estadoColors,
+                        hoverBackgroundColor: estadoColors.map(c => c + 'dd'),
                         borderWidth: 0,
-                        hoverOffset: 15,
-                        borderRadius: 20,
-                        spacing: 6
+                        hoverOffset: 20,
+                        borderRadius: 15,
+                        spacing: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: 20
+                    },
                     plugins: {
                         legend: {
                             display: false
@@ -602,32 +572,34 @@
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: '#18181b',
+                            backgroundColor: 'rgba(24, 24, 27, 0.95)',
                             titleFont: {
-                                size: 13,
-                                weight: 'black'
+                                size: 14,
+                                weight: '800'
                             },
                             bodyFont: {
-                                size: 12
+                                size: 13
                             },
-                            padding: 14,
-                            cornerRadius: 12,
+                            padding: 16,
+                            cornerRadius: 16,
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
                             displayColors: true,
-                            boxPadding: 6,
+                            boxPadding: 8,
                             callbacks: {
                                 label: function(ctx) {
                                     const val = ctx.parsed;
                                     const pct = totalBienes > 0 ? ((val / totalBienes) * 100).toFixed(1) : 0;
-                                    return ` ${ctx.label}: ${val} bienes (${pct}%)`;
+                                    return ` ${ctx.label}: ${val} (${pct}%)`;
                                 }
                             }
                         }
                     },
-                    cutout: '80%'
+                    cutout: '82%'
                 }
             });
 
-            // 2. Chart Categoría
+            // 2. Chart Categoría (Bar)
             const ctxCategoria = document.getElementById('categoriaChart').getContext('2d');
             const catGradient = ctxCategoria.createLinearGradient(0, 0, 0, 400);
             catGradient.addColorStop(0, '#a855f7');
@@ -636,30 +608,25 @@
             new Chart(ctxCategoria, {
                 type: 'bar',
                 data: {
-                    labels: {
-                        {
-                            \
-                            Illuminate\ Support\ Js::from($categoriaLabels)
-                        }
-                    },
-
+                    labels: @json($categoriaLabels),
                     datasets: [{
-                        label: 'Bienes por Categoría',
-                        data: {
-                            {
-                                \
-                                Illuminate\ Support\ Js::from($categoriaCounts)
-                            }
-                        },
-
+                        label: 'Bienes',
+                        data: @json($categoriaCounts),
                         backgroundColor: catGradient,
-                        borderRadius: 12,
-                        barThickness: 28,
+                        hoverBackgroundColor: '#a855f7',
+                        borderRadius: 14,
+                        barThickness: 'flex',
+                        maxBarThickness: 35
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            top: 30
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -675,10 +642,11 @@
                                 display: false
                             },
                             ticks: {
+                                color: 'rgb(156 163 175)',
                                 font: {
-                                    size: 10
-                                },
-                                color: '#94a3b8'
+                                    size: 11,
+                                    weight: '700'
+                                }
                             }
                         }
                     },
@@ -689,17 +657,18 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'top',
-                            color: '#c084fc',
+                            color: '#a855f7',
                             font: {
-                                size: 11,
-                                weight: 'bold'
+                                size: 12,
+                                weight: '800'
                             },
+                            offset: 8,
                             formatter: (value) => value > 0 ? value : ''
                         },
                         tooltip: {
-                            backgroundColor: '#18181b',
-                            cornerRadius: 12,
-                            padding: 12,
+                            backgroundColor: 'rgba(24, 24, 27, 0.95)',
+                            padding: 16,
+                            cornerRadius: 16,
                             callbacks: {
                                 label: function(ctx) {
                                     const pct = totalBienes > 0 ? ((ctx.parsed.y / totalBienes) * 100).toFixed(1) : 0;
@@ -711,49 +680,32 @@
                 }
             });
 
-            // 3. Chart Trámites
+            // 3. Chart Trámites (Horizontal Bar)
             const ctxTramite = document.getElementById('tramiteChart').getContext('2d');
-            const totalTramites = {
-                {
-                    $totalTramitesCount
-                }
-            };
-
+            const totalTramites = @json($totalTramitesCount ? : 0);
 
             new Chart(ctxTramite, {
                 type: 'bar',
                 data: {
-                    labels: {
-                        {
-                            \
-                            Illuminate\ Support\ Js::from($tramiteLabels)
-                        }
-                    },
-
+                    labels: @json($tramiteLabels),
                     datasets: [{
-                        label: 'Trámites por estatus',
-                        data: {
-                            {
-                                \
-                                Illuminate\ Support\ Js::from($tramiteCounts)
-                            }
-                        },
-
-                        backgroundColor: {
-                            {
-                                \
-                                Illuminate\ Support\ Js::from($tramiteColors)
-                            }
-                        },
-
+                        label: 'Trámites',
+                        data: @json($tramiteCounts),
+                        backgroundColor: @json($tramiteColors),
                         borderRadius: 50,
-                        barThickness: 14,
+                        barThickness: 16,
+                        hoverOffset: 4
                     }]
                 },
                 options: {
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            right: 50
+                        }
+                    },
                     scales: {
                         x: {
                             grid: {
@@ -769,10 +721,10 @@
                             },
                             ticks: {
                                 font: {
-                                    size: 11,
-                                    weight: 'black'
+                                    size: 12,
+                                    weight: '800'
                                 },
-                                color: '#94a3b8'
+                                color: 'rgb(156 163 175)'
                             }
                         }
                     },
@@ -783,19 +735,22 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'right',
-                            color: '#e2e8f0',
+                            color: 'rgb(107 114 128)',
                             font: {
-                                size: 11
+                                size: 11,
+                                weight: '800'
                             },
+                            offset: 10,
                             formatter: (value) => {
+                                if (value === 0) return '';
                                 const pct = totalTramites > 0 ? ((value / totalTramites) * 100).toFixed(0) : 0;
                                 return `${value} (${pct}%)`;
                             }
                         },
                         tooltip: {
-                            backgroundColor: '#18181b',
-                            cornerRadius: 12,
-                            padding: 12,
+                            backgroundColor: 'rgba(24, 24, 27, 0.95)',
+                            padding: 16,
+                            cornerRadius: 16,
                             callbacks: {
                                 label: function(ctx) {
                                     const pct = totalTramites > 0 ? ((ctx.parsed.x / totalTramites) * 100).toFixed(1) : 0;

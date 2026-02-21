@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head></head>
+<body>
+<form id="myform" action="?submitted=1">
+    <input type="hidden" name="test" required value="">
+    <button type="submit">Submit</button>
+</form>
+<script>
+document.getElementById('myform').addEventListener('submit', function(e) {
+    console.log('Submitted successfully');
+});
+if(document.getElementById('myform').checkValidity()){
+    console.log('Form is valid');
+}else{
+    console.log('Form is INVALID');
+}
+</script>
+</body>
+</html>

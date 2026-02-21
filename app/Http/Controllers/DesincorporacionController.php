@@ -15,6 +15,8 @@ use App\Models\Desincorporacion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Services\BienMovimientoService;
 
 class DesincorporacionController extends Controller
@@ -57,11 +59,37 @@ class DesincorporacionController extends Controller
             $query->whereDate('fecha', '<=', $request->fecha_hasta);
         }
 
-        $desincorporaciones = $query->paginate(10)->withQueryString();
+        // Agrupación por codigo_acta para visualización
+        $agrupadores = $query->clone()
+            ->selectRaw('COALESCE(codigo_acta, CONCAT("legacy_", id)) as group_key, MAX(id) as max_id')
+            ->groupBy('group_key')
+            ->orderByDesc('max_id');
+
+        $gruposPaginados = DB::query()->select('group_key')
+            ->fromSub($agrupadores, 'agrupados')
+            ->paginate(10)
+            ->withQueryString();
+
+        $clavesPagina = collect($gruposPaginados->items())->pluck('group_key');
+
+        $desincorporacionesFinales = Desincorporacion::with(['procedencia', 'estatusActa', 'bien', 'bienExterno'])
+            ->whereIn(DB::raw('COALESCE(codigo_acta, CONCAT("legacy_", id))'), $clavesPagina)
+            ->latest('id')
+            ->get();
+
+        $desincorporacionesAgrupadas = $desincorporacionesFinales->groupBy(function ($item) {
+            return $item->codigo_acta ?? 'legacy_' . $item->id;
+        });
+
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
 
-        return view('desincorporaciones.index', compact('desincorporaciones', 'departamentos', 'estatuses'));
+        return view('desincorporaciones.index', [
+            'desincorporacionesPaginadas' => $gruposPaginados,
+            'desincorporacionesAgrupadas' => $desincorporacionesAgrupadas,
+            'departamentos' => $departamentos,
+            'estatuses' => $estatuses
+        ]);
     }
 
     /**
@@ -73,9 +101,9 @@ class DesincorporacionController extends Controller
         $estatuses = EstatusActa::all();
         $areas = \App\Models\Area::orderBy('nombre')->get();
 
-        // Buscar el destino predeterminado
-        $destinoPredeterminadoId = Departamento::where('nombre', 'Administración - Bienes y Materias')->first()?->id;
-        $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+        // Buscar el destino predeterminado (Insensible a mayúsculas/minúsculas para robustez)
+        $destinoPredeterminadoId = Departamento::where('nombre', 'LIKE', 'Administración - Bienes y Materias')->first()?->id;
+        $dticId = Departamento::where('nombre', 'LIKE', 'DTIC')->first()?->id;
 
         return view('desincorporaciones.create', compact('departamentos', 'estatuses', 'destinoPredeterminadoId', 'areas', 'dticId'));
     }
@@ -85,14 +113,44 @@ class DesincorporacionController extends Controller
      */
     public function store(StoreDesincorporacionRequest $request): RedirectResponse
     {
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request) {
-            $desincorporacion = Desincorporacion::create([
-                ...$request->validated(),
-                'user_id' => auth()->id(),
-            ]);
+        $validated = $request->validated();
 
-            // Marcar el bien como desincorporado usando el servicio
-            $this->movimientoService->marcarBienDesincorporado($desincorporacion);
+        DB::transaction(function () use ($validated, $request) {
+            $codigoActa = Str::uuid()->toString();
+
+            $numeroInforme = null;
+            if ($request->filled('numero_informe')) {
+                $informes = collect($request->input('numero_informe'))
+                    ->filter()
+                    ->unique()
+                    ->toArray();
+                $numeroInforme = !empty($informes) ? implode(', ', $informes) : null;
+            }
+
+            $commonData = [
+                'codigo_acta' => $codigoActa,
+                'procedencia_id' => $validated['procedencia_id'],
+                'destino_id' => $validated['destino_id'],
+                'fecha' => $validated['fecha'],
+                'numero_informe' => $numeroInforme,
+                'estatus_acta_id' => $validated['estatus_acta_id'],
+                'observaciones' => $validated['observaciones'] ?? null,
+                'user_id' => auth()->id(),
+            ];
+
+            foreach ($validated['bienes'] as $bienData) {
+                $desincorporacion = Desincorporacion::create([
+                    ...$commonData,
+                    'numero_bien' => $bienData['numero_bien'],
+                    'descripcion' => $bienData['descripcion'],
+                    'serial' => $bienData['serial'] ?? null,
+                    'bien_id' => $bienData['tipo'] === 'dtic' ? $bienData['id'] : null,
+                    'bien_externo_id' => $bienData['tipo'] === 'externo' ? $bienData['id'] : null,
+                ]);
+
+                // Marcar el bien como desincorporado usando el servicio
+                $this->movimientoService->marcarBienDesincorporado($desincorporacion);
+            }
         });
 
         return redirect()->route('desincorporaciones.index')
@@ -105,7 +163,14 @@ class DesincorporacionController extends Controller
     public function show(Desincorporacion $desincorporacione): View
     {
         $desincorporacione->load(['procedencia', 'bien', 'bienExterno', 'user', 'estatusActa']);
-        return view('desincorporaciones.show', ['desincorporacion' => $desincorporacione]);
+        $bienesGrupo = $desincorporacione->codigo_acta
+            ? Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->get()
+            : collect([$desincorporacione]);
+
+        return view('desincorporaciones.show', [
+            'desincorporacion' => $desincorporacione,
+            'bienesGrupo' => $bienesGrupo
+        ]);
     }
 
     /**
@@ -118,8 +183,13 @@ class DesincorporacionController extends Controller
         $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
+        $bienesGrupo = $desincorporacione->codigo_acta
+            ? Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->get()
+            : collect([$desincorporacione]);
+
         return view('desincorporaciones.edit', [
             'desincorporacion' => $desincorporacione,
+            'bienesGrupo' => $bienesGrupo,
             'departamentos' => $departamentos,
             'estatuses' => $estatuses,
             'areas' => $areas,
@@ -132,7 +202,33 @@ class DesincorporacionController extends Controller
      */
     public function update(UpdateDesincorporacionRequest $request, Desincorporacion $desincorporacione): RedirectResponse
     {
-        $desincorporacione->update($request->validated());
+        $validated = $request->validated();
+
+        DB::transaction(function () use ($validated, $desincorporacione, $request) {
+            $numeroInforme = null;
+            if ($request->filled('numero_informe')) {
+                $informes = collect($request->input('numero_informe'))
+                    ->filter()
+                    ->unique()
+                    ->toArray();
+                $numeroInforme = !empty($informes) ? implode(', ', $informes) : null;
+            }
+
+            $commonData = [
+                'procedencia_id' => $validated['procedencia_id'],
+                'destino_id' => $validated['destino_id'],
+                'fecha' => $validated['fecha'],
+                'numero_informe' => $numeroInforme,
+                'estatus_acta_id' => $validated['estatus_acta_id'],
+                'observaciones' => $validated['observaciones'] ?? null,
+            ];
+
+            if ($desincorporacione->codigo_acta) {
+                Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->update($commonData);
+            } else {
+                $desincorporacione->update($commonData);
+            }
+        });
 
         return redirect()->route('desincorporaciones.index')
             ->with('success', 'Desincorporación actualizada exitosamente.');
@@ -143,8 +239,12 @@ class DesincorporacionController extends Controller
      */
     public function destroy(Desincorporacion $desincorporacione): RedirectResponse
     {
-        \Illuminate\Support\Facades\DB::transaction(function () use ($desincorporacione) {
-            $desincorporacione->forceDelete();
+        DB::transaction(function () use ($desincorporacione) {
+            if ($desincorporacione->codigo_acta) {
+                Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->forceDelete();
+            } else {
+                $desincorporacione->forceDelete();
+            }
         });
 
         return redirect()->route('desincorporaciones.index')
