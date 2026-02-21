@@ -517,23 +517,25 @@
     })->values();
     $totalTramitesCount = $porEstatusTramite->sum('count');
     $tramiteCounts = $porEstatusTramite->pluck('count')->values();
+
+    $dashboardData = [
+    'estadoLabels' => $estadoLabels,
+    'estadoCounts' => $estadoCounts,
+    'categoriaLabels' => $categoriaLabels,
+    'categoriaCounts' => $categoriaCounts,
+    'tramiteLabels' => $tramiteLabels,
+    'tramiteCounts' => $tramiteCounts,
+    'tramiteColors' => $tramiteColors,
+    'totalBienes' => $totalBienes ?? 0,
+    'totalTramites' => $totalTramitesCount ?? 0,
+    ];
     @endphp
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
         // Datos inyectados desde PHP para los gráficos
-        window.__dashboardData = @json([
-            'estadoLabels' => $estadoLabels,
-            'estadoCounts' => $estadoCounts,
-            'categoriaLabels' => $categoriaLabels,
-            'categoriaCounts' => $categoriaCounts,
-            'tramiteLabels' => $tramiteLabels,
-            'tramiteCounts' => $tramiteCounts,
-            'tramiteColors' => $tramiteColors,
-            'totalBienes' => $totalBienes ? : 0,
-            'totalTramites' => $totalTramitesCount ? : 0,
-        ]);
+        window.__dashboardData = {{ Js::from($dashboardData) }};
 
         document.addEventListener('DOMContentLoaded', function() {
             const data = window.__dashboardData;
