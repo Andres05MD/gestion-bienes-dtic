@@ -84,9 +84,8 @@
                         <table class="min-w-full">
                             <thead>
                                 <tr class="bg-dark-800/50">
-                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">N° Bien</th>
-                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Descripción</th>
-                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Serial</th>
+                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest min-w-[200px]">N° Bien / Equipo</th>
+                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Marca / Serial</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Procedencia</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Fecha</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">N° Informe</th>
@@ -102,47 +101,54 @@
                                 $cantidad = $grupo->count();
                                 @endphp
                                 <tr class="hover:bg-dark-800/30 transition-all duration-300">
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
+                                    <!-- N° Bien / Equipo Combinados -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         @if($cantidad > 1)
-                                        <div class="flex flex-col gap-1 mt-6">
+                                        <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $d)
-                                            <span class="text-gray-300">{{ $d->numero_bien }}</span>
+                                            <div>
+                                                <span class="text-base font-bold text-white block">{{ $d->numero_bien }}</span>
+                                                <span class="text-xs text-gray-400 font-bold uppercase tracking-widest block truncate max-w-[200px]" title="{{ $d->descripcion }}">{{ $d->descripcion }}</span>
+                                            </div>
                                             @endforeach
                                         </div>
                                         @else
-                                        {{ $primera->numero_bien }}
+                                        <div>
+                                            <span class="text-base font-bold text-white block">{{ $primera->numero_bien }}</span>
+                                            <span class="text-xs text-gray-400 font-bold uppercase tracking-widest block truncate max-w-[200px]" title="{{ $primera->descripcion }}">{{ $primera->descripcion }}</span>
+                                        </div>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+                                    <!-- Marca / Serial Combinados -->
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         @if($cantidad > 1)
-                                        <div class="flex flex-col gap-1 mt-6">
+                                        <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $d)
-                                            <span class="text-gray-300 truncate max-w-[220px]" title="{{ $d->descripcion }}">{{ $d->descripcion }}</span>
+                                            <div>
+                                                <span class="text-sm font-bold text-gray-300 block uppercase tracking-widest">{{ $d->bien?->marca ?? $d->bienExterno?->marca ?? 'N/A' }}</span>
+                                                <span class="text-xs text-gray-500 font-mono block mt-0.5">{{ $d->serial ?? 'S/N' }}</span>
+                                            </div>
                                             @endforeach
                                         </div>
                                         @else
-                                        {{ $primera->descripcion }}
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">
-                                        @if($cantidad > 1)
-                                        <div class="flex flex-col gap-1 mt-6">
-                                            @foreach($grupo as $d)
-                                            <span class="text-gray-400 font-mono text-xs">{{ $d->serial ?? '—' }}</span>
-                                            @endforeach
+                                        <div>
+                                            <span class="text-sm font-bold text-gray-300 block uppercase tracking-widest">{{ $primera->bien?->marca ?? $primera->bienExterno?->marca ?? 'N/A' }}</span>
+                                            <span class="text-xs text-gray-500 font-mono block mt-0.5">{{ $primera->serial ?? 'S/N' }}</span>
                                         </div>
-                                        @else
-                                        {{ $primera->serial ?? '—' }}
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $primera->procedencia?->nombre ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text">{{ $primera->fecha->format('d/m/Y') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <code class="text-brand-lila bg-brand-lila/5 px-2 py-0.5 rounded-md font-mono text-xs border border-brand-lila/10">{{ $primera->numero_informe }}</code>
+                                    <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text">{{ $primera->procedencia?->nombre ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text font-medium">{{ $primera->fecha->format('d/m/Y') }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-base">
+                                        <code class="text-brand-lila bg-brand-lila/5 px-2.5 py-1 rounded-md font-mono text-sm border border-brand-lila/10">{{ $primera->numero_informe }}</code>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-3 py-1 inline-flex text-[10px] leading-4 font-black rounded-lg bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200 shadow-sm uppercase">
-                                            {{ $primera->estatusActa?->nombre ?? 'N/A' }}
+                                        @php
+                                        $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
+                                        @endphp
+                                        <span class="px-3 py-1.5 inline-block text-center text-xs leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
+                                            @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50" ])>
+                                            {!! str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A')) !!}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold flex items-center gap-3">

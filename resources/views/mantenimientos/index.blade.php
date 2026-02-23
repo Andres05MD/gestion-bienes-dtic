@@ -192,8 +192,8 @@
                                         </button>
                                         @endcan
 
-                                        <!-- Botón Devolver (Solo si es entrada) -->
-                                        @if($primera->tipo_movimiento === 'entrada')
+                                        <!-- Botón Devolver (Solo si es entrada y no ha sido devuelto) -->
+                                        @if($primera->tipo_movimiento === 'entrada' && !$grupo->contains('tipo_movimiento', 'salida'))
                                         <a href="{{ route('mantenimientos.devolver', $primera) }}" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition" title="Devolver Bien al Origen">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>

@@ -48,7 +48,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
                                 </button>
-                                @if(request()->anyFilled(['buscar', 'tipo_movimiento', 'departamento_id', 'fecha_desde', 'fecha_hasta', 'origen_dtic']))
+                                @if(request()->anyFilled(['buscar', 'tipo_movimiento', 'departamento_origen_id', 'area_origen_id', 'departamento_destino_id', 'area_destino_id', 'fecha_desde', 'fecha_hasta', 'origen_dtic']))
                                 <a href="{{ route('movimientos.index') }}" class="w-[52px] shrink-0 bg-rose-500/10 text-rose-400 rounded-2xl hover:bg-rose-500/20 transition-colors shadow-lg shadow-rose-500/5 flex items-center justify-center" title="Limpiar Filtros">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -59,7 +59,13 @@
                         </div>
 
                         <!-- Fila Inferior: Filtros Desplegables -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-dark-900/30 rounded-2xl border border-dark-800/60 shadow-inner">
+                        <div x-data="{ 
+                                dOrigen: '{{ request('departamento_origen_id', '') }}', 
+                                dDestino: '{{ request('departamento_destino_id', '') }}',
+                                dticId: '{{ $dticId }}'
+                             }"
+                            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-dark-900/30 rounded-2xl border border-dark-800/60 shadow-inner items-start transition-all duration-300">
+
                             <x-select-premium
                                 name="tipo_movimiento"
                                 placeholder="Tipo de Movimiento"
@@ -68,11 +74,38 @@
                                 :value="request('tipo_movimiento')" />
 
                             <x-select-premium
-                                name="departamento_id"
-                                placeholder="Departamento"
+                                name="departamento_origen_id"
+                                placeholder="Dpto. Origen"
                                 icon="o-building-office"
+                                @option-selected="dOrigen = $event.detail"
                                 :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()"
-                                :value="request('departamento_id')" />
+                                :value="request('departamento_origen_id')" />
+
+                            <template x-if="dOrigen == dticId">
+                                <x-select-premium
+                                    name="area_origen_id"
+                                    placeholder="Área Origen"
+                                    icon="o-hashtag"
+                                    :options="$areas->map(fn($a) => ['value' => $a->id, 'label' => $a->nombre])->toArray()"
+                                    :value="request('area_origen_id')" class="animate-fade-in-down" />
+                            </template>
+
+                            <x-select-premium
+                                name="departamento_destino_id"
+                                placeholder="Dpto. Destino"
+                                icon="o-building-office"
+                                @option-selected="dDestino = $event.detail"
+                                :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()"
+                                :value="request('departamento_destino_id')" />
+
+                            <template x-if="dDestino == dticId">
+                                <x-select-premium
+                                    name="area_destino_id"
+                                    placeholder="Área Destino"
+                                    icon="o-hashtag"
+                                    :options="$areas->map(fn($a) => ['value' => $a->id, 'label' => $a->nombre])->toArray()"
+                                    :value="request('area_destino_id')" class="animate-fade-in-down" />
+                            </template>
 
                             <x-date-input-premium
                                 name="fecha_desde"
@@ -90,15 +123,15 @@
 
                     <!-- Mini-Estadísticas Clickeables -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => null, 'departamento_id' => null]) }}" class="bg-dark-900 border {{ !request('tipo_movimiento') && !request('departamento_id') ? 'border-brand-purple/50 bg-brand-purple/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-brand-purple/50 transition-all duration-300 relative overflow-hidden group">
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => null, 'departamento_origen_id' => null, 'departamento_destino_id' => null, 'area_origen_id' => null, 'area_destino_id' => null]) }}" class="bg-dark-900 border {{ !request('tipo_movimiento') && !request('departamento_origen_id') && !request('departamento_destino_id') ? 'border-brand-purple/50 bg-brand-purple/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-brand-purple/50 transition-all duration-300 relative overflow-hidden group">
                             <div class="absolute inset-0 bg-brand-purple/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total Filtro</p>
                                     <h3 class="text-3xl font-black text-white mt-1">{{ number_format($estadisticas['total'] ?? 0) }}</h3>
                                 </div>
-                                <div class="p-2 {{ !request('tipo_movimiento') && !request('departamento_id') ? 'bg-brand-purple/20' : 'bg-dark-800 group-hover:bg-brand-purple/20' }} rounded-xl transition-colors">
-                                    <x-mary-icon name="o-document-chart-bar" class="w-5 h-5 {{ !request('tipo_movimiento') && !request('departamento_id') ? 'text-brand-lila' : 'text-gray-400 group-hover:text-brand-lila' }} transition-colors" />
+                                <div class="p-2 {{ !request('tipo_movimiento') && !request('departamento_origen_id') && !request('departamento_destino_id') ? 'bg-brand-purple/20' : 'bg-dark-800 group-hover:bg-brand-purple/20' }} rounded-xl transition-colors">
+                                    <x-mary-icon name="o-document-chart-bar" class="w-5 h-5 {{ !request('tipo_movimiento') && !request('departamento_origen_id') && !request('departamento_destino_id') ? 'text-brand-lila' : 'text-gray-400 group-hover:text-brand-lila' }} transition-colors" />
                                 </div>
                             </div>
                         </a>
@@ -263,7 +296,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"></path>
                                             </svg>
                                             <p class="text-gray-500 dark:text-gray-400 font-medium">
-                                                @if(request()->anyFilled(['buscar', 'tipo_movimiento', 'departamento_id', 'fecha_desde', 'fecha_hasta']))
+                                                @if(request()->anyFilled(['buscar', 'tipo_movimiento', 'departamento_origen_id', 'departamento_destino_id', 'area_origen_id', 'area_destino_id', 'fecha_desde', 'fecha_hasta']))
                                                 No se encontraron movimientos con los filtros aplicados.
                                                 @else
                                                 No hay movimientos registrados aún.

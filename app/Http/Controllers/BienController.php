@@ -45,6 +45,11 @@ class BienController extends Controller
         // Filtro por estado
         if ($request->filled('estado_id')) {
             $query->where('estado_id', $request->input('estado_id'));
+        } else {
+            // Excluir 'Desincorporado' si no se está filtrando específicamente por él
+            $query->whereHas('estado', function ($q) {
+                $q->where('nombre', '!=', 'Desincorporado');
+            });
         }
 
         // Filtro por categoría

@@ -36,12 +36,20 @@ class MovimientoBienController extends Controller
             $ultimosIds->where('tipo_movimiento', $request->input('tipo_movimiento'));
         }
 
-        if ($request->filled('departamento_id')) {
-            $depId = $request->input('departamento_id');
-            $ultimosIds->where(function ($q) use ($depId) {
-                $q->where('departamento_origen_id', $depId)
-                    ->orWhere('departamento_destino_id', $depId);
-            });
+        if ($request->filled('departamento_origen_id')) {
+            $ultimosIds->where('departamento_origen_id', $request->input('departamento_origen_id'));
+        }
+
+        if ($request->filled('area_origen_id')) {
+            $ultimosIds->where('area_origen_id', $request->input('area_origen_id'));
+        }
+
+        if ($request->filled('departamento_destino_id')) {
+            $ultimosIds->where('departamento_destino_id', $request->input('departamento_destino_id'));
+        }
+
+        if ($request->filled('area_destino_id')) {
+            $ultimosIds->where('area_destino_id', $request->input('area_destino_id'));
         }
 
         if ($request->filled('origen_dtic')) {
@@ -73,6 +81,7 @@ class MovimientoBienController extends Controller
 
         $movimientos = $query->paginate(15)->withQueryString();
         $departamentos = Departamento::orderBy('nombre')->get();
+        $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = $departamentos->where('nombre', 'DTIC')->first()?->id;
         $tiposMovimiento = MovimientoBien::etiquetasTipo();
 
@@ -88,7 +97,7 @@ class MovimientoBienController extends Controller
             'origen_dtic' => $dticId ? MovimientoBien::whereIn('id', clone $statsIds)->where('departamento_origen_id', $dticId)->count() : 0,
         ];
 
-        return view('movimientos.index', compact('movimientos', 'departamentos', 'tiposMovimiento', 'estadisticas'));
+        return view('movimientos.index', compact('movimientos', 'departamentos', 'areas', 'dticId', 'tiposMovimiento', 'estadisticas'));
     }
 
     /**

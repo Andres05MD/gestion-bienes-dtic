@@ -275,10 +275,12 @@ class BienMovimientoService
     }
 
     /**
-     * Registra el movimiento de desincorporación y elimina lógicamente el bien.
+     * Registra el movimiento de desincorporación, actualiza el estatus a "Desincorporado" y elimina lógicamente el bien.
      */
     public function marcarBienDesincorporado(Desincorporacion $desincorporacion): void
     {
+        $estadoDesincorporadoId = \App\Models\Estado::where('nombre', 'Desincorporado')->first()?->id;
+
         // Registrar movimiento antes de eliminar
         if ($desincorporacion->bien_id) {
             $bien = Bien::find($desincorporacion->bien_id);
@@ -296,7 +298,10 @@ class BienMovimientoService
                     descripcion: "Bien desincorporado: " . ($desincorporacion->observaciones ?? ''),
                     fecha: $desincorporacion->fecha?->toDateString(),
                 );
-                $bien->delete();
+
+                if ($estadoDesincorporadoId) {
+                    $bien->update(['estado_id' => $estadoDesincorporadoId]);
+                }
             }
         } elseif ($desincorporacion->bien_externo_id) {
             $bienExterno = BienExterno::find($desincorporacion->bien_externo_id);
@@ -312,7 +317,10 @@ class BienMovimientoService
                     descripcion: "Bien desincorporado: " . ($desincorporacion->observaciones ?? ''),
                     fecha: $desincorporacion->fecha?->toDateString(),
                 );
-                $bienExterno->delete();
+
+                if ($estadoDesincorporadoId) {
+                    $bienExterno->update(['estado_id' => $estadoDesincorporadoId]);
+                }
             }
         }
     }
