@@ -31,9 +31,9 @@
                 <input type="hidden" name="area_procedencia_id" value="{{ $areaMantenimiento->id }}">
                 @endif
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Columna Izquierda -->
-                    <div class="lg:col-span-2 space-y-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Columna Izquierda: Entidades Físicas -->
+                    <div class="space-y-8 relative z-20">
                         <!-- Datos del Bien a Devolver -->
                         <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-30'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative group transition-all duration-500 hover:shadow-brand-purple/5">
                             <div class="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none"></div>
@@ -61,8 +61,8 @@
                                                 {{ $mantenimiento->numero_bien }}
                                             </div>
                                         </div>
-                                        <div>
-                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Descripción</label>
+                                        <div class="md:col-span-2">
+                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Descripción <span class="text-gray-400 font-normal normal-case ml-1">(incluye marca/modelo si aplica)</span></label>
                                             <div class="w-full h-11 bg-gray-100 dark:bg-[#222] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-400 opacity-80 cursor-not-allowed truncate" title="{{ $mantenimiento->descripcion }}">
                                                 {{ $mantenimiento->descripcion }}
                                             </div>
@@ -76,19 +76,8 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-10">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <x-date-input-premium
-                                        name="fecha"
-                                        label="Fecha de Devolución"
-                                        required />
-                                </div>
-                            </div>
                         </div>
-                    </div>
 
-                    <div class="space-y-8 relative z-10">
                         <!-- Origen Fijo: DTIC -->
                         <div class="bg-linear-to-br from-brand-purple/10 to-transparent backdrop-blur-xl p-8 rounded-[2.5rem] shadow-sm border border-brand-purple/20 relative">
                             <div class="flex items-center gap-3 mb-4">
@@ -137,17 +126,25 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+                    <!-- Columna Derecha: Administrativa -->
+                    <div class="space-y-8 relative z-10">
                         <!-- Estado y Acta -->
                         <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-30'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                                     <x-mary-icon name="o-clipboard-document-check" class="w-6 h-6 text-brand-lila" />
                                 </div>
-                                <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Estado y Acta de Salida</h3>
+                                <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Detalles de Devolución</h3>
                             </div>
 
                             <div class="space-y-6">
+                                <x-date-input-premium
+                                    name="fecha"
+                                    label="Fecha de Devolución"
+                                    required />
+
                                 <div>
                                     <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">N° Orden Acta (Opcional)</label>
                                     <input type="text" name="n_orden_acta" value="{{ old('n_orden_acta') }}" class="w-full h-11 bg-white dark:bg-[#222] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-purple/20 transition-all placeholder-gray-400" placeholder="Ej: 0002" maxlength="4" pattern="\d{4}" title="Debe ser un número de 4 dígitos (Ej. 0002)">

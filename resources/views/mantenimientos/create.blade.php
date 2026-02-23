@@ -319,7 +319,7 @@
                                                     <div class="flex flex-col items-start ml-2 flex-1">
                                                         <div class="flex items-center gap-2 mb-1">
                                                             <span class="font-bold tracking-wider text-gray-900 dark:text-white" x-text="b.numero_bien"></span>
-                                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter bg-blue-500/10 text-blue-500 border border-blue-500/20">Externo</span>
+                                                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-tighter bg-blue-500/10 text-blue-500 border border-blue-500/20" x-text="b.departamento_nombre"></span>
                                                         </div>
                                                         <span class="text-[11px] text-gray-500 uppercase font-medium line-clamp-1" x-text="`${b.equipo}${b.marca ? ' - ' + b.marca : ''}${b.modelo ? ' - ' + b.modelo : ''}`"></span>
                                                         <span class="text-[9px] text-gray-400 font-bold uppercase mt-0.5 block" x-show="b.serial" x-text="'SN: ' + b.serial"></span>

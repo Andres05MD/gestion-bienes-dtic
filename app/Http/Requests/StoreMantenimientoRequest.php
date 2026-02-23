@@ -38,7 +38,7 @@ class StoreMantenimientoRequest extends FormRequest
             // Validación para múltiples bienes
             'bienes'               => ['required', 'array', 'min:1'],
             'bienes.*.id'          => ['nullable'],
-            'bienes.*.tipo'        => ['required', 'in:externo'],
+            'bienes.*.tipo'        => ['required', 'in:externo,dtic'],
             'bienes.*.numero_bien' => ['required', 'string', 'max:255'],
             'bienes.*.descripcion' => ['required', 'string', 'max:255'],
             'bienes.*.serial'      => ['nullable', 'string', 'max:255'],
