@@ -12,6 +12,7 @@ use App\Models\DistribucionDireccion;
 use App\Models\Mantenimiento;
 use App\Models\MovimientoBien;
 use App\Models\TransferenciaInterna;
+use Illuminate\Support\Facades\Log;
 
 class BienMovimientoService
 {
@@ -32,9 +33,30 @@ class BienMovimientoService
         ?string $descripcion = null,
         ?string $fecha = null,
     ): MovimientoBien {
+        $bienIdInt = (int) $bienId;
+
+        // Auto-resolver bien_id si es inválido, buscando por numero_bien
+        if ($bienIdInt <= 0) {
+            Log::info("Auto-resolviendo bien_id para numero_bien: {$numeroBien} (tipo indicado: {$bienType})");
+
+            $bien = Bien::where('numero_bien', $numeroBien)->first();
+            if ($bien) {
+                $bienType = Bien::class;
+                $bienIdInt = $bien->id;
+            } else {
+                $bienExterno = BienExterno::where('numero_bien', $numeroBien)->first();
+                if ($bienExterno) {
+                    $bienType = BienExterno::class;
+                    $bienIdInt = $bienExterno->id;
+                } else {
+                    Log::warning("No se pudo resolver bien_id para numero_bien: {$numeroBien}. No existe en ninguna tabla.");
+                }
+            }
+        }
+
         return MovimientoBien::create([
             'bien_type' => $bienType,
-            'bien_id' => (int) $bienId,
+            'bien_id' => $bienIdInt,
             'numero_bien' => $numeroBien,
             'tipo_movimiento' => $tipoMovimiento,
             'operacion_type' => $operacionType,

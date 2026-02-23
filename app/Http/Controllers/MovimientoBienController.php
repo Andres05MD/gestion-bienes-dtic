@@ -18,44 +18,50 @@ class MovimientoBienController extends Controller
      */
     public function index(Request $request): View
     {
+        // Subconsulta para obtener el ID del último movimiento por cada bien único
+        $ultimosIds = MovimientoBien::query()
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('bien_type', 'bien_id');
+
+        // Si hay filtros aplicados, primero filtrar y luego agrupar
+        if ($request->filled('buscar')) {
+            $buscar = $request->input('buscar');
+            $ultimosIds->where(function ($q) use ($buscar) {
+                $q->where('numero_bien', 'like', "%{$buscar}%")
+                    ->orWhere('descripcion', 'like', "%{$buscar}%");
+            });
+        }
+
+        if ($request->filled('tipo_movimiento')) {
+            $ultimosIds->where('tipo_movimiento', $request->input('tipo_movimiento'));
+        }
+
+        if ($request->filled('departamento_id')) {
+            $depId = $request->input('departamento_id');
+            $ultimosIds->where(function ($q) use ($depId) {
+                $q->where('departamento_origen_id', $depId)
+                    ->orWhere('departamento_destino_id', $depId);
+            });
+        }
+
+        if ($request->filled('fecha_desde')) {
+            $ultimosIds->whereDate('fecha', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $ultimosIds->whereDate('fecha', '<=', $request->fecha_hasta);
+        }
+
+        // Consulta principal: solo los últimos movimientos por bien
         $query = MovimientoBien::with([
             'departamentoOrigen',
             'departamentoDestino',
             'areaOrigen',
             'areaDestino',
             'user',
-        ])->latest();
-
-        // Búsqueda por texto
-        if ($request->filled('buscar')) {
-            $buscar = $request->input('buscar');
-            $query->where(function ($q) use ($buscar) {
-                $q->where('numero_bien', 'like', "%{$buscar}%")
-                    ->orWhere('descripcion', 'like', "%{$buscar}%");
-            });
-        }
-
-        // Filtro por tipo de movimiento
-        if ($request->filled('tipo_movimiento')) {
-            $query->where('tipo_movimiento', $request->input('tipo_movimiento'));
-        }
-
-        // Filtro por departamento
-        if ($request->filled('departamento_id')) {
-            $depId = $request->input('departamento_id');
-            $query->where(function ($q) use ($depId) {
-                $q->where('departamento_origen_id', $depId)
-                    ->orWhere('departamento_destino_id', $depId);
-            });
-        }
-
-        // Filtro por fecha (Rango)
-        if ($request->filled('fecha_desde')) {
-            $query->whereDate('fecha', '>=', $request->fecha_desde);
-        }
-        if ($request->filled('fecha_hasta')) {
-            $query->whereDate('fecha', '<=', $request->fecha_hasta);
-        }
+        ])
+            ->whereIn('id', $ultimosIds)
+            ->selectRaw('movimientos_bienes.*, (SELECT COUNT(*) FROM movimientos_bienes AS mb WHERE mb.bien_type = movimientos_bienes.bien_type AND mb.bien_id = movimientos_bienes.bien_id) as total_movimientos')
+            ->latest();
 
         $movimientos = $query->paginate(15)->withQueryString();
         $departamentos = Departamento::orderBy('nombre')->get();
