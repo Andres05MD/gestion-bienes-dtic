@@ -92,7 +92,6 @@
                             <thead>
                                 <tr class="bg-dark-800/50">
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest min-w-[160px]">N° Bien / Equipo</th>
-                                    <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest min-w-[200px]">Marca / Serial</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest min-w-[250px]">Origen / Destino</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Fecha</th>
                                     <th scope="col" class="px-6 py-5 text-left text-xs font-bold text-dark-text uppercase tracking-widest">Estatus</th>
@@ -111,7 +110,7 @@
                                     <!-- N° Bien y Equipo Combinados -->
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if($cantidad > 1)
-                                        <div class="flex flex-col gap-3 mt-6">
+                                        <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $t)
                                             <div>
                                                 <span class="text-sm font-bold text-white block">{{ $t->numero_bien }}</span>
@@ -123,25 +122,6 @@
                                         <div>
                                             <span class="text-sm font-bold text-white block">{{ $primera->numero_bien }}</span>
                                             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest block truncate max-w-[200px]" title="{{ $primera->descripcion }}">{{ $primera->descripcion }}</span>
-                                        </div>
-                                        @endif
-                                    </td>
-
-                                    <!-- Marca y Serial Combinados -->
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        @if($cantidad > 1)
-                                        <div class="flex flex-col gap-3 mt-6">
-                                            @foreach($grupo as $t)
-                                            <div>
-                                                <span class="text-sm font-bold text-white block truncate max-w-[220px]" title="{{ $t->bien_asociado?->marca ?? 'N/A' }}">{{ $t->bien_asociado?->marca ?? 'N/A' }}</span>
-                                                <span class="text-[10px] text-gray-500 font-mono tracking-widest">{{ $t->serial ?? 'S/N' }}</span>
-                                            </div>
-                                            @endforeach
-                                        </div>
-                                        @else
-                                        <div>
-                                            <span class="text-sm font-bold text-white block truncate max-w-[220px]" title="{{ $primera->bien_asociado?->marca ?? 'N/A' }}">{{ $primera->bien_asociado?->marca ?? 'N/A' }}</span>
-                                            <span class="text-[10px] text-gray-500 font-mono tracking-widest">{{ $primera->serial ?? 'S/N' }}</span>
                                         </div>
                                         @endif
                                     </td>
@@ -198,7 +178,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-12 text-center">
+                                    <td colspan="6" class="px-6 py-12 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <svg class="w-12 h-12 text-dark-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
