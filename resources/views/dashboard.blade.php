@@ -248,35 +248,35 @@
 
                     @php
                     $estadoStyles = [
-                    'Bueno' => [
+                    'BUENO' => [
                     'icon' => 'o-check-circle',
                     'bg' => 'bg-emerald-500/10',
                     'text' => 'text-emerald-500',
                     'border' => 'border-emerald-500/20',
                     'iconBg' => 'bg-emerald-500/15',
                     ],
-                    'Regular' => [
+                    'REGULAR' => [
                     'icon' => 'o-exclamation-circle',
                     'bg' => 'bg-amber-500/10',
                     'text' => 'text-amber-500',
                     'border' => 'border-amber-500/20',
                     'iconBg' => 'bg-amber-500/15',
                     ],
-                    'Malo' => [
+                    'MALO' => [
                     'icon' => 'o-x-circle',
                     'bg' => 'bg-rose-500/10',
                     'text' => 'text-rose-500',
                     'border' => 'border-rose-500/20',
                     'iconBg' => 'bg-rose-500/15',
                     ],
-                    'En Reparación' => [
+                    'EN REPARACION' => [
                     'icon' => 'o-wrench-screwdriver',
                     'bg' => 'bg-blue-500/10',
                     'text' => 'text-blue-500',
                     'border' => 'border-blue-500/20',
                     'iconBg' => 'bg-blue-500/15',
                     ],
-                    'Desincorporado' => [
+                    'DESINCORPORADO' => [
                     'icon' => 'o-trash',
                     'bg' => 'bg-gray-500/10',
                     'text' => 'text-gray-500',
@@ -295,9 +295,11 @@
 
                     @foreach($porEstado as $estadoData)
                     @php
-                    $estadoNombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
-                    $estadoCount = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
-                    $style = $estadoStyles[$estadoNombre] ?? $defaultStyle;
+                    $estadoNombre = $estadoData['estado'] ?? (is_object($estadoData) ? $estadoData->estado : $estadoData);
+                    // Normalizar para comparación
+                    $normalizedNombre = mb_strtoupper(trim($estadoNombre));
+                    $style = $estadoStyles[$normalizedNombre] ?? $defaultStyle;
+                    $estadoCount = $estadoData['count'] ?? (is_object($estadoData) ? $estadoData->count : 0);
                     $porcentaje = $totalBienes > 0 ? round(($estadoCount / $totalBienes) * 100, 1) : 0;
                     $estadoId = \App\Models\Estado::where('nombre', $estadoNombre)->first()?->id;
                     @endphp
@@ -347,9 +349,10 @@
                         <div class="mt-4 grid grid-cols-2 gap-2">
                             @foreach($porEstado as $estadoData)
                             @php
-                            $nombre = is_array($estadoData) ? $estadoData['estado'] : $estadoData->estado;
-                            $cnt = is_array($estadoData) ? $estadoData['count'] : $estadoData->count;
-                            $s = $estadoStyles[$nombre] ?? $defaultStyle;
+                            $nombre = $estadoData['estado'] ?? (is_object($estadoData) ? $estadoData->estado : $estadoData);
+                            $cnt = $estadoData['count'] ?? (is_object($estadoData) ? $estadoData->count : 0);
+                            $normalizedNombre = mb_strtoupper(trim($nombre));
+                            $s = $estadoStyles[$normalizedNombre] ?? $defaultStyle;
                             @endphp
                             <div class="flex items-center gap-2 px-2 py-1">
                                 <div class="w-2.5 h-2.5 rounded-full {{ $s['bg'] }} {{ $s['border'] }} border"></div>
@@ -359,6 +362,7 @@
                             @endforeach
                         </div>
                     </div>
+
 
                     <!-- Gestión Operativa (Vertical Stats & Quick Links) -->
                     <div class="lg:col-span-7 space-y-6">
@@ -535,7 +539,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
         // Datos inyectados desde PHP para los gráficos
-        window.__dashboardData = {{ Js::from($dashboardData) }};
+        window.__dashboardData = {
+            {
+                Js::from($dashboardData)
+            }
+        };
 
         document.addEventListener('DOMContentLoaded', function() {
             const data = window.__dashboardData;
@@ -546,16 +554,20 @@
             Chart.defaults.font.weight = '600';
 
             const estadoColorMap = {
-                'Bueno': '#10b981',
-                'Regular': '#f59e0b',
-                'Malo': '#ef4444',
-                'En Reparación': '#3b82f6',
-                'Desincorporado': '#71717a'
+                'BUENO': '#10b981',
+                'REGULAR': '#f59e0b',
+                'MALO': '#ef4444',
+                'EN REPARACION': '#3b82f6',
+                'EN REPARACIÓN': '#3b82f6',
+                'DESINCORPORADO': '#71717a'
             };
 
             const estadoLabels = data.estadoLabels;
             const estadoData = data.estadoCounts;
-            const estadoColors = estadoLabels.map(label => estadoColorMap[label] || '#a855f7');
+            const estadoColors = estadoLabels.map(label => {
+                const normalized = label ? label.toString().trim().toUpperCase() : '';
+                return estadoColorMap[normalized] || '#a855f7';
+            });
             const totalBienes = data.totalBienes;
 
             // 1. Chart Estado (Donut)
