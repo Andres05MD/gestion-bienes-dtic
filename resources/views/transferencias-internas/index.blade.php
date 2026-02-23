@@ -140,9 +140,9 @@
                                         @php
                                         $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
                                         @endphp
-                                        <span class="px-2.5 py-1.5 inline-flex text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
+                                        <span class="px-2.5 py-1.5 inline-block text-center text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
                                             style="background-color: {{ $estatusColor }}20; color: {{ $estatusColor }}; border: 1px solid {{ $estatusColor }}50;">
-                                            {{ $primera->estatusActa?->nombre ?? 'N/A' }}
+                                            {!! str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A')) !!}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-dark-text font-medium">{{ $primera->fecha_firma?->format('d/m/Y') ?? '—' }}</td>
