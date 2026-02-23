@@ -71,45 +71,48 @@ class BienMovimientoService
                 $bienOriginal = Bien::find($transferencia->bien_id);
 
                 if ($bienOriginal) {
-                    // 1. Crear Bien Externo con trazabilidad de origen
+                    // 1. Capturar datos antes de eliminar
+                    $datosOriginal = $bienOriginal->toArray();
+
+                    // 2. Eliminar Bien Original primero (libera numero_bien único)
+                    $bienOriginal->delete();
+
+                    // 3. Crear Bien Externo con trazabilidad de origen
                     $bienExterno = BienExterno::create([
-                        'equipo' => $bienOriginal->equipo,
-                        'marca' => $bienOriginal->marca,
-                        'modelo' => $bienOriginal->modelo,
-                        'serial' => $bienOriginal->serial,
-                        'color' => $bienOriginal->color,
-                        'numero_bien' => $bienOriginal->numero_bien,
-                        'categoria_bien_id' => $bienOriginal->categoria_bien_id,
-                        'estado_id' => $bienOriginal->estado_id,
-                        'observaciones' => $bienOriginal->observaciones,
+                        'equipo' => $datosOriginal['equipo'],
+                        'marca' => $datosOriginal['marca'],
+                        'modelo' => $datosOriginal['modelo'],
+                        'serial' => $datosOriginal['serial'],
+                        'color' => $datosOriginal['color'],
+                        'numero_bien' => $datosOriginal['numero_bien'],
+                        'categoria_bien_id' => $datosOriginal['categoria_bien_id'],
+                        'estado_id' => $datosOriginal['estado_id'],
+                        'observaciones' => $datosOriginal['observaciones'],
                         'departamento_id' => $transferencia->destino_id,
                         'departamento_origen_id' => $dticId, // Trazabilidad DTIC
                         'user_id' => auth()->id(),
                     ]);
 
-                    // 2. Registrar movimiento en el historial
+                    // 4. Registrar movimiento en el historial
                     $this->registrarMovimiento(
                         bienType: BienExterno::class,
                         bienId: $bienExterno->id,
-                        numeroBien: $bienOriginal->numero_bien,
+                        numeroBien: $datosOriginal['numero_bien'],
                         tipoMovimiento: $tipoMovimiento,
                         operacionType: get_class($transferencia),
                         operacionId: $transferencia->id,
                         departamentoOrigenId: $dticId,
                         departamentoDestinoId: $transferencia->destino_id,
-                        areaOrigenId: $bienOriginal->area_id,
+                        areaOrigenId: $datosOriginal['area_id'],
                         descripcion: "Transferido de DTIC a " . ($transferencia->destino?->nombre ?? 'departamento externo'),
                         fecha: $transferencia->fecha?->toDateString(),
                     );
 
-                    // 3. Actualizar Transferencia
+                    // 5. Actualizar Transferencia
                     $transferencia->update([
                         'bien_externo_id' => $bienExterno->id,
                         'bien_id' => null
                     ]);
-
-                    // 4. Eliminar Bien Original
-                    $bienOriginal->delete();
                 }
             }
             // Si era un bien externo recuperado que se vuelve a enviar fuera, solo actualizamos departamento
@@ -145,26 +148,32 @@ class BienMovimientoService
                 $bienExternoOriginal = BienExterno::find($transferencia->bien_externo_id);
 
                 if ($bienExternoOriginal) {
-                    // 1. Crear Bien Interno (DTIC)
+                    // 1. Capturar datos antes de eliminar
+                    $datosOriginal = $bienExternoOriginal->toArray();
+
+                    // 2. Eliminar Bien Externo Original primero (libera numero_bien único)
+                    $bienExternoOriginal->delete();
+
+                    // 3. Crear Bien Interno (DTIC)
                     $bienInterno = Bien::create([
-                        'equipo' => $bienExternoOriginal->equipo,
-                        'marca' => $bienExternoOriginal->marca,
-                        'modelo' => $bienExternoOriginal->modelo,
-                        'serial' => $bienExternoOriginal->serial,
-                        'color' => $bienExternoOriginal->color,
-                        'numero_bien' => $bienExternoOriginal->numero_bien,
-                        'categoria_bien_id' => $bienExternoOriginal->categoria_bien_id,
-                        'estado_id' => $bienExternoOriginal->estado_id,
-                        'observaciones' => $bienExternoOriginal->observaciones,
+                        'equipo' => $datosOriginal['equipo'],
+                        'marca' => $datosOriginal['marca'],
+                        'modelo' => $datosOriginal['modelo'],
+                        'serial' => $datosOriginal['serial'],
+                        'color' => $datosOriginal['color'],
+                        'numero_bien' => $datosOriginal['numero_bien'],
+                        'categoria_bien_id' => $datosOriginal['categoria_bien_id'],
+                        'estado_id' => $datosOriginal['estado_id'],
+                        'observaciones' => $datosOriginal['observaciones'],
                         'area_id' => $areaId,
                         'user_id' => auth()->id(),
                     ]);
 
-                    // 2. Registrar movimiento
+                    // 4. Registrar movimiento
                     $this->registrarMovimiento(
                         bienType: Bien::class,
                         bienId: $bienInterno->id,
-                        numeroBien: $bienExternoOriginal->numero_bien,
+                        numeroBien: $datosOriginal['numero_bien'],
                         tipoMovimiento: $tipoMovimiento,
                         operacionType: get_class($transferencia),
                         operacionId: $transferencia->id,
@@ -175,14 +184,11 @@ class BienMovimientoService
                         fecha: $transferencia->fecha?->toDateString(),
                     );
 
-                    // 3. Actualizar Transferencia
+                    // 5. Actualizar Transferencia
                     $transferencia->update([
                         'bien_id' => $bienInterno->id,
                         'bien_externo_id' => null
                     ]);
-
-                    // 4. Eliminar Bien Externo Original
-                    $bienExternoOriginal->delete();
                 }
             }
         }
