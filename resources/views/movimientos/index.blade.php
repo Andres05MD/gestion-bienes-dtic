@@ -78,6 +78,61 @@
                         </div>
                     </form>
 
+                    <!-- Mini-Estadísticas Clickeables -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => null]) }}" class="bg-dark-900 border {{ !request('tipo_movimiento') ? 'border-brand-purple/50 bg-brand-purple/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-brand-purple/50 transition-all duration-300 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-brand-purple/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total Filtro</p>
+                                    <h3 class="text-3xl font-black text-white mt-1">{{ number_format($estadisticas['total'] ?? 0) }}</h3>
+                                </div>
+                                <div class="p-2 {{ !request('tipo_movimiento') ? 'bg-brand-purple/20' : 'bg-dark-800 group-hover:bg-brand-purple/20' }} rounded-xl transition-colors">
+                                    <x-mary-icon name="o-document-chart-bar" class="w-5 h-5 {{ !request('tipo_movimiento') ? 'text-brand-lila' : 'text-gray-400 group-hover:text-brand-lila' }} transition-colors" />
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => 'transferencia']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'transferencia' ? 'border-blue-500/50 bg-blue-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Transferencias</p>
+                                    <h3 class="text-3xl font-black text-blue-400 mt-1">{{ number_format($estadisticas['transferencias'] ?? 0) }}</h3>
+                                </div>
+                                <div class="p-2 {{ request('tipo_movimiento') === 'transferencia' ? 'bg-blue-500/20' : 'bg-dark-800 group-hover:bg-blue-500/20' }} rounded-xl transition-colors">
+                                    <x-mary-icon name="o-arrows-right-left" class="w-5 h-5 {{ request('tipo_movimiento') === 'transferencia' ? 'text-blue-400' : 'text-gray-400 group-hover:text-blue-400' }} transition-colors" />
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => 'mantenimiento']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'mantenimiento' ? 'border-amber-500/50 bg-amber-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-amber-500/50 transition-all duration-300 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Mantenimientos</p>
+                                    <h3 class="text-3xl font-black text-amber-400 mt-1">{{ number_format($estadisticas['mantenimientos'] ?? 0) }}</h3>
+                                </div>
+                                <div class="p-2 {{ request('tipo_movimiento') === 'mantenimiento' ? 'bg-amber-500/20' : 'bg-dark-800 group-hover:bg-amber-500/20' }} rounded-xl transition-colors">
+                                    <x-mary-icon name="o-wrench-screwdriver" class="w-5 h-5 {{ request('tipo_movimiento') === 'mantenimiento' ? 'text-amber-400' : 'text-gray-400 group-hover:text-amber-400' }} transition-colors" />
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => 'desincorporacion']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'desincorporacion' ? 'border-rose-500/50 bg-rose-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-rose-500/50 transition-all duration-300 relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex justify-between items-start relative z-10">
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Desincorporaciones</p>
+                                    <h3 class="text-3xl font-black text-rose-400 mt-1">{{ number_format($estadisticas['desincorporaciones'] ?? 0) }}</h3>
+                                </div>
+                                <div class="p-2 {{ request('tipo_movimiento') === 'desincorporacion' ? 'bg-rose-500/20' : 'bg-dark-800 group-hover:bg-rose-500/20' }} rounded-xl transition-colors">
+                                    <x-mary-icon name="o-trash" class="w-5 h-5 {{ request('tipo_movimiento') === 'desincorporacion' ? 'text-rose-400' : 'text-gray-400 group-hover:text-rose-400' }} transition-colors" />
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
                     <div class="overflow-x-auto rounded-xl">
                         <table class="min-w-full">
                             <thead>

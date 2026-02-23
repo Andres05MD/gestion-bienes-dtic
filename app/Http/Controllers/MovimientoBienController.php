@@ -67,7 +67,18 @@ class MovimientoBienController extends Controller
         $departamentos = Departamento::orderBy('nombre')->get();
         $tiposMovimiento = MovimientoBien::etiquetasTipo();
 
-        return view('movimientos.index', compact('movimientos', 'departamentos', 'tiposMovimiento'));
+        // Estadísticas Rápidas basadas en los filtros actuales
+        $statsIds = clone $ultimosIds;
+
+        // Contamos sobre la tabla movimientos usando los IDs filtrados
+        $estadisticas = [
+            'total' => MovimientoBien::whereIn('id', clone $statsIds)->count(),
+            'transferencias' => MovimientoBien::whereIn('id', clone $statsIds)->where('tipo_movimiento', 'transferencia')->count(),
+            'mantenimientos' => MovimientoBien::whereIn('id', clone $statsIds)->whereIn('tipo_movimiento', ['mantenimiento', 'mantenimiento_devolucion'])->count(),
+            'desincorporaciones' => MovimientoBien::whereIn('id', clone $statsIds)->where('tipo_movimiento', 'desincorporacion')->count(),
+        ];
+
+        return view('movimientos.index', compact('movimientos', 'departamentos', 'tiposMovimiento', 'estadisticas'));
     }
 
     /**

@@ -533,17 +533,14 @@
     'totalBienes' => $totalBienes ?? 0,
     'totalTramites' => $totalTramitesCount ?? 0,
     ];
+    $dashboardJson = base64_encode(json_encode($dashboardData));
     @endphp
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
-        // Datos inyectados desde PHP para los gráficos
-        window.__dashboardData = {
-            {
-                Js::from($dashboardData)
-            }
-        };
+        // Datos inyectados desde PHP codificados en base64 (inmune a formateadores)
+        window.__dashboardData = JSON.parse(atob('{{ $dashboardJson }}'));
 
         document.addEventListener('DOMContentLoaded', function() {
             const data = window.__dashboardData;
