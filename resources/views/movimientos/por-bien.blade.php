@@ -14,10 +14,16 @@
                     </h2>
                     <p class="text-sm font-medium text-gray-500 dark:text-dark-text uppercase tracking-widest mt-1">
                         {{ $bien->equipo ?? $bien->descripcion ?? 'Bien' }}
-                        @if($bien instanceof \App\Models\BienExterno && $bien->departamentoOrigen)
+                        @php
+                        $esExterno = $bien instanceof \App\Models\BienExterno;
+                        $tuvoOrigenDtic = $todosMovimientos->contains(fn($m) => $m->departamentoOrigen?->nombre === 'DTIC');
+                        $mostrarProcedencia = $esExterno && ($bien->departamentoOrigen?->nombre === 'DTIC' || $tuvoOrigenDtic);
+                        $nombreProcedencia = $bien->departamentoOrigen?->nombre ?? 'DTIC';
+                        @endphp
+                        @if($mostrarProcedencia)
                         <span class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
                             <x-mary-icon name="o-building-office" class="w-3 h-3" />
-                            Procedencia: {{ $bien->departamentoOrigen->nombre }}
+                            Procedencia: {{ $nombreProcedencia }}
                         </span>
                         @endif
                     </p>
@@ -34,7 +40,14 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">N° Bien</p>
-                        <p class="text-sm font-bold text-white mt-1">{{ $bien->numero_bien }}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p class="text-sm font-bold text-white">{{ $bien->numero_bien }}</p>
+                            @if($bien instanceof \App\Models\Bien || $todosMovimientos->contains(fn($m) => $m->departamentoOrigen?->nombre === 'DTIC'))
+                            <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-black rounded-md bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 uppercase tracking-tighter" title="Asignado desde DTIC">
+                                Asg Dtic
+                            </span>
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">Equipo</p>
@@ -139,7 +152,14 @@
                                             <x-mary-icon name="o-arrow-up-right" class="w-3 h-3 text-gray-500" />
                                             <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">Origen</p>
                                         </div>
-                                        <p class="text-sm font-bold text-gray-200 leading-tight">{{ $mov->departamentoOrigen?->nombre ?? '—' }}</p>
+                                        <div class="flex items-center gap-2">
+                                            <p class="text-sm font-bold text-gray-200 leading-tight">{{ $mov->departamentoOrigen?->nombre ?? '—' }}</p>
+                                            @if($mov->departamentoOrigen?->nombre === 'DTIC')
+                                            <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-black rounded-md bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 uppercase tracking-tighter" title="Asignado desde DTIC">
+                                                Asg Dtic
+                                            </span>
+                                            @endif
+                                        </div>
                                         @if($mov->areaOrigen)
                                         <p class="text-[11px] text-brand-lila font-medium mt-1 leading-tight flex items-center gap-1">
                                             <x-mary-icon name="o-hashtag" class="w-3 h-3" />

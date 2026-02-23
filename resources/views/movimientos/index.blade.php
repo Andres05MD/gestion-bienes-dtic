@@ -21,19 +21,45 @@
                 <div class="p-6">
 
                     <!-- Barra de Búsqueda y Filtros -->
-                    <form method="GET" action="{{ route('movimientos.index') }}" class="mb-8 flex flex-col xl:flex-row gap-4">
-                        <!-- Búsqueda -->
-                        <div class="xl:w-1/3 relative">
-                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
+                    <form method="GET" action="{{ route('movimientos.index') }}" class="mb-8 space-y-4">
+                        <!-- Fila Superior: Búsqueda y Acciones principales -->
+                        <div class="flex flex-col md:flex-row gap-4 w-full">
+                            <!-- Búsqueda -->
+                            <div class="flex-1 relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </div>
+                                <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por número de bien, descripción..." class="block w-full pl-12 pr-4 h-[52px] bg-dark-900/80 border border-dark-800 rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-brand-purple/50 focus:border-transparent transition-all text-sm shadow-inner" />
                             </div>
-                            <input type="text" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por número de bien, descripción..." class="block w-full pl-11 pr-4 h-12 bg-dark-900 border-none rounded-2xl text-white placeholder-gray-500 focus:ring-2 focus:ring-brand-purple/20 transition-all text-sm" />
+
+                            <!-- Acciones Rápidas -->
+                            <div class="flex gap-3 h-[52px]">
+                                <div class="flex-1 md:flex-none flex items-center justify-center bg-dark-900 border border-dark-800 hover:border-brand-purple/50 transition-colors rounded-2xl px-5 shadow-sm">
+                                    <label class="flex items-center justify-center gap-2.5 cursor-pointer w-full h-full">
+                                        <input type="checkbox" name="origen_dtic" value="1" {{ request('origen_dtic') ? 'checked' : '' }} class="w-4 h-4 text-brand-purple rounded border-dark-700 bg-dark-800 focus:ring-brand-purple focus:ring-offset-dark-900 transition-colors" onchange="this.form.submit()">
+                                        <span class="text-xs font-bold text-gray-300 uppercase tracking-widest whitespace-nowrap">Solo Asg DTIC</span>
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="w-[52px] shrink-0 bg-brand-purple/20 text-brand-lila rounded-2xl hover:bg-brand-purple/30 transition-colors shadow-lg shadow-brand-purple/5 flex items-center justify-center" title="Buscar">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                </button>
+                                @if(request()->anyFilled(['buscar', 'tipo_movimiento', 'departamento_id', 'fecha_desde', 'fecha_hasta', 'origen_dtic']))
+                                <a href="{{ route('movimientos.index') }}" class="w-[52px] shrink-0 bg-rose-500/10 text-rose-400 rounded-2xl hover:bg-rose-500/20 transition-colors shadow-lg shadow-rose-500/5 flex items-center justify-center" title="Limpiar Filtros">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </a>
+                                @endif
+                            </div>
                         </div>
 
-                        <!-- Filtros -->
-                        <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-end">
+                        <!-- Fila Inferior: Filtros Desplegables -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-dark-900/30 rounded-2xl border border-dark-800/60 shadow-inner">
                             <x-select-premium
                                 name="tipo_movimiento"
                                 placeholder="Tipo de Movimiento"
@@ -54,41 +80,25 @@
                                 icon="o-calendar"
                                 :value="request('fecha_desde')" />
 
-                            <div class="flex gap-2 items-end">
-                                <div class="flex-1">
-                                    <x-date-input-premium
-                                        name="fecha_hasta"
-                                        placeholder="Hasta"
-                                        icon="o-calendar"
-                                        :value="request('fecha_hasta')" />
-                                </div>
-                                <button type="submit" class="mb-2 shrink-0 p-4 bg-brand-purple/20 text-brand-lila rounded-2xl hover:bg-brand-purple/30 transition-colors shadow-lg shadow-brand-purple/5 h-14 flex items-center justify-center" title="Buscar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </button>
-                                @if(request()->anyFilled(['buscar', 'tipo_movimiento', 'departamento_id', 'fecha_desde', 'fecha_hasta']))
-                                <a href="{{ route('movimientos.index') }}" class="mb-2 shrink-0 p-4 bg-rose-500/10 text-rose-400 rounded-2xl hover:bg-rose-500/20 transition-colors shadow-lg shadow-rose-500/5 flex items-center h-14 justify-center" title="Limpiar Filtros">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                    </svg>
-                                </a>
-                                @endif
-                            </div>
+                            <x-date-input-premium
+                                name="fecha_hasta"
+                                placeholder="Hasta"
+                                icon="o-calendar"
+                                :value="request('fecha_hasta')" />
                         </div>
                     </form>
 
                     <!-- Mini-Estadísticas Clickeables -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => null]) }}" class="bg-dark-900 border {{ !request('tipo_movimiento') ? 'border-brand-purple/50 bg-brand-purple/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-brand-purple/50 transition-all duration-300 relative overflow-hidden group">
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => null, 'departamento_id' => null]) }}" class="bg-dark-900 border {{ !request('tipo_movimiento') && !request('departamento_id') ? 'border-brand-purple/50 bg-brand-purple/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-brand-purple/50 transition-all duration-300 relative overflow-hidden group">
                             <div class="absolute inset-0 bg-brand-purple/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Total Filtro</p>
                                     <h3 class="text-3xl font-black text-white mt-1">{{ number_format($estadisticas['total'] ?? 0) }}</h3>
                                 </div>
-                                <div class="p-2 {{ !request('tipo_movimiento') ? 'bg-brand-purple/20' : 'bg-dark-800 group-hover:bg-brand-purple/20' }} rounded-xl transition-colors">
-                                    <x-mary-icon name="o-document-chart-bar" class="w-5 h-5 {{ !request('tipo_movimiento') ? 'text-brand-lila' : 'text-gray-400 group-hover:text-brand-lila' }} transition-colors" />
+                                <div class="p-2 {{ !request('tipo_movimiento') && !request('departamento_id') ? 'bg-brand-purple/20' : 'bg-dark-800 group-hover:bg-brand-purple/20' }} rounded-xl transition-colors">
+                                    <x-mary-icon name="o-document-chart-bar" class="w-5 h-5 {{ !request('tipo_movimiento') && !request('departamento_id') ? 'text-brand-lila' : 'text-gray-400 group-hover:text-brand-lila' }} transition-colors" />
                                 </div>
                             </div>
                         </a>
@@ -98,10 +108,10 @@
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Transferencias</p>
-                                    <h3 class="text-3xl font-black text-blue-400 mt-1">{{ number_format($estadisticas['transferencias'] ?? 0) }}</h3>
+                                    <h3 class="text-3xl font-black text-blue-500 mt-1">{{ number_format($estadisticas['transferencias'] ?? 0) }}</h3>
                                 </div>
                                 <div class="p-2 {{ request('tipo_movimiento') === 'transferencia' ? 'bg-blue-500/20' : 'bg-dark-800 group-hover:bg-blue-500/20' }} rounded-xl transition-colors">
-                                    <x-mary-icon name="o-arrows-right-left" class="w-5 h-5 {{ request('tipo_movimiento') === 'transferencia' ? 'text-blue-400' : 'text-gray-400 group-hover:text-blue-400' }} transition-colors" />
+                                    <x-mary-icon name="o-arrows-right-left" class="w-5 h-5 {{ request('tipo_movimiento') === 'transferencia' ? 'text-blue-500' : 'text-gray-400 group-hover:text-blue-500' }} transition-colors" />
                                 </div>
                             </div>
                         </a>
@@ -111,10 +121,10 @@
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Mantenimientos</p>
-                                    <h3 class="text-3xl font-black text-amber-400 mt-1">{{ number_format($estadisticas['mantenimientos'] ?? 0) }}</h3>
+                                    <h3 class="text-3xl font-black text-amber-500 mt-1">{{ number_format($estadisticas['mantenimientos'] ?? 0) }}</h3>
                                 </div>
                                 <div class="p-2 {{ request('tipo_movimiento') === 'mantenimiento' ? 'bg-amber-500/20' : 'bg-dark-800 group-hover:bg-amber-500/20' }} rounded-xl transition-colors">
-                                    <x-mary-icon name="o-wrench-screwdriver" class="w-5 h-5 {{ request('tipo_movimiento') === 'mantenimiento' ? 'text-amber-400' : 'text-gray-400 group-hover:text-amber-400' }} transition-colors" />
+                                    <x-mary-icon name="o-wrench-screwdriver" class="w-5 h-5 {{ request('tipo_movimiento') === 'mantenimiento' ? 'text-amber-500' : 'text-gray-400 group-hover:text-amber-500' }} transition-colors" />
                                 </div>
                             </div>
                         </a>
@@ -124,15 +134,14 @@
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
                                     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Desincorporaciones</p>
-                                    <h3 class="text-3xl font-black text-rose-400 mt-1">{{ number_format($estadisticas['desincorporaciones'] ?? 0) }}</h3>
+                                    <h3 class="text-3xl font-black text-rose-500 mt-1">{{ number_format($estadisticas['desincorporaciones'] ?? 0) }}</h3>
                                 </div>
                                 <div class="p-2 {{ request('tipo_movimiento') === 'desincorporacion' ? 'bg-rose-500/20' : 'bg-dark-800 group-hover:bg-rose-500/20' }} rounded-xl transition-colors">
-                                    <x-mary-icon name="o-trash" class="w-5 h-5 {{ request('tipo_movimiento') === 'desincorporacion' ? 'text-rose-400' : 'text-gray-400 group-hover:text-rose-400' }} transition-colors" />
+                                    <x-mary-icon name="o-trash" class="w-5 h-5 {{ request('tipo_movimiento') === 'desincorporacion' ? 'text-rose-500' : 'text-gray-400 group-hover:text-rose-500' }} transition-colors" />
                                 </div>
                             </div>
                         </a>
                     </div>
-
                     <div class="overflow-x-auto rounded-xl">
                         <table class="min-w-full">
                             <thead>
@@ -176,8 +185,15 @@
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center gap-2">
                                             <div>
-                                                <div class="text-sm font-bold text-white">{{ $mov->numero_bien }}</div>
-                                                <div class="text-[10px] text-gray-500 font-medium max-w-[200px] truncate">{{ $mov->descripcion }}</div>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="text-sm font-bold text-white">{{ $mov->numero_bien }}</div>
+                                                    @if($mov->departamentoOrigen?->nombre === 'DTIC')
+                                                    <span class="inline-flex items-center px-1.5 py-0.5 text-[8px] font-black rounded-md bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 uppercase tracking-tighter" title="Asignado desde DTIC">
+                                                        Asg Dtic
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                                <div class="text-[10px] text-gray-500 font-medium max-w-[200px] truncate uppercase">{{ $mov->bien?->equipo ?? 'EQUIPO DESCONOCIDO' }}</div>
                                             </div>
                                             @if($mov->total_movimientos > 1)
                                             <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[9px] font-black rounded-lg bg-brand-purple/20 text-brand-lila border border-brand-purple/30" title="{{ $mov->total_movimientos }} movimientos registrados">

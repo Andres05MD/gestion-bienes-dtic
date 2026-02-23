@@ -98,16 +98,16 @@ class DashboardController extends Controller
             })->sortByDesc('count')->values();
 
         // Últimos bienes registrados (Ambos tipos)
-        $ultimosBienesDTIC = Bien::with(['categoria', 'estado', 'area'])->latest()->take(5)->get()->map(function($b) {
+        $ultimosBienesDTIC = Bien::with(['categoria', 'estado', 'area'])->latest()->take(5)->get()->map(function ($b) {
             $b->tipo_label = 'DTIC';
             return $b;
         });
-        
-        $ultimosBienesExternos = \App\Models\BienExterno::with(['categoria', 'estado', 'departamento'])->latest()->take(5)->get()->map(function($b) {
+
+        $ultimosBienesExternos = \App\Models\BienExterno::with(['categoria', 'estado', 'departamento'])->latest()->take(5)->get()->map(function ($b) {
             $b->tipo_label = 'Externo';
             return $b;
         });
-        
+
         $ultimosBienes = $ultimosBienesDTIC->concat($ultimosBienesExternos)
             ->sortByDesc('created_at')
             ->take(5);
@@ -132,7 +132,7 @@ class DashboardController extends Controller
             ->join('estatus_actas', 'desincorporaciones.estatus_acta_id', '=', 'estatus_actas.id');
         $applyDateFilter($estatusDesincQuery, 'desincorporaciones.created_at');
         $estatusDesincorporaciones = $estatusDesincQuery->groupBy('estatus_actas.nombre')->get();
-        
+
         $estatusTransfQuery = \App\Models\TransferenciaInterna::selectRaw('estatus_actas.nombre as estatus, count(*) as count')
             ->join('estatus_actas', 'transferencias_internas.estatus_acta_id', '=', 'estatus_actas.id');
         $applyDateFilter($estatusTransfQuery, 'transferencias_internas.created_at');
@@ -179,6 +179,10 @@ class DashboardController extends Controller
             });
 
         $operacionesPendientes = $desincPendientes->concat($transfPendientes)
+            ->map(function ($op) {
+                $op->numero_bien = $op->bien?->numero_bien ?? $op->bienExterno?->numero_bien ?? $op->numero_bien;
+                return $op;
+            })
             ->sortByDesc('dias_transcurridos')
             ->values();
 
@@ -189,11 +193,11 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard', compact(
-            'totalBienes', 
-            'totalBienesDTIC', 
-            'totalBienesExternos', 
-            'porEstado', 
-            'porCategoria', 
+            'totalBienes',
+            'totalBienesDTIC',
+            'totalBienesExternos',
+            'porEstado',
+            'porCategoria',
             'ultimosBienes',
             'totalDesincorporaciones',
             'totalTransferencias',

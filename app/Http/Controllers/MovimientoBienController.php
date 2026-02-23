@@ -44,6 +44,13 @@ class MovimientoBienController extends Controller
             });
         }
 
+        if ($request->filled('origen_dtic')) {
+            $dticId = Departamento::where('nombre', 'DTIC')->value('id');
+            if ($dticId) {
+                $ultimosIds->where('departamento_origen_id', $dticId);
+            }
+        }
+
         if ($request->filled('fecha_desde')) {
             $ultimosIds->whereDate('fecha', '>=', $request->fecha_desde);
         }
@@ -58,6 +65,7 @@ class MovimientoBienController extends Controller
             'areaOrigen',
             'areaDestino',
             'user',
+            'bien'
         ])
             ->whereIn('id', $ultimosIds)
             ->selectRaw('movimientos_bienes.*, (SELECT COUNT(*) FROM movimientos_bienes AS mb WHERE mb.bien_type = movimientos_bienes.bien_type AND mb.bien_id = movimientos_bienes.bien_id) as total_movimientos')
@@ -65,6 +73,7 @@ class MovimientoBienController extends Controller
 
         $movimientos = $query->paginate(15)->withQueryString();
         $departamentos = Departamento::orderBy('nombre')->get();
+        $dticId = $departamentos->where('nombre', 'DTIC')->first()?->id;
         $tiposMovimiento = MovimientoBien::etiquetasTipo();
 
         // Estadísticas Rápidas basadas en los filtros actuales
@@ -76,6 +85,7 @@ class MovimientoBienController extends Controller
             'transferencias' => MovimientoBien::whereIn('id', clone $statsIds)->where('tipo_movimiento', 'transferencia')->count(),
             'mantenimientos' => MovimientoBien::whereIn('id', clone $statsIds)->whereIn('tipo_movimiento', ['mantenimiento', 'mantenimiento_devolucion'])->count(),
             'desincorporaciones' => MovimientoBien::whereIn('id', clone $statsIds)->where('tipo_movimiento', 'desincorporacion')->count(),
+            'origen_dtic' => $dticId ? MovimientoBien::whereIn('id', clone $statsIds)->where('departamento_origen_id', $dticId)->count() : 0,
         ];
 
         return view('movimientos.index', compact('movimientos', 'departamentos', 'tiposMovimiento', 'estadisticas'));
