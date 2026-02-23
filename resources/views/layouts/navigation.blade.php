@@ -97,6 +97,13 @@
             </a>
             @endcan
 
+            <a href="{{ route('movimientos.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group {{ request()->routeIs('movimientos.*') ? 'bg-brand-purple/10 text-white shadow-[0_0_20px_rgba(168,85,247,0.15)] border border-brand-purple/20' : 'text-gray-400 hover:bg-white/5 hover:text-white' }}">
+                <svg class="mr-3 h-5 w-5 {{ request()->routeIs('movimientos.*') ? 'text-brand-lila' : 'text-gray-500 group-hover:text-white' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {{ __('Historial Movim.') }}
+            </a>
+
             <!-- Categoría de Bienes -->
             <div class="px-4 mt-6 mb-2">
                 <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Extras</span>
@@ -272,6 +279,10 @@
                 {{ __('Distribución Dir.') }}
             </a>
             @endcan
+
+            <a href="{{ route('movimientos.index') }}" class="flex items-center px-4 py-3 text-sm font-medium rounded-xl {{ request()->routeIs('movimientos.*') ? 'bg-brand-purple/10 text-white' : 'text-gray-400' }}">
+                {{ __('Historial Movim.') }}
+            </a>
 
             <!-- Categoría de Bienes -->
             <div class="px-4 mt-6 mb-2">

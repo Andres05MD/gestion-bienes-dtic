@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Traits\HasUpperCaseAttributes;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -126,5 +127,13 @@ class Bien extends Model
     public function estado(): BelongsTo
     {
         return $this->belongsTo(Estado::class);
+    }
+
+    /**
+     * Relación: historial de movimientos del bien.
+     */
+    public function movimientos(): MorphMany
+    {
+        return $this->morphMany(MovimientoBien::class, 'bien');
     }
 }

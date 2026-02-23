@@ -13,9 +13,11 @@ use App\Models\DistribucionDireccion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Services\BienMovimientoService;
 
 class DistribucionDireccionController extends Controller
 {
+    public function __construct(private BienMovimientoService $movimientoService) {}
     /**
      * Muestra el listado de distribuciones de dirección con búsqueda y filtros.
      */
@@ -93,6 +95,9 @@ class DistribucionDireccionController extends Controller
             'bien_externo_id' => $bienExterno->id,
             'user_id' => auth()->id(),
         ]);
+
+        // Registrar movimiento en el historial
+        $this->movimientoService->registrarDistribucion($distribucion);
 
         return redirect()->route('distribuciones-direccion.index')
             ->with('success', 'Distribución de dirección creada exitosamente. El bien ha sido registrado.');

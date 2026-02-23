@@ -8,13 +8,50 @@ use App\Models\Bien;
 use App\Models\BienExterno;
 use App\Models\Departamento;
 use App\Models\Desincorporacion;
+use App\Models\DistribucionDireccion;
 use App\Models\Mantenimiento;
+use App\Models\MovimientoBien;
 use App\Models\TransferenciaInterna;
 
 class BienMovimientoService
 {
     /**
+     * Registra un movimiento en el historial centralizado.
+     */
+    public function registrarMovimiento(
+        string $bienType,
+        int|string $bienId,
+        string $numeroBien,
+        string $tipoMovimiento,
+        ?string $operacionType = null,
+        int|string|null $operacionId = null,
+        int|string|null $departamentoOrigenId = null,
+        int|string|null $departamentoDestinoId = null,
+        int|string|null $areaOrigenId = null,
+        int|string|null $areaDestinoId = null,
+        ?string $descripcion = null,
+        ?string $fecha = null,
+    ): MovimientoBien {
+        return MovimientoBien::create([
+            'bien_type' => $bienType,
+            'bien_id' => (int) $bienId,
+            'numero_bien' => $numeroBien,
+            'tipo_movimiento' => $tipoMovimiento,
+            'operacion_type' => $operacionType,
+            'operacion_id' => $operacionId ? (int) $operacionId : null,
+            'departamento_origen_id' => $departamentoOrigenId ? (int) $departamentoOrigenId : null,
+            'departamento_destino_id' => $departamentoDestinoId ? (int) $departamentoDestinoId : null,
+            'area_origen_id' => $areaOrigenId ? (int) $areaOrigenId : null,
+            'area_destino_id' => $areaDestinoId ? (int) $areaDestinoId : null,
+            'descripcion' => $descripcion,
+            'fecha' => $fecha ?? now()->toDateString(),
+            'user_id' => auth()->id(),
+        ]);
+    }
+
+    /**
      * Actualiza la ubicación y la tabla del bien (DTIC <-> Externo) basado en una transferencia.
+     * También registra el movimiento en el historial.
      */
     public function actualizarUbicacionBien(TransferenciaInterna|Mantenimiento $transferencia, int|string|null $areaId = null): void
     {
@@ -23,6 +60,10 @@ class BienMovimientoService
         $esProcedenciaDtic = $transferencia->procedencia_id == $dticId;
         $esDestinoDtic = $transferencia->destino_id == $dticId;
 
+        $tipoMovimiento = $transferencia instanceof TransferenciaInterna
+            ? MovimientoBien::TIPO_TRANSFERENCIA
+            : MovimientoBien::TIPO_MANTENIMIENTO;
+
         // Escenario 1: DTIC a Externo (Movimiento de tabla)
         // Origen: DTIC -> Destino: Externo
         if ($esProcedenciaDtic && !$esDestinoDtic) {
@@ -30,7 +71,7 @@ class BienMovimientoService
                 $bienOriginal = Bien::find($transferencia->bien_id);
 
                 if ($bienOriginal) {
-                    // 1. Crear Bien Externo
+                    // 1. Crear Bien Externo con trazabilidad de origen
                     $bienExterno = BienExterno::create([
                         'equipo' => $bienOriginal->equipo,
                         'marca' => $bienOriginal->marca,
@@ -42,23 +83,58 @@ class BienMovimientoService
                         'estado_id' => $bienOriginal->estado_id,
                         'observaciones' => $bienOriginal->observaciones,
                         'departamento_id' => $transferencia->destino_id,
-                        'user_id' => auth()->id(), // O el original si se prefiere conservar
+                        'departamento_origen_id' => $dticId, // Trazabilidad DTIC
+                        'user_id' => auth()->id(),
                     ]);
 
-                    // 2. Actualizar Transferencia
+                    // 2. Registrar movimiento en el historial
+                    $this->registrarMovimiento(
+                        bienType: BienExterno::class,
+                        bienId: $bienExterno->id,
+                        numeroBien: $bienOriginal->numero_bien,
+                        tipoMovimiento: $tipoMovimiento,
+                        operacionType: get_class($transferencia),
+                        operacionId: $transferencia->id,
+                        departamentoOrigenId: $dticId,
+                        departamentoDestinoId: $transferencia->destino_id,
+                        areaOrigenId: $bienOriginal->area_id,
+                        descripcion: "Transferido de DTIC a " . ($transferencia->destino?->nombre ?? 'departamento externo'),
+                        fecha: $transferencia->fecha?->toDateString(),
+                    );
+
+                    // 3. Actualizar Transferencia
                     $transferencia->update([
                         'bien_externo_id' => $bienExterno->id,
                         'bien_id' => null
                     ]);
 
-                    // 3. Eliminar Bien Original
+                    // 4. Eliminar Bien Original
                     $bienOriginal->delete();
                 }
             }
             // Si era un bien externo recuperado que se vuelve a enviar fuera, solo actualizamos departamento
             elseif ($transferencia->bien_externo_id) {
+                $bienExterno = BienExterno::find($transferencia->bien_externo_id);
+                $depOrigenId = $bienExterno?->departamento_id;
+
                 BienExterno::where('id', $transferencia->bien_externo_id)
                     ->update(['departamento_id' => $transferencia->destino_id]);
+
+                // Registrar movimiento
+                if ($bienExterno) {
+                    $this->registrarMovimiento(
+                        bienType: BienExterno::class,
+                        bienId: $bienExterno->id,
+                        numeroBien: $bienExterno->numero_bien,
+                        tipoMovimiento: $tipoMovimiento,
+                        operacionType: get_class($transferencia),
+                        operacionId: $transferencia->id,
+                        departamentoOrigenId: $depOrigenId,
+                        departamentoDestinoId: $transferencia->destino_id,
+                        descripcion: "Transferido de DTIC a " . ($transferencia->destino?->nombre ?? 'departamento externo'),
+                        fecha: $transferencia->fecha?->toDateString(),
+                    );
+                }
             }
         }
 
@@ -80,17 +156,32 @@ class BienMovimientoService
                         'categoria_bien_id' => $bienExternoOriginal->categoria_bien_id,
                         'estado_id' => $bienExternoOriginal->estado_id,
                         'observaciones' => $bienExternoOriginal->observaciones,
-                        'area_id' => $areaId, // Área de destino en DTIC
+                        'area_id' => $areaId,
                         'user_id' => auth()->id(),
                     ]);
 
-                    // 2. Actualizar Transferencia
+                    // 2. Registrar movimiento
+                    $this->registrarMovimiento(
+                        bienType: Bien::class,
+                        bienId: $bienInterno->id,
+                        numeroBien: $bienExternoOriginal->numero_bien,
+                        tipoMovimiento: $tipoMovimiento,
+                        operacionType: get_class($transferencia),
+                        operacionId: $transferencia->id,
+                        departamentoOrigenId: $transferencia->procedencia_id,
+                        departamentoDestinoId: $dticId,
+                        areaDestinoId: $areaId ? (int) $areaId : null,
+                        descripcion: "Transferido de " . ($transferencia->procedencia?->nombre ?? 'departamento externo') . " a DTIC",
+                        fecha: $transferencia->fecha?->toDateString(),
+                    );
+
+                    // 3. Actualizar Transferencia
                     $transferencia->update([
                         'bien_id' => $bienInterno->id,
                         'bien_externo_id' => null
                     ]);
 
-                    // 3. Eliminar Bien Externo Original
+                    // 4. Eliminar Bien Externo Original
                     $bienExternoOriginal->delete();
                 }
             }
@@ -100,8 +191,27 @@ class BienMovimientoService
         // Solo actualizamos el departamento del bien externo
         elseif (!$esProcedenciaDtic && !$esDestinoDtic) {
             if ($transferencia->bien_externo_id) {
+                $bienExterno = BienExterno::find($transferencia->bien_externo_id);
+                $depOrigenId = $bienExterno?->departamento_id;
+
                 BienExterno::where('id', $transferencia->bien_externo_id)
                     ->update(['departamento_id' => $transferencia->destino_id]);
+
+                // Registrar movimiento
+                if ($bienExterno) {
+                    $this->registrarMovimiento(
+                        bienType: BienExterno::class,
+                        bienId: $bienExterno->id,
+                        numeroBien: $bienExterno->numero_bien,
+                        tipoMovimiento: $tipoMovimiento,
+                        operacionType: get_class($transferencia),
+                        operacionId: $transferencia->id,
+                        departamentoOrigenId: $depOrigenId,
+                        departamentoDestinoId: $transferencia->destino_id,
+                        descripcion: "Transferido de " . ($transferencia->procedencia?->nombre ?? '—') . " a " . ($transferencia->destino?->nombre ?? '—'),
+                        fecha: $transferencia->fecha?->toDateString(),
+                    );
+                }
             }
         }
 
@@ -109,21 +219,103 @@ class BienMovimientoService
         // Solo actualizamos el área del bien interno
         elseif ($esProcedenciaDtic && $esDestinoDtic) {
             if ($transferencia->bien_id && $areaId) {
+                $bien = Bien::find($transferencia->bien_id);
+                $areaOrigenId = $bien?->area_id;
+
                 Bien::where('id', $transferencia->bien_id)
                     ->update(['area_id' => $areaId]);
+
+                // Registrar movimiento
+                if ($bien) {
+                    $this->registrarMovimiento(
+                        bienType: Bien::class,
+                        bienId: $bien->id,
+                        numeroBien: $bien->numero_bien,
+                        tipoMovimiento: $tipoMovimiento,
+                        operacionType: get_class($transferencia),
+                        operacionId: $transferencia->id,
+                        departamentoOrigenId: $dticId,
+                        departamentoDestinoId: $dticId,
+                        areaOrigenId: $areaOrigenId,
+                        areaDestinoId: (int) $areaId,
+                        descripcion: "Movimiento interno en DTIC",
+                        fecha: $transferencia->fecha?->toDateString(),
+                    );
+                }
             }
         }
     }
 
     /**
-     * Elimina lógicamente el bien vinculado de la base de datos (Bienes/Bienes Externos).
+     * Registra el movimiento de desincorporación y elimina lógicamente el bien.
      */
     public function marcarBienDesincorporado(Desincorporacion $desincorporacion): void
     {
+        // Registrar movimiento antes de eliminar
         if ($desincorporacion->bien_id) {
-            Bien::where('id', $desincorporacion->bien_id)->delete();
+            $bien = Bien::find($desincorporacion->bien_id);
+            if ($bien) {
+                $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+                $this->registrarMovimiento(
+                    bienType: Bien::class,
+                    bienId: $bien->id,
+                    numeroBien: $bien->numero_bien,
+                    tipoMovimiento: MovimientoBien::TIPO_DESINCORPORACION,
+                    operacionType: Desincorporacion::class,
+                    operacionId: $desincorporacion->id,
+                    departamentoOrigenId: $dticId,
+                    areaOrigenId: $bien->area_id,
+                    descripcion: "Bien desincorporado: " . ($desincorporacion->observaciones ?? ''),
+                    fecha: $desincorporacion->fecha?->toDateString(),
+                );
+                $bien->delete();
+            }
         } elseif ($desincorporacion->bien_externo_id) {
-            BienExterno::where('id', $desincorporacion->bien_externo_id)->delete();
+            $bienExterno = BienExterno::find($desincorporacion->bien_externo_id);
+            if ($bienExterno) {
+                $this->registrarMovimiento(
+                    bienType: BienExterno::class,
+                    bienId: $bienExterno->id,
+                    numeroBien: $bienExterno->numero_bien,
+                    tipoMovimiento: MovimientoBien::TIPO_DESINCORPORACION,
+                    operacionType: Desincorporacion::class,
+                    operacionId: $desincorporacion->id,
+                    departamentoOrigenId: $bienExterno->departamento_id,
+                    descripcion: "Bien desincorporado: " . ($desincorporacion->observaciones ?? ''),
+                    fecha: $desincorporacion->fecha?->toDateString(),
+                );
+                $bienExterno->delete();
+            }
         }
+    }
+
+    /**
+     * Registra el movimiento de una distribución.
+     */
+    public function registrarDistribucion(DistribucionDireccion $distribucion): void
+    {
+        $bienType = $distribucion->bien_id ? Bien::class : BienExterno::class;
+        $bienId = $distribucion->bien_id ?? $distribucion->bien_externo_id;
+
+        if (!$bienId) {
+            return;
+        }
+
+        $bien = $bienType === Bien::class ? Bien::find($bienId) : BienExterno::find($bienId);
+        if (!$bien) {
+            return;
+        }
+
+        $this->registrarMovimiento(
+            bienType: $bienType,
+            bienId: $bienId,
+            numeroBien: $bien->numero_bien,
+            tipoMovimiento: MovimientoBien::TIPO_DISTRIBUCION,
+            operacionType: DistribucionDireccion::class,
+            operacionId: $distribucion->id,
+            departamentoOrigenId: $distribucion->procedencia_id,
+            descripcion: "Distribución desde dirección",
+            fecha: $distribucion->fecha?->toDateString(),
+        );
     }
 }

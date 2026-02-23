@@ -15,6 +15,7 @@ use App\Http\Controllers\DesincorporacionController;
 use App\Http\Controllers\DistribucionDireccionController;
 use App\Http\Controllers\BienSearchController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\MovimientoBienController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -82,6 +83,13 @@ Route::middleware('auth')->group(function () {
     Route::get('historial-actividad', [ActivityLogController::class, 'index'])
         ->name('activity-log.index')
         ->middleware('can:gestionar usuarios');
+
+    // Historial de movimientos de bienes
+    Route::get('movimientos', [MovimientoBienController::class, 'index'])
+        ->name('movimientos.index');
+    Route::get('movimientos/{tipo}/{id}', [MovimientoBienController::class, 'porBien'])
+        ->name('movimientos.por-bien')
+        ->where(['tipo' => 'dtic|externo', 'id' => '[0-9]+']);
 
     // Detalles (Configuración)
     Route::resource('areas', AreaController::class)->middleware('can:ver areas');
