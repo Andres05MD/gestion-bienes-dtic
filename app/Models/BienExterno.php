@@ -25,14 +25,18 @@ class BienExterno extends Model
     }
 
     /**
-     * Genera el siguiente número S/N secuencial disponible (ej: S/N-001)
+     * Genera el siguiente número S/N secuencial disponible (ej: S/N-001).
+     * Busca en AMBAS tablas (bienes y bienes_externos) para evitar duplicados.
      */
     public static function generarNumeroSN(): string
     {
-        $bienesSN = self::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
+        $bienesSN = Bien::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
+        $externosSN = self::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
+
+        $todosLosSN = $bienesSN->merge($externosSN);
 
         $maxNumero = 0;
-        foreach ($bienesSN as $numero) {
+        foreach ($todosLosSN as $numero) {
             $partes = explode('-', $numero);
             if (isset($partes[1]) && is_numeric($partes[1])) {
                 $num = (int)$partes[1];
