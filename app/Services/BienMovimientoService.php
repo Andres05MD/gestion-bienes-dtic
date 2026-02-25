@@ -143,7 +143,10 @@ class BienMovimientoService
                 $depOrigenId = $bienExterno?->departamento_id;
 
                 BienExterno::where('id', $transferencia->bien_externo_id)
-                    ->update(['departamento_id' => $transferencia->destino_id]);
+                    ->update([
+                        'departamento_id' => $transferencia->destino_id,
+                        'area_id' => null, // Limpiar área si la tuviera
+                    ]);
 
                 // Registrar movimiento
                 if ($bienExterno) {
@@ -300,7 +303,10 @@ class BienMovimientoService
                 );
 
                 if ($estadoDesincorporadoId) {
-                    $bien->update(['estado_id' => $estadoDesincorporadoId]);
+                    $bien->update([
+                        'estado_id' => $estadoDesincorporadoId,
+                        'area_id' => null, // Ya no está en un área específica, está desincorporado
+                    ]);
                 }
             }
         } elseif ($desincorporacion->bien_externo_id) {
@@ -319,7 +325,11 @@ class BienMovimientoService
                 );
 
                 if ($estadoDesincorporadoId) {
-                    $bienExterno->update(['estado_id' => $estadoDesincorporadoId]);
+                    $bienExterno->update([
+                        'estado_id' => $estadoDesincorporadoId,
+                        'departamento_id' => $desincorporacion->destino_id ?? $bienExterno->departamento_id, // Usualmente va a un almacén de desincorporados
+                        'area_id' => null,
+                    ]);
                 }
             }
         }
