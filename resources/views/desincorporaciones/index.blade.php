@@ -143,7 +143,10 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text font-medium">{{ $primera->fecha->format('d/m/Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-base">
                                         @php
-                                        $todosLosInformes = $grupo->pluck('numero_informe')->filter()->unique();
+                                        $todosLosInformes = $grupo->pluck('numero_informe')
+                                        ->filter()
+                                        ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
+                                        ->unique();
                                         @endphp
                                         @if($todosLosInformes->isNotEmpty())
                                         <div class="flex flex-col gap-2 items-start">

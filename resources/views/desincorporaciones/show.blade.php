@@ -117,7 +117,14 @@
                                     <div class="group">
                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">N° Informe(s)</p>
                                         <p class="text-xl font-mono font-bold text-brand-lila tracking-wider">
-                                            {{ $bienesGrupo->pluck('numero_informe')->filter()->unique()->implode(', ') ?: 'N/A' }}
+                                            @php
+                                            $todosLosInformesShow = $bienesGrupo->pluck('numero_informe')
+                                            ->filter()
+                                            ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
+                                            ->unique()
+                                            ->implode(', ');
+                                            @endphp
+                                            {{ $todosLosInformesShow ?: 'N/A' }}
                                         </p>
                                     </div>
                                 </div>
@@ -141,9 +148,13 @@
                                                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SN: <span class="text-gray-200 ml-1">{{ $bg->serial ?: 'N/A' }}</span></span>
                                                     </div>
                                                     @if($bg->numero_informe)
+                                                    @php
+                                                    $informesDelBien = array_map('trim', explode(',', $bg->numero_informe));
+                                                    $informeMostrar = count($informesDelBien) > 1 ? ($informesDelBien[$loop->index] ?? $informesDelBien[0]) : $bg->numero_informe;
+                                                    @endphp
                                                     <div class="inline-flex items-center gap-2 bg-brand-purple/10 px-4 py-2.5 rounded-2xl border border-brand-purple/20 shadow-sm">
                                                         <x-mary-icon name="o-document-text" class="w-4 h-4 text-brand-lila" />
-                                                        <span class="text-[10px] font-bold text-brand-lila uppercase tracking-wider">Informe: <span class="text-white ml-1 font-mono">{{ $bg->numero_informe }}</span></span>
+                                                        <span class="text-[10px] font-bold text-brand-lila uppercase tracking-wider">Informe: <span class="text-white ml-1 font-mono">{{ $informeMostrar }}</span></span>
                                                     </div>
                                                     @endif
                                                 </div>

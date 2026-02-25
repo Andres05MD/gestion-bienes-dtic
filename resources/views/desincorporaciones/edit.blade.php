@@ -111,12 +111,18 @@
                                     <x-select-premium name="destino_id" label="Destino" placeholder="Depto. de destino" required icon="o-map-pin" :options="$departamentos->map(fn($d) => ['value' => $d->id, 'label' => $d->nombre])->toArray()" :value="old('destino_id', $desincorporacion->destino_id ?? $dticId)" @option-selected="destinoSeleccionado = $event.detail" />
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Estado y Datos -->
-                        <div x-data="{ 
+                            <!-- Estado y Datos -->
+                            @php
+                            $informesExtraidos = $bienesGrupo->pluck('numero_informe')
+                            ->filter()
+                            ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
+                            ->unique()
+                            ->values()
+                            ->toArray();
+                            @endphp
+                            <div x-data="{ 
                             activeCard: false,
-                            informes: @js(old('numero_informe', $bienesGrupo->pluck('numero_informe')->map(fn($i) => $i ?: '')->toArray() ?: [''])),
+                            informes: @js(old('numero_informe', !empty($informesExtraidos) ? $informesExtraidos : [''])),
                             
                             agregarInforme() {
                                 this.informes.push('');
@@ -130,59 +136,59 @@
                                 }
                             }
                         }" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-30'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
-                            <div class="flex items-center gap-3 mb-8">
-                                <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
-                                    <x-mary-icon name="o-shield-check" class="w-6 h-6 text-brand-lila" />
-                                </div>
-                                <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Datos del Acta</h3>
-                            </div>
-                            <div class="space-y-6">
-                                <x-date-input-premium name="fecha" label="Fecha" :value="$desincorporacion->fecha->format('Y-m-d')" required />
-                                <div class="space-y-4">
-                                    <div class="flex items-center justify-between ml-1">
-                                        <label class="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.2em]">N° Informe(s)</label>
-                                        <button type="button" @click="agregarInforme()" class="text-[10px] font-bold text-brand-purple hover:text-brand-lila uppercase tracking-widest transition-colors flex items-center gap-1 cursor-pointer">
-                                            <x-mary-icon name="o-plus" class="w-3 h-3 border border-current rounded-full" />
-                                            Añadir
-                                        </button>
+                                <div class="flex items-center gap-3 mb-8">
+                                    <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
+                                        <x-mary-icon name="o-shield-check" class="w-6 h-6 text-brand-lila" />
                                     </div>
-
-                                    <template x-for="(informe, idx) in informes" :key="idx">
-                                        <div class="relative group">
-                                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                                <x-mary-icon name="o-document-text" class="w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-brand-purple transition-colors duration-300" />
-                                            </div>
-                                            <input
-                                                type="text"
-                                                name="numero_informe[]"
-                                                x-model="informes[idx]"
-                                                placeholder="00-00-00"
-                                                class="block w-full pl-11 pr-12 py-4 h-14 bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-none rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:bg-gray-50 dark:focus:bg-[#222] focus:ring-2 focus:ring-brand-purple/20 transition-all duration-300 shadow-sm dark:shadow-none appearance-none" />
-                                            <button
-                                                type="button"
-                                                @click="removerInforme(idx)"
-                                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-red-500 transition-colors"
-                                                x-show="informes.length > 1 || (informes.length === 1 && informes[0] !== '')">
-                                                <x-mary-icon name="o-trash" class="w-4 h-4" />
+                                    <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Datos del Acta</h3>
+                                </div>
+                                <div class="space-y-6">
+                                    <x-date-input-premium name="fecha" label="Fecha" :value="$desincorporacion->fecha->format('Y-m-d')" required />
+                                    <div class="space-y-4">
+                                        <div class="flex items-center justify-between ml-1">
+                                            <label class="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.2em]">N° Informe(s)</label>
+                                            <button type="button" @click="agregarInforme()" class="text-[10px] font-bold text-brand-purple hover:text-brand-lila uppercase tracking-widest transition-colors flex items-center gap-1 cursor-pointer">
+                                                <x-mary-icon name="o-plus" class="w-3 h-3 border border-current rounded-full" />
+                                                Añadir
                                             </button>
                                         </div>
-                                    </template>
+
+                                        <template x-for="(informe, idx) in informes" :key="idx">
+                                            <div class="relative group">
+                                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                                    <x-mary-icon name="o-document-text" class="w-5 h-5 text-gray-400 dark:text-gray-500 group-focus-within:text-brand-purple transition-colors duration-300" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    name="numero_informe[]"
+                                                    x-model="informes[idx]"
+                                                    placeholder="00-00-00"
+                                                    class="block w-full pl-11 pr-12 py-4 h-14 bg-white dark:bg-[#1a1a1a] border-gray-200 dark:border-none rounded-2xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:bg-gray-50 dark:focus:bg-[#222] focus:ring-2 focus:ring-brand-purple/20 transition-all duration-300 shadow-sm dark:shadow-none appearance-none" />
+                                                <button
+                                                    type="button"
+                                                    @click="removerInforme(idx)"
+                                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-red-500 transition-colors"
+                                                    x-show="informes.length > 1 || (informes.length === 1 && informes[0] !== '')">
+                                                    <x-mary-icon name="o-trash" class="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <x-select-premium name="estatus_acta_id" label="Estatus" placeholder="Seleccione estatus" required icon="o-clock" :options="$estatuses->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()" :value="old('estatus_acta_id', $desincorporacion->estatus_acta_id)" />
                                 </div>
-                                <x-select-premium name="estatus_acta_id" label="Estatus" placeholder="Seleccione estatus" required icon="o-clock" :options="$estatuses->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()" :value="old('estatus_acta_id', $desincorporacion->estatus_acta_id)" />
+                            </div>
+
+                            <div class="p-2 space-y-4">
+                                <button type="submit" class="w-full inline-flex items-center justify-center px-8 py-5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-2xl font-black text-xs text-white uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all duration-300 shadow-[0_10px_30px_rgba(168,85,247,0.3)] cursor-pointer group">
+                                    <x-mary-icon name="o-arrow-path" class="w-5 h-5 mr-3 group-hover:rotate-180 transition-transform duration-500" />
+                                    {{ __('Actualizar Desincorporación') }}
+                                </button>
+                                <a href="{{ route('desincorporaciones.index') }}" class="w-full inline-flex items-center justify-center px-8 py-4 bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl font-bold text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-300">
+                                    {{ __('Descartar Cambios') }}
+                                </a>
                             </div>
                         </div>
-
-                        <div class="p-2 space-y-4">
-                            <button type="submit" class="w-full inline-flex items-center justify-center px-8 py-5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-2xl font-black text-xs text-white uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all duration-300 shadow-[0_10px_30px_rgba(168,85,247,0.3)] cursor-pointer group">
-                                <x-mary-icon name="o-arrow-path" class="w-5 h-5 mr-3 group-hover:rotate-180 transition-transform duration-500" />
-                                {{ __('Actualizar Desincorporación') }}
-                            </button>
-                            <a href="{{ route('desincorporaciones.index') }}" class="w-full inline-flex items-center justify-center px-8 py-4 bg-transparent border border-gray-200 dark:border-white/10 rounded-2xl font-bold text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-white/5 transition-all duration-300">
-                                {{ __('Descartar Cambios') }}
-                            </a>
-                        </div>
                     </div>
-                </div>
             </form>
         </div>
     </div>
