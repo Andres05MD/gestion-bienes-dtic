@@ -349,7 +349,9 @@ class BienMovimientoService
             tipoMovimiento: MovimientoBien::TIPO_DISTRIBUCION,
             operacionType: DistribucionDireccion::class,
             operacionId: $distribucion->id,
-            departamentoOrigenId: $distribucion->procedencia_id,
+            departamentoOrigenId: null,
+            departamentoDestinoId: $distribucion->procedencia_id,
+            areaDestinoId: $distribucion->area_id,
             descripcion: "Distribución desde dirección",
             fecha: $distribucion->fecha?->toDateString(),
         );

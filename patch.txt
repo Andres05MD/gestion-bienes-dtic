@@ -1,0 +1,64 @@
+--- resources/views/desincorporaciones/edit.blade.php
++++ resources/views/desincorporaciones/edit.blade.php
+@@ -114,9 +114,16 @@
+                         </div>
+ 
+                         <!-- Estado y Datos -->
++                        @php
++                            $informesExtraidos = $bienesGrupo->pluck('numero_informe')
++                                ->filter()
++                                ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
++                                ->unique()
++                                ->values()
++                                ->toArray();
++                        @endphp
+                         <div x-data="{ 
+                             activeCard: false,
+-                            informes: @js(old('numero_informe', $bienesGrupo->pluck('numero_informe')->map(fn($i) => $i ?: '')->toArray() ?: [''])),
++                            informes: @js(old('numero_informe', !empty($informesExtraidos) ? $informesExtraidos : [''])),
+                             
+                             agregarInforme() {
+--- resources/views/desincorporaciones/show.blade.php
++++ resources/views/desincorporaciones/show.blade.php
+@@ -116,7 +116,13 @@
+                                     <div class="group">
+                                         <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">N° Informe(s)</p>
+                                         <p class="text-xl font-mono font-bold text-brand-lila tracking-wider">
+-                                            {{ $bienesGrupo->pluck('numero_informe')->filter()->unique()->implode(', ') ?: 'N/A' }}
++                                            @php
++                                                $todosLosInformesShow = $bienesGrupo->pluck('numero_informe')
++                                                    ->filter()
++                                                    ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
++                                                    ->unique()
++                                                    ->implode(', ');
++                                            @endphp
++                                            {{ $todosLosInformesShow ?: 'N/A' }}
+                                         </p>
+                                     </div>
+@@ -137,8 +143,12 @@
+                                                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SN: <span class="text-gray-200 ml-1">{{ $bg->serial ?: 'N/A' }}</span></span>
+                                                     </div>
+                                                     @if($bg->numero_informe)
++                                                    @php
++                                                        $informesDelBien = array_map('trim', explode(',', $bg->numero_informe));
++                                                        $informeMostrar = count($informesDelBien) > 1 ? ($informesDelBien[$loop->index] ?? $informesDelBien[0]) : $bg->numero_informe;
++                                                    @endphp
+                                                     <div class="inline-flex items-center gap-2 bg-brand-purple/10 px-4 py-2.5 rounded-2xl border border-brand-purple/20 shadow-sm">
+                                                         <x-mary-icon name="o-document-text" class="w-4 h-4 text-brand-lila" />
+-                                                        <span class="text-[10px] font-bold text-brand-lila uppercase tracking-wider">Informe: <span class="text-white ml-1 font-mono">{{ $bg->numero_informe }}</span></span>
++                                                        <span class="text-[10px] font-bold text-brand-lila uppercase tracking-wider">Informe: <span class="text-white ml-1 font-mono">{{ $informeMostrar }}</span></span>
+                                                     </div>
+                                                     @endif
+--- resources/views/desincorporaciones/index.blade.php
++++ resources/views/desincorporaciones/index.blade.php
+@@ -143,7 +143,10 @@
+                                     <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text font-medium">{{ $primera->fecha->format('d/m/Y') }}</td>
+                                     <td class="px-6 py-4 whitespace-nowrap text-base">
+                                         @php
+-                                            $todosLosInformes = $grupo->pluck('numero_informe')->filter()->unique();
++                                            $todosLosInformes = $grupo->pluck('numero_informe')
++                                                ->filter()
++                                                ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
++                                                ->unique();
+                                         @endphp
+                                         @if($todosLosInformes->isNotEmpty())

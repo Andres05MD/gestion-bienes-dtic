@@ -136,7 +136,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => 'transferencia']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'transferencia' ? 'border-blue-500/50 bg-blue-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden group">
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => request('tipo_movimiento') === 'transferencia' ? null : 'transferencia']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'transferencia' ? 'border-blue-500/50 bg-blue-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden group">
                             <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
@@ -149,7 +149,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => 'mantenimiento']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'mantenimiento' ? 'border-amber-500/50 bg-amber-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-amber-500/50 transition-all duration-300 relative overflow-hidden group">
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => request('tipo_movimiento') === 'mantenimiento' ? null : 'mantenimiento']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'mantenimiento' ? 'border-amber-500/50 bg-amber-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-amber-500/50 transition-all duration-300 relative overflow-hidden group">
                             <div class="absolute inset-0 bg-amber-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex justify-between items-start relative z-10">
                                 <div>
@@ -162,7 +162,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => 'desincorporacion']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'desincorporacion' ? 'border-rose-500/50 bg-rose-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-rose-500/50 transition-all duration-300 relative overflow-hidden group">
+                        <a href="{{ request()->fullUrlWithQuery(['tipo_movimiento' => request('tipo_movimiento') === 'desincorporacion' ? null : 'desincorporacion']) }}" class="bg-dark-900 border {{ request('tipo_movimiento') === 'desincorporacion' ? 'border-rose-500/50 bg-rose-500/5' : 'border-dark-800' }} rounded-2xl p-4 hover:border-rose-500/50 transition-all duration-300 relative overflow-hidden group">
                             <div class="absolute inset-0 bg-rose-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex justify-between items-start relative z-10">
                                 <div>

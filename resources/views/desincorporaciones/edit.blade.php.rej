@@ -1,0 +1,21 @@
+--- resources/views/desincorporaciones/edit.blade.php
++++ resources/views/desincorporaciones/edit.blade.php
+@@ -114,9 +114,16 @@
+                         </div>
+ 
+                         <!-- Estado y Datos -->
++                        @php
++                            $informesExtraidos = $bienesGrupo->pluck('numero_informe')
++                                ->filter()
++                                ->flatMap(fn($i) => array_map('trim', explode(',', $i)))
++                                ->unique()
++                                ->values()
++                                ->toArray();
++                        @endphp
+                         <div x-data="{ 
+                             activeCard: false,
+-                            informes: @js(old('numero_informe', $bienesGrupo->pluck('numero_informe')->map(fn($i) => $i ?: '')->toArray() ?: [''])),
++                            informes: @js(old('numero_informe', !empty($informesExtraidos) ? $informesExtraidos : [''])),
+                             
+                             agregarInforme() {
+--- resources/views/desincorporaciones/show.blade.php

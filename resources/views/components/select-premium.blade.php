@@ -28,11 +28,15 @@
             return option ? option.label : '{{ $placeholder }}';
         },
         select(val) {
-            this.selected = val;
+            if (this.selected == val) {
+                this.selected = null;
+            } else {
+                this.selected = val;
+            }
             this.open = false;
             this.search = '';
-            this.$dispatch('option-selected', val);
-            this.$dispatch('change', val);
+            this.$dispatch('option-selected', this.selected);
+            this.$dispatch('change', this.selected);
         }
      }"
     @click.away="open = false; search = ''"
