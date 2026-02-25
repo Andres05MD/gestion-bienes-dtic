@@ -58,7 +58,7 @@
                             </div>
 
                             <div class="mt-6">
-                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número</p>
+                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número de Bien</p>
                                 <h1 class="text-5xl font-black text-white tracking-tighter">{{ $bien->numero_bien }}</h1>
                             </div>
 

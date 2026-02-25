@@ -51,9 +51,9 @@
                                 <span class="px-3 py-1 mb-2 text-[9px] font-black rounded-full uppercase tracking-widest {{ $mantenimiento->tipo_movimiento === 'entrada' ? 'bg-brand-lila/20 text-brand-lila' : 'bg-emerald-500/20 text-emerald-400' }}">
                                     {{ $mantenimiento->tipo_movimiento }}
                                 </span>
-                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número</p>
-                                <h1 class="text-4xl font-black text-white tracking-tighter">
-                                    #{{ $mantenimiento->numero_bien }}
+                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número de Bien</p>
+                                <h1 class="text-5xl font-black text-white tracking-tighter">
+                                    {{ $mantenimiento->numero_bien }}
                                 </h1>
                             </div>
 
@@ -64,11 +64,26 @@
                         </div>
                     </div>
 
-                    <!-- Tarjetas de Movimiento -->
-                    <div class="space-y-4">
-                        <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 p-8 shadow-2xl relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    <!-- Tarjeta de Estatus, Procedencia y Destino -->
+                    <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 p-8 shadow-2xl space-y-6 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+
+                        @if($mantenimiento->estatusActa)
+                        <div class="relative z-10 text-center">
+                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Estatus del Acta</p>
+                            @php
+                            $estatusColor = $mantenimiento->estatusActa->color ?? '#6b7280';
+                            @endphp
+                            <div class="inline-flex px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg"
+                                @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50"
+                                ])>
+                                {!! str_replace(' falta ', '<br>falta ', e($mantenimiento->estatusActa->nombre)) !!}
+                            </div>
+                        </div>
+                        <div class="border-t border-white/5 pt-6 relative z-10 text-center">
+                            @else
                             <div class="relative z-10 text-center">
+                                @endif
                                 <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Procedencia</p>
                                 <div class="flex flex-col items-center gap-2">
                                     <div class="flex justify-center items-center gap-2">
@@ -80,11 +95,8 @@
                                     @endif
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 p-8 shadow-2xl relative overflow-hidden group">
-                            <div class="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                            <div class="relative z-10 text-center">
+                            <div class="border-t border-white/5 pt-6 relative z-10 text-center">
                                 <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Destino</p>
                                 <div class="flex flex-col items-center gap-2">
                                     <div class="flex justify-center items-center gap-2">
@@ -98,102 +110,101 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Columna Derecha: Detalles -->
-                <div class="lg:col-span-8 space-y-8">
-                    <!-- Panel de Especificaciones -->
-                    <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
-                        <div class="px-10 py-8 border-b border-white/5 bg-white/1 flex items-center justify-between">
-                            <h3 class="text-sm font-black text-white uppercase tracking-[0.25em] flex items-center gap-3">
-                                <x-mary-icon name="o-document-text" class="w-6 h-6 text-brand-purple" />
-                                Detalles del Movimiento
-                            </h3>
-                            <div class="flex gap-2">
-                                <div class="w-2.5 h-2.5 rounded-full bg-rose-500/20"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-amber-500/20"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/20"></div>
+                    <!-- Columna Derecha: Detalles -->
+                    <div class="lg:col-span-8 space-y-8">
+                        <!-- Panel de Especificaciones -->
+                        <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+                            <div class="px-10 py-8 border-b border-white/5 bg-white/1 flex items-center justify-between">
+                                <h3 class="text-sm font-black text-white uppercase tracking-[0.25em] flex items-center gap-3">
+                                    <x-mary-icon name="o-document-text" class="w-6 h-6 text-brand-purple" />
+                                    Detalles del Movimiento
+                                </h3>
+                                <div class="flex gap-2">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-rose-500/20"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500/20"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/20"></div>
+                                </div>
+                            </div>
+
+                            <div class="p-12">
+                                <div class="mb-12">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Descripción</p>
+                                    <p class="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">{{ $mantenimiento->descripcion }}</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-16 gap-x-12 border-t border-white/5 pt-12">
+                                    <!-- Serial -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Serial</p>
+                                        <p class="text-2xl font-mono font-bold text-brand-lila tracking-wider">{{ $mantenimiento->serial ?? '—' }}</p>
+                                    </div>
+
+                                    <!-- Fecha Registro Movimiento -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha de Movimiento</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->fecha->format('d/m/Y') }}</p>
+                                    </div>
+
+                                    @if($mantenimiento->n_orden_acta)
+                                    <!-- N Orden Acta -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">N° de Acta</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->n_orden_acta }}</p>
+                                    </div>
+                                    @endif
+
+                                    @if($mantenimiento->fecha_acta)
+                                    <!-- Fecha Acta -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha de Acta</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->fecha_acta->format('d/m/Y') }}</p>
+                                    </div>
+                                    @endif
+
+                                    <!-- Fecha Firma -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha de Firma</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->fecha_firma?->format('d/m/Y') ?? '—' }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="p-12">
-                            <div class="mb-12">
-                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Descripción</p>
-                                <p class="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">{{ $mantenimiento->descripcion }}</p>
+                        <!-- Metadatos de Sistema -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
+                                <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
+                                    <x-mary-icon name="o-user" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Registrado por</p>
+                                    <p class="text-lg font-black text-white">{{ $mantenimiento->user?->name ?? 'Sistema' }}</p>
+                                </div>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-16 gap-x-12 border-t border-white/5 pt-12">
-                                <!-- Serial -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Serial</p>
-                                    <p class="text-2xl font-mono font-bold text-brand-lila tracking-wider">{{ $mantenimiento->serial ?? '—' }}</p>
+                            <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
+                                <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
+                                    <x-mary-icon name="o-calendar" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
                                 </div>
-
-                                <!-- Fecha Registro Movimiento -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha de Movimiento</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->fecha->format('d/m/Y') }}</p>
-                                </div>
-
-                                @if($mantenimiento->n_orden_acta)
-                                <!-- N Orden Acta -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">N° de Acta</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->n_orden_acta }}</p>
-                                </div>
-                                @endif
-
-                                @if($mantenimiento->fecha_acta)
-                                <!-- Fecha Acta -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha de Acta</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->fecha_acta->format('d/m/Y') }}</p>
-                                </div>
-                                @endif
-
-                                <!-- Fecha Firma -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha de Firma</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $mantenimiento->fecha_firma?->format('d/m/Y') ?? '—' }}</p>
+                                <div>
+                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Fecha de Registro</p>
+                                    <p class="text-lg font-black text-white">{{ $mantenimiento->created_at->format('d/m/Y') }}</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Metadatos de Sistema -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
-                            <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
-                                <x-mary-icon name="o-user" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Registrado por</p>
-                                <p class="text-lg font-black text-white">{{ $mantenimiento->user?->name ?? 'Sistema' }}</p>
-                            </div>
+                        <!-- Botón de Acción Inferior para móviles -->
+                        <div class="lg:hidden">
+                            @can('editar transferencias')
+                            <a href="{{ route('mantenimientos.edit', $mantenimiento) }}" class="w-full inline-flex items-center justify-center px-8 py-5 bg-white text-brand-purple rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
+                                <x-mary-icon name="o-pencil-square" class="w-5 h-5 mr-3" />
+                                Editar Registro
+                            </a>
+                            @endcan
                         </div>
-
-                        <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
-                            <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
-                                <x-mary-icon name="o-calendar" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Fecha de Registro</p>
-                                <p class="text-lg font-black text-white">{{ $mantenimiento->created_at->format('d/m/Y') }}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Botón de Acción Inferior para móviles -->
-                    <div class="lg:hidden">
-                        @can('editar transferencias')
-                        <a href="{{ route('mantenimientos.edit', $mantenimiento) }}" class="w-full inline-flex items-center justify-center px-8 py-5 bg-white text-brand-purple rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
-                            <x-mary-icon name="o-pencil-square" class="w-5 h-5 mr-3" />
-                            Editar Registro
-                        </a>
-                        @endcan
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </x-app-layout>

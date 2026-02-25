@@ -48,9 +48,9 @@
                             </div>
 
                             <div class="mt-6">
-                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número</p>
-                                <h1 class="text-4xl font-black text-white tracking-tighter">
-                                    #{{ $distribucion->numero_bien }}
+                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número de Bien</p>
+                                <h1 class="text-5xl font-black text-white tracking-tighter">
+                                    {{ $distribucion->numero_bien }}
                                 </h1>
                             </div>
                         </div>
@@ -60,106 +60,109 @@
                     <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 p-8 shadow-2xl space-y-6 relative overflow-hidden group">
                         <div class="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
-                        <div class="relative z-10 text-center">
-                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Departamento Destino</p>
-                            <div class="flex justify-center items-center gap-2">
-                                <x-mary-icon name="o-building-office-2" class="w-5 h-5 text-gray-400" />
-                                <p class="text-base font-black text-white leading-tight">{{ $distribucion->procedencia?->nombre ?? 'N/A' }}</p>
-                            </div>
-                        </div>
-
                         @if($distribucion->estatusActa)
-                        <div class="relative z-10 text-center mt-6 pt-6 border-t border-white/5">
+                        <div class="relative z-10 text-center">
                             <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Estatus del Acta</p>
-                            @php $estatusColor = $distribucion->estatusActa->color ?? '#6b7280'; @endphp
-                            <span class="px-3 py-2 inline-block text-center text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
+                            @php
+                            $estatusColor = $distribucion->estatusActa->color ?? '#6b7280';
+                            @endphp
+                            <div class="inline-flex px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg"
                                 @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50"
                                 ])>
-                                {{ $distribucion->estatusActa->nombre }}
-                            </span>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- Columna Derecha: Detalles -->
-                <div class="lg:col-span-8 space-y-8">
-                    <!-- Panel de Especificaciones -->
-                    <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
-                        <div class="px-10 py-8 border-b border-white/5 bg-white/1 flex items-center justify-between">
-                            <h3 class="text-sm font-black text-white uppercase tracking-[0.25em] flex items-center gap-3">
-                                <x-mary-icon name="o-document-text" class="w-6 h-6 text-brand-purple" />
-                                Detalles de la Distribución
-                            </h3>
-                            <div class="flex gap-2">
-                                <div class="w-2.5 h-2.5 rounded-full bg-rose-500/20"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-amber-500/20"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/20"></div>
+                                {!! str_replace(' falta ', '<br>falta ', e($distribucion->estatusActa->nombre)) !!}
                             </div>
                         </div>
-
-                        <div class="p-12">
-                            <div class="mb-12">
-                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Descripción</p>
-                                <p class="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">{{ $distribucion->descripcion }}</p>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-16 gap-x-12 border-t border-white/5 pt-12">
-                                <!-- Fecha -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $distribucion->fecha->format('d/m/Y') }}</p>
-                                </div>
-
-                                <!-- Marca -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Marca</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $distribucion->marca ?? 'SIN MARCA' }}</p>
-                                </div>
-
-                                <!-- Serial -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Serial</p>
-                                    <p class="text-2xl font-mono font-bold text-brand-lila tracking-wider">{{ $distribucion->serial ?? 'S/N' }}</p>
+                        <div class="border-t border-white/5 pt-6 relative z-10 text-center">
+                            @else
+                            <div class="relative z-10 text-center">
+                                @endif
+                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Departamento Destino</p>
+                                <div class="flex justify-center items-center gap-2">
+                                    <x-mary-icon name="o-building-office-2" class="w-5 h-5 text-gray-400" />
+                                    <p class="text-base font-black text-white leading-tight">{{ $distribucion->procedencia?->nombre ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Metadatos de Sistema -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
-                            <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
-                                <x-mary-icon name="o-user" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                    <!-- Columna Derecha: Detalles -->
+                    <div class="lg:col-span-8 space-y-8">
+                        <!-- Panel de Especificaciones -->
+                        <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+                            <div class="px-10 py-8 border-b border-white/5 bg-white/1 flex items-center justify-between">
+                                <h3 class="text-sm font-black text-white uppercase tracking-[0.25em] flex items-center gap-3">
+                                    <x-mary-icon name="o-document-text" class="w-6 h-6 text-brand-purple" />
+                                    Detalles de la Distribución
+                                </h3>
+                                <div class="flex gap-2">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-rose-500/20"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500/20"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/20"></div>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Registrado por</p>
-                                <p class="text-lg font-black text-white">{{ $distribucion->user?->name ?? 'Sistema' }}</p>
+
+                            <div class="p-12">
+                                <div class="mb-12">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-3">Descripción</p>
+                                    <p class="text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">{{ $distribucion->descripcion }}</p>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-16 gap-x-12 border-t border-white/5 pt-12">
+                                    <!-- Fecha -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $distribucion->fecha->format('d/m/Y') }}</p>
+                                    </div>
+
+                                    <!-- Marca -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Marca</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $distribucion->marca ?? 'SIN MARCA' }}</p>
+                                    </div>
+
+                                    <!-- Serial -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Serial</p>
+                                        <p class="text-2xl font-mono font-bold text-brand-lila tracking-wider">{{ $distribucion->serial ?? 'S/N' }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
-                            <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
-                                <x-mary-icon name="o-calendar" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                        <!-- Metadatos de Sistema -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
+                                <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
+                                    <x-mary-icon name="o-user" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Registrado por</p>
+                                    <p class="text-lg font-black text-white">{{ $distribucion->user?->name ?? 'Sistema' }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Fecha de Registro</p>
-                                <p class="text-lg font-black text-white">{{ $distribucion->created_at->format('d/m/Y') }}</p>
+
+                            <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
+                                <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
+                                    <x-mary-icon name="o-calendar" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Fecha de Registro</p>
+                                    <p class="text-lg font-black text-white">{{ $distribucion->created_at->format('d/m/Y') }}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Botón de Acción Inferior para móviles -->
-                    <div class="lg:hidden">
-                        @can('editar distribuciones')
-                        <a href="{{ route('distribuciones-direccion.edit', $distribucion) }}" class="w-full inline-flex items-center justify-center px-8 py-5 bg-white text-brand-purple rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
-                            <x-mary-icon name="o-pencil-square" class="w-5 h-5 mr-3" />
-                            Editar Registro
-                        </a>
-                        @endcan
+                        <!-- Botón de Acción Inferior para móviles -->
+                        <div class="lg:hidden">
+                            @can('editar distribuciones')
+                            <a href="{{ route('distribuciones-direccion.edit', $distribucion) }}" class="w-full inline-flex items-center justify-center px-8 py-5 bg-white text-brand-purple rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
+                                <x-mary-icon name="o-pencil-square" class="w-5 h-5 mr-3" />
+                                Editar Registro
+                            </a>
+                            @endcan
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </x-app-layout>

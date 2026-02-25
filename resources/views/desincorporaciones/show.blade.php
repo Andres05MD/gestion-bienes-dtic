@@ -48,137 +48,151 @@
                             </div>
 
                             <div class="mt-6">
-                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número</p>
-                                <h1 class="text-3xl font-black text-white tracking-tighter">
+                                <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-2">Número de Desinc.</p>
+                                <h1 class="text-4xl font-black text-white tracking-tighter">
                                     @if($bienesGrupo->count() > 1)
                                     Grupo ({{ $bienesGrupo->count() }} ítems)
                                     @else
-                                    #{{ $desincorporacion->numero_bien }}
+                                    {{ $desincorporacion->numero_bien }}
                                     @endif
                                 </h1>
                             </div>
-
-                            <div class="mt-10 pt-10 border-t border-white/5 text-center">
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-2">Estatus Acta</p>
-                                <p class="text-sm font-black text-brand-lila leading-tight">{{ $desincorporacion->estatusActa?->nombre ?? 'N/A' }}</p>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Tarjeta de Estado y Ubicación -->
+                    <!-- Tarjeta de Estatus y Procedencia -->
                     <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 p-8 shadow-2xl space-y-6 relative overflow-hidden group">
                         <div class="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
 
+                        @if($desincorporacion->estatusActa)
                         <div class="relative z-10 text-center">
-                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Procedencia</p>
-                            <div class="flex justify-center items-center gap-2">
-                                <x-mary-icon name="o-building-office" class="w-5 h-5 text-gray-400" />
-                                <p class="text-base font-black text-white leading-tight">{{ $desincorporacion->procedencia?->nombre ?? 'N/A' }}</p>
+                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Estatus del Acta</p>
+                            @php
+                            $estatusColor = $desincorporacion->estatusActa->color ?? '#6b7280';
+                            @endphp
+                            <div class="inline-flex px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg"
+                                @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50"
+                                ])>
+                                {!! str_replace(' falta ', '<br>falta ', e($desincorporacion->estatusActa->nombre)) !!}
+                            </div>
+                        </div>
+                        <div class="border-t border-white/5 pt-6 relative z-10 text-center">
+                            @else
+                            <div class="relative z-10 text-center">
+                                @endif
+                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Procedencia</p>
+                                <div class="flex justify-center items-center gap-2">
+                                    <x-mary-icon name="o-building-office" class="w-5 h-5 text-gray-400" />
+                                    <p class="text-base font-black text-white leading-tight">{{ $desincorporacion->procedencia?->nombre ?? 'N/A' }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Columna Derecha: Detalles -->
-                <div class="lg:col-span-8 space-y-8">
-                    <!-- Panel de Especificaciones -->
-                    <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
-                        <div class="px-10 py-8 border-b border-white/5 bg-white/1 flex items-center justify-between">
-                            <h3 class="text-sm font-black text-white uppercase tracking-[0.25em] flex items-center gap-3">
-                                <x-mary-icon name="o-document-text" class="w-6 h-6 text-brand-purple" />
-                                Detalles de la Desincorporación
-                            </h3>
-                            <div class="flex gap-2">
-                                <div class="w-2.5 h-2.5 rounded-full bg-rose-500/20"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-amber-500/20"></div>
-                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/20"></div>
-                            </div>
-                        </div>
-
-                        <div class="p-12">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-16 gap-x-12">
-                                <!-- Fecha -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha</p>
-                                    <p class="text-2xl font-black text-white tracking-tight">{{ $desincorporacion->fecha->format('d/m/Y') }}</p>
-                                </div>
-
-                                <!-- N Informe -->
-                                <div class="group">
-                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">N° Informe</p>
-                                    <p class="text-2xl font-mono font-bold text-brand-lila tracking-wider">{{ $desincorporacion->numero_informe ?? 'N/A' }}</p>
+                    <!-- Columna Derecha: Detalles -->
+                    <div class="lg:col-span-8 space-y-8">
+                        <!-- Panel de Especificaciones -->
+                        <div class="bg-dark-850 rounded-[2.5rem] border border-white/5 overflow-hidden shadow-2xl">
+                            <div class="px-10 py-8 border-b border-white/5 bg-white/1 flex items-center justify-between">
+                                <h3 class="text-sm font-black text-white uppercase tracking-[0.25em] flex items-center gap-3">
+                                    <x-mary-icon name="o-document-text" class="w-6 h-6 text-brand-purple" />
+                                    Detalles de la Desincorporación
+                                </h3>
+                                <div class="flex gap-2">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-rose-500/20"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500/20"></div>
+                                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/20"></div>
                                 </div>
                             </div>
 
-                            <!-- Bienes Involucrados -->
-                            <div class="mt-16 pt-10 border-t border-white/5">
-                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6">Bienes involucrados</p>
-                                <div class="space-y-6">
-                                    @foreach($bienesGrupo as $bg)
-                                    <div class="bg-dark-900 rounded-3xl p-6 border border-white/5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between group overflow-hidden relative">
-                                        <div class="absolute inset-0 bg-linear-to-r from-brand-purple/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                        <div class="relative z-10">
-                                            <p class="text-lg font-black text-white leading-tight tracking-tight">{{ $bg->descripcion }}</p>
-                                            <div class="flex gap-3 mt-2">
-                                                <code class="text-xs font-mono text-brand-lila bg-brand-lila/10 px-2 py-1 rounded-lg">{{ $bg->numero_bien }}</code>
-                                                <span class="text-xs font-bold text-gray-400">SN: {{ $bg->serial ?: 'S/N' }}</span>
+                            <div class="p-12">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-y-16 gap-x-12">
+                                    <!-- Fecha -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">Fecha</p>
+                                        <p class="text-2xl font-black text-white tracking-tight">{{ $desincorporacion->fecha->format('d/m/Y') }}</p>
+                                    </div>
+
+                                    <!-- N Informe -->
+                                    <div class="group">
+                                        <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.25em] mb-2 group-hover:text-brand-lila transition-colors">N° Informe</p>
+                                        <p class="text-2xl font-mono font-bold text-brand-lila tracking-wider">{{ $desincorporacion->numero_informe ?? 'N/A' }}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Bienes Involucrados -->
+                                <div class="mt-16 pt-10 border-t border-white/5">
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em] mb-6">Bienes involucrados</p>
+                                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                                        @foreach($bienesGrupo as $bg)
+                                        <div class="bg-dark-900/50 hover:bg-dark-900 rounded-[2.5rem] p-8 border border-white/5 relative group transition-all duration-300">
+                                            <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:scale-110 group-hover:opacity-20 transition-all duration-500 pointer-events-none">
+                                                <x-mary-icon name="o-cube" class="w-16 h-16 text-brand-purple" />
+                                            </div>
+                                            <div class="relative z-10">
+                                                <p class="text-[10px] font-black text-brand-lila uppercase tracking-[0.2em] mb-3">{{ $bg->numero_bien }}</p>
+                                                <p class="text-lg font-black text-white leading-tight tracking-tight mb-6 pr-12">{{ $bg->descripcion }}</p>
+
+                                                <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-2.5 rounded-2xl border border-white/5 shadow-sm">
+                                                    <x-mary-icon name="o-qr-code" class="w-4 h-4 text-gray-500" />
+                                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SN: <span class="text-gray-200 ml-1">{{ $bg->serial ?: 'N/A' }}</span></span>
+                                                </div>
                                             </div>
                                         </div>
+                                        @endforeach
                                     </div>
-                                    @endforeach
+                                </div>
+
+                                @if($desincorporacion->observaciones)
+                                <div class="mt-16 pt-10 border-t border-white/5">
+                                    <div class="bg-dark-900 rounded-3xl p-8 border border-white/5 relative group overflow-hidden">
+                                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
+                                            <x-mary-icon name="o-document-text" class="w-24 h-24" />
+                                        </div>
+                                        <h4 class="text-[10px] font-black text-brand-lila uppercase tracking-[0.3em] mb-4">Notas y Observaciones</h4>
+                                        <p class="text-gray-300 font-medium leading-relaxed italic pr-12">
+                                            "{{ $desincorporacion->observaciones }}"
+                                        </p>
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Metadatos de Sistema -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
+                                <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
+                                    <x-mary-icon name="o-user" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Registrado por</p>
+                                    <p class="text-lg font-black text-white">{{ $desincorporacion->user?->name ?? 'Sistema' }}</p>
                                 </div>
                             </div>
 
-                            @if($desincorporacion->observaciones)
-                            <div class="mt-16 pt-10 border-t border-white/5">
-                                <div class="bg-dark-900 rounded-3xl p-8 border border-white/5 relative group overflow-hidden">
-                                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                                        <x-mary-icon name="o-document-text" class="w-24 h-24" />
-                                    </div>
-                                    <h4 class="text-[10px] font-black text-brand-lila uppercase tracking-[0.3em] mb-4">Notas y Observaciones</h4>
-                                    <p class="text-gray-300 font-medium leading-relaxed italic pr-12">
-                                        "{{ $desincorporacion->observaciones }}"
-                                    </p>
+                            <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
+                                <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
+                                    <x-mary-icon name="o-calendar" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Fecha de Registro</p>
+                                    <p class="text-lg font-black text-white">{{ $desincorporacion->created_at->format('d/m/Y') }}</p>
                                 </div>
                             </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <!-- Metadatos de Sistema -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
-                            <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
-                                <x-mary-icon name="o-user" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Registrado por</p>
-                                <p class="text-lg font-black text-white">{{ $desincorporacion->user?->name ?? 'Sistema' }}</p>
-                            </div>
                         </div>
 
-                        <div class="bg-dark-850/50 backdrop-blur-xl p-8 rounded-4xl border border-white/5 flex items-center gap-5 shadow-xl group hover:border-white/10 transition-colors">
-                            <div class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-brand-purple/10 transition-colors">
-                                <x-mary-icon name="o-calendar" class="w-7 h-7 text-gray-400 group-hover:text-brand-lila transition-colors" />
-                            </div>
-                            <div>
-                                <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Fecha de Registro</p>
-                                <p class="text-lg font-black text-white">{{ $desincorporacion->created_at->format('d/m/Y') }}</p>
-                            </div>
+                        <!-- Botón de Acción Inferior para móviles -->
+                        <div class="lg:hidden">
+                            @can('editar desincorporaciones')
+                            <a href="{{ route('desincorporaciones.edit', $desincorporacion) }}" class="w-full inline-flex items-center justify-center px-8 py-5 bg-white text-brand-purple rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
+                                <x-mary-icon name="o-pencil-square" class="w-5 h-5 mr-3" />
+                                Editar Registro
+                            </a>
+                            @endcan
                         </div>
-                    </div>
-
-                    <!-- Botón de Acción Inferior para móviles -->
-                    <div class="lg:hidden">
-                        @can('editar desincorporaciones')
-                        <a href="{{ route('desincorporaciones.edit', $desincorporacion) }}" class="w-full inline-flex items-center justify-center px-8 py-5 bg-white text-brand-purple rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-2xl active:scale-95 transition-all">
-                            <x-mary-icon name="o-pencil-square" class="w-5 h-5 mr-3" />
-                            Editar Registro
-                        </a>
-                        @endcan
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </x-app-layout>
