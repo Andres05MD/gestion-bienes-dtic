@@ -131,7 +131,7 @@
                                         </div>
                                         <div class="flex items-center gap-2 mt-1.5">
                                             <x-mary-icon name="o-calendar" class="w-3.5 h-3.5 text-gray-500" />
-                                            <p class="text-[11px] text-gray-400 font-medium">{{ $mov->fecha->format('d/m/Y') }} <span class="text-gray-600 mx-1">•</span> Hace {{ $mov->created_at->diffForHumans() }}</p>
+                                            <p class="text-[11px] text-gray-400 font-medium">{{ $mov->fecha->format('d/m/Y') }} <span class="text-gray-600 mx-1">•</span> {{ ucfirst($mov->created_at->diffForHumans()) }}</p>
                                         </div>
                                     </div>
                                     @if($mov->user)

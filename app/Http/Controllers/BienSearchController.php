@@ -76,6 +76,6 @@ class BienSearchController extends Controller
                 return $data;
             });
 
-        return response()->json($bienes->merge($externos)->take(20)->values());
+        return response()->json(collect($bienes)->merge($externos)->take(20)->values());
     }
 }

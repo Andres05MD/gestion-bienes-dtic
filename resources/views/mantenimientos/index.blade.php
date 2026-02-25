@@ -159,8 +159,13 @@
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-3 py-1 inline-flex text-[10px] leading-4 font-black rounded-lg bg-gray-100 dark:bg-white/10 text-gray-800 dark:text-gray-200 shadow-sm uppercase">
-                                            {{ $primera->estatusActa?->nombre ?? 'N/A' }}
+                                        @php
+                                        $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
+                                        @endphp
+                                        <span class="px-2.5 py-1.5 inline-block text-center text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
+                                            @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50"
+                                            ])>
+                                            {!! str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A')) !!}
                                         </span>
                                     </td>
 

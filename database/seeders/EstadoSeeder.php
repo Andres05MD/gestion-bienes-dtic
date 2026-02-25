@@ -14,19 +14,18 @@ class EstadoSeeder extends Seeder
     public function run(): void
     {
         $estados = [
-            'Bueno',
-            'Malo',
-            'Regular',
-            'En Reparacion',
-            'Desincorporado',
+            ['nombre' => 'BUENO', 'color' => '#34d399'],
+            ['nombre' => 'MALO', 'color' => '#fb7185'],
+            ['nombre' => 'REGULAR', 'color' => '#fbbf24'],
+            ['nombre' => 'EN REPARACION', 'color' => '#60a5fa'],
+            ['nombre' => 'DESINCORPORADO', 'color' => '#9ca3af'],
         ];
 
         foreach ($estados as $estado) {
-            DB::table('estados')->insert([
-                'nombre' => $estado,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            \App\Models\Estado::updateOrCreate(
+                ['nombre' => $estado['nombre']],
+                ['color' => $estado['color']]
+            );
         }
     }
 }

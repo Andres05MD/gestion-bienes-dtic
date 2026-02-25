@@ -14,15 +14,15 @@ class AreaSeeder extends Seeder
     public function run(): void
     {
         $areas = [
-            'Jefatura',
-            'Asistente',
-            'Programación',
-            'Soporte Técnico',
-            'Carnetización',
-            'Secretaría',
-            'Cuarto de Servidores',
-            'Central Telefónica',
-            'Área Común',
+            'JEFATURA',
+            'ASISTENTE',
+            'PROGRAMACIÓN',
+            'SOPORTE TÉCNICO',
+            'CARNETIZACIÓN',
+            'SECRETARÍA',
+            'CUARTO DE SERVIDORES',
+            'CENTRAL TELEFÓNICA',
+            'ÁREA COMÚN',
         ];
 
         foreach ($areas as $area) {

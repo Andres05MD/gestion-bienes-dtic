@@ -119,7 +119,7 @@
                                         {{ $bien->area?->nombre ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-3 py-1 inline-flex text-[10px] leading-4 font-black rounded-lg {{ $bien->estado?->badgeClasses() ?? 'bg-gray-500/10 text-gray-400' }} shadow-sm uppercase">
+                                        <span style="{{ $bien->estado?->badgeStyles() }}" class="px-3 py-1 inline-flex text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase">
                                             {{ $bien->estado?->nombre ?? 'Sin Estado' }}
                                         </span>
                                     </td>

@@ -13,9 +13,9 @@ class EstatusActaSeeder extends Seeder
     public function run(): void
     {
         $estatus = [
-            ['nombre' => 'Actas Listas', 'color' => '#22c55e'], // Verde
-            ['nombre' => 'Acta Firmada falta Copia', 'color' => '#f59e0b'], // Ámbar/Naranja
-            ['nombre' => 'Pendiente', 'color' => '#ef4444'], // Rojo/Pendiente
+            ['nombre' => 'ACTAS LISTAS', 'color' => '#22c55e'], // Verde
+            ['nombre' => 'ACTA FIRMADA FALTA COPIA', 'color' => '#f59e0b'], // Ámbar/Naranja
+            ['nombre' => 'PENDIENTE', 'color' => '#ef4444'], // Rojo/Pendiente
         ];
 
         foreach ($estatus as $item) {

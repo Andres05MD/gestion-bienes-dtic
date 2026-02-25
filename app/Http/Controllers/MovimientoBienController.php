@@ -117,8 +117,8 @@ class MovimientoBienController extends Controller
                 'areaDestino',
                 'user',
             ])
-            ->orderBy('fecha', 'asc')
-            ->orderBy('created_at', 'asc')
+            ->orderBy('fecha', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         // También buscar movimientos por numero_bien (para bienes que cambiaron de tabla)
@@ -134,14 +134,14 @@ class MovimientoBienController extends Controller
                 'areaDestino',
                 'user',
             ])
-            ->orderBy('fecha', 'asc')
-            ->orderBy('created_at', 'asc')
+            ->orderBy('fecha', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         // Combinar y ordenar cronológicamente
         $todosMovimientos = $movimientos->merge($movimientosPorNumero)->sortBy([
-            ['fecha', 'asc'],
-            ['created_at', 'asc'],
+            ['fecha', 'desc'],
+            ['created_at', 'desc'],
         ]);
 
         return view('movimientos.por-bien', compact('bien', 'tipo', 'todosMovimientos'));

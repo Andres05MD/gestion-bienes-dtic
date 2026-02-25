@@ -76,7 +76,7 @@
                         @if($bienExterno->estado)
                         <div class="relative z-10 text-center">
                             <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Estado Operativo</p>
-                            <div class="inline-flex px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest {{ $bienExterno->estado->badgeClasses() }} shadow-lg">
+                            <div style="{{ $bienExterno->estado?->badgeStyles() }}" class="inline-flex px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
                                 {{ $bienExterno->estado->nombre }}
                             </div>
                         </div>

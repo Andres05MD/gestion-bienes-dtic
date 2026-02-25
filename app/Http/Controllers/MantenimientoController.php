@@ -201,8 +201,9 @@ class MantenimientoController extends Controller
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+        $areas = \App\Models\Area::orderBy('nombre')->get();
 
-        return view('mantenimientos.edit', compact('mantenimiento', 'departamentos', 'estatuses', 'dticId'));
+        return view('mantenimientos.edit', compact('mantenimiento', 'departamentos', 'estatuses', 'dticId', 'areas'));
     }
 
     /**

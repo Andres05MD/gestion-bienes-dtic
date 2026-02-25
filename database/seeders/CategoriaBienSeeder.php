@@ -13,11 +13,11 @@ class CategoriaBienSeeder extends Seeder
     public function run(): void
     {
         $categorias = [
-            'Bien Nacional',
-            'Bien Estadal',
-            'Bien de Terceros', 
-            'Comodato',
-            'Bien Menor',
+            'BIEN NACIONAL',
+            'BIEN ESTADAL',
+            'BIEN DE TERCEROS',
+            'COMODATO',
+            'BIEN MENOR',
             'PENDIENTE POR CATEGORIA',
         ];
 

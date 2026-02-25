@@ -23,6 +23,7 @@ class EstadoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255|unique:estados',
             'descripcion' => 'nullable|string',
+            'color' => 'nullable|string|max:7',
         ]);
 
         Estado::create($request->all());
@@ -45,6 +46,7 @@ class EstadoController extends Controller
         $request->validate([
             'nombre' => 'required|string|max:255|unique:estados,nombre,' . $estado->id,
             'descripcion' => 'nullable|string',
+            'color' => 'nullable|string|max:7',
         ]);
 
         $estado->update($request->all());

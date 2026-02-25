@@ -25,7 +25,7 @@
                 <div class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative group transition-all duration-500">
                     <!-- Inner Shine -->
                     <div class="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none"></div>
-                    
+
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                             <x-mary-icon name="o-shield-check" class="w-6 h-6 text-brand-lila" />
@@ -43,8 +43,7 @@
                             required
                             autofocus
                             icon="o-tag"
-                            placeholder="Ej: Bueno, Malo, En Reparación"
-                        />
+                            placeholder="Ej: Bueno, Malo, En Reparación" />
                         <x-input-error :messages="$errors->get('nombre')" class="mt-2" />
 
                         <div>
@@ -55,15 +54,30 @@
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-start pt-3 pointer-events-none">
                                     <x-mary-icon name="o-document-text" class="h-5 w-5 text-gray-400 group-focus-within:text-brand-lila transition-colors" />
                                 </div>
-                                <textarea 
-                                    id="descripcion" 
-                                    name="descripcion" 
-                                    rows="4" 
-                                    class="block w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-dark-900 border-none rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-brand-purple/50 transition-all text-sm resize-none" 
-                                    placeholder="Breve descripción de lo que representa este estado..."
-                                >{{ old('descripcion') }}</textarea>
+                                <textarea
+                                    id="descripcion"
+                                    name="descripcion"
+                                    rows="4"
+                                    class="block w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-dark-900 border-none rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-brand-purple/50 transition-all text-sm resize-none"
+                                    placeholder="Breve descripción de lo que representa este estado...">{{ old('descripcion') }}</textarea>
                             </div>
                             <x-input-error :messages="$errors->get('descripcion')" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <label for="color" class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 ml-1">
+                                Color del Estado (Opcional)
+                            </label>
+                            <div class="flex items-center gap-4">
+                                <input
+                                    type="color"
+                                    id="color"
+                                    name="color"
+                                    value="{{ old('color', '#6b7280') }}"
+                                    class="w-14 h-14 rounded-2xl cursor-pointer border-none bg-transparent p-0 overflow-hidden shadow-lg hover:scale-105 transition-transform" />
+                                <span class="text-xs text-brand-lila font-bold tracking-widest uppercase" x-text="$el.previousElementSibling.value">{{ old('color', '#6b7280') }}</span>
+                            </div>
+                            <x-input-error :messages="$errors->get('color')" class="mt-2" />
                         </div>
                     </div>
 
