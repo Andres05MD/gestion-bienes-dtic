@@ -137,7 +137,9 @@
                                         </div>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text">{{ $primera->procedencia?->nombre ?? 'N/A' }}</td>
+                                    <td class="px-6 py-4 whitespace-normal min-w-[200px] text-base text-dark-text leading-tight">
+                                        {!! str_replace(' - ', '<br>', e($primera->procedencia?->nombre ?? 'N/A')) !!}
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text font-medium">{{ $primera->fecha->format('d/m/Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-base">
                                         @if($primera->numero_informe)
@@ -148,13 +150,13 @@
                                         </div>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-normal min-w-[160px]">
                                         @php
                                         $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
                                         @endphp
-                                        <span class="px-3 py-1.5 inline-block text-center text-xs leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
+                                        <span class="px-3 py-1.5 inline-block text-center text-xs leading-5 font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal"
                                             @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50" ])>
-                                            {!! str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A')) !!}
+                                            {!! str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A'))) !!}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold flex items-center gap-3">
