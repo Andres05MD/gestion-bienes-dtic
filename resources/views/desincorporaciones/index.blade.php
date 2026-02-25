@@ -142,10 +142,13 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-base text-dark-text font-medium">{{ $primera->fecha->format('d/m/Y') }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-base">
-                                        @if($primera->numero_informe)
+                                        @php
+                                        $todosLosInformes = $grupo->pluck('numero_informe')->filter()->unique();
+                                        @endphp
+                                        @if($todosLosInformes->isNotEmpty())
                                         <div class="flex flex-col gap-2 items-start">
-                                            @foreach(explode(',', $primera->numero_informe) as $informe)
-                                            <code class="text-brand-lila bg-brand-lila/5 px-2.5 py-1 rounded-md font-mono text-sm border border-brand-lila/10">{{ trim($informe) }}</code>
+                                            @foreach($todosLosInformes as $informe)
+                                            <code class="text-brand-lila bg-brand-lila/5 px-2.5 py-1 rounded-md font-mono text-sm border border-brand-lila/10 whitespace-nowrap">{{ trim($informe) }}</code>
                                             @endforeach
                                         </div>
                                         @endif

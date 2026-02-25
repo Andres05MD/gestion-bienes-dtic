@@ -116,7 +116,7 @@
                         <!-- Estado y Datos -->
                         <div x-data="{ 
                             activeCard: false,
-                            informes: @js(old('numero_informe', $desincorporacion->numero_informe ? explode(', ', $desincorporacion->numero_informe) : [''])),
+                            informes: @js(old('numero_informe', $bienesGrupo->pluck('numero_informe')->map(fn($i) => $i ?: '')->toArray() ?: [''])),
                             
                             agregarInforme() {
                                 this.informes.push('');

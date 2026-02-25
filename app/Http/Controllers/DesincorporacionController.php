@@ -118,29 +118,24 @@ class DesincorporacionController extends Controller
         DB::transaction(function () use ($validated, $request) {
             $codigoActa = Str::uuid()->toString();
 
-            $numeroInforme = null;
-            if ($request->filled('numero_informe')) {
-                $informes = collect($request->input('numero_informe'))
-                    ->filter()
-                    ->unique()
-                    ->toArray();
-                $numeroInforme = !empty($informes) ? implode(', ', $informes) : null;
-            }
+            $informesInput = array_values(array_filter($request->input('numero_informe', [])));
 
             $commonData = [
                 'codigo_acta' => $codigoActa,
                 'procedencia_id' => $validated['procedencia_id'],
                 'destino_id' => $validated['destino_id'],
                 'fecha' => $validated['fecha'],
-                'numero_informe' => $numeroInforme,
+                // 'numero_informe' se asignará por array en cada iteración
                 'estatus_acta_id' => $validated['estatus_acta_id'],
                 'observaciones' => $validated['observaciones'] ?? null,
                 'user_id' => auth()->id(),
             ];
 
-            foreach ($validated['bienes'] as $bienData) {
+            foreach ($validated['bienes'] as $index => $bienData) {
+                $numeroInforme = $informesInput[$index] ?? null;
                 $desincorporacion = Desincorporacion::create([
                     ...$commonData,
+                    'numero_informe' => $numeroInforme,
                     'numero_bien' => $bienData['numero_bien'],
                     'descripcion' => $bienData['descripcion'],
                     'serial' => $bienData['serial'] ?? null,
@@ -205,28 +200,28 @@ class DesincorporacionController extends Controller
         $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $desincorporacione, $request) {
-            $numeroInforme = null;
-            if ($request->filled('numero_informe')) {
-                $informes = collect($request->input('numero_informe'))
-                    ->filter()
-                    ->unique()
-                    ->toArray();
-                $numeroInforme = !empty($informes) ? implode(', ', $informes) : null;
-            }
+            $informesInput = array_values(array_filter($request->input('numero_informe', [])));
 
             $commonData = [
                 'procedencia_id' => $validated['procedencia_id'],
                 'destino_id' => $validated['destino_id'],
                 'fecha' => $validated['fecha'],
-                'numero_informe' => $numeroInforme,
+                // 'numero_informe' se asigna dinámicamente según el bien
                 'estatus_acta_id' => $validated['estatus_acta_id'],
                 'observaciones' => $validated['observaciones'] ?? null,
             ];
 
             if ($desincorporacione->codigo_acta) {
-                Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->update($commonData);
+                $bienesRelacionados = Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->orderBy('id')->get();
+                foreach ($bienesRelacionados as $index => $bienRelacionado) {
+                    $bienRelacionado->update(array_merge($commonData, [
+                        'numero_informe' => $informesInput[$index] ?? null,
+                    ]));
+                }
             } else {
-                $desincorporacione->update($commonData);
+                $desincorporacione->update(array_merge($commonData, [
+                    'numero_informe' => $informesInput[0] ?? null,
+                ]));
             }
         });
 
