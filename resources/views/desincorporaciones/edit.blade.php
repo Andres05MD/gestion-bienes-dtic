@@ -92,20 +92,7 @@
                         <div x-data="{ 
                             activeCard: false, 
                             procedenciaSeleccionada: '{{ old('procedencia_id', $desincorporacion->procedencia_id ?? $dticId) }}', 
-                            destinoSeleccionado: '{{ old('destino_id', $desincorporacion->destino_id ?? $dticId) }}',
-                            informes: @js(old('numero_informe', $desincorporacion->numero_informe ? explode(', ', $desincorporacion->numero_informe) : [''])),
-                            
-                            agregarInforme() {
-                                this.informes.push('');
-                            },
-
-                            removerInforme(index) {
-                                if (this.informes.length > 1) {
-                                    this.informes.splice(index, 1);
-                                } else {
-                                    this.informes[0] = '';
-                                }
-                            }
+                            destinoSeleccionado: '{{ old('destino_id', $desincorporacion->destino_id ?? $dticId) }}'
                         }" @set-selected-procedencia-id.window="procedenciaSeleccionada = $event.detail" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-40'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
@@ -127,7 +114,22 @@
                         </div>
 
                         <!-- Estado y Datos -->
-                        <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-30'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
+                        <div x-data="{ 
+                            activeCard: false,
+                            informes: @js(old('numero_informe', $desincorporacion->numero_informe ? explode(', ', $desincorporacion->numero_informe) : [''])),
+                            
+                            agregarInforme() {
+                                this.informes.push('');
+                            },
+
+                            removerInforme(index) {
+                                if (this.informes.length > 1) {
+                                    this.informes.splice(index, 1);
+                                } else {
+                                    this.informes[0] = '';
+                                }
+                            }
+                        }" @click="activeCard = true" @click.outside="activeCard = false" :class="activeCard ? 'z-50' : 'z-30'" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                                     <x-mary-icon name="o-shield-check" class="w-6 h-6 text-brand-lila" />
