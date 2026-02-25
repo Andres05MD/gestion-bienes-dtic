@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateDistribucionDireccionRequest;
 use App\Models\Bien;
 use App\Models\BienExterno;
 use App\Models\Departamento;
+use App\Models\EstatusActa;
 use App\Models\DistribucionDireccion;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class DistribucionDireccionController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = DistribucionDireccion::query()->with('procedencia');
+        $query = DistribucionDireccion::query()->with(['procedencia', 'estatusActa']);
 
         // Búsqueda por texto
         if ($request->filled('buscar')) {
@@ -49,10 +50,16 @@ class DistribucionDireccionController extends Controller
             $query->whereDate('fecha', '<=', $request->fecha_hasta);
         }
 
+        // Filtro por estatus de acta
+        if ($request->filled('estatus_acta_id')) {
+            $query->where('estatus_acta_id', $request->input('estatus_acta_id'));
+        }
+
         $distribuciones = $query->latest()->paginate(10)->withQueryString();
         $departamentos = Departamento::orderBy('nombre')->get();
+        $estatuses = EstatusActa::all();
 
-        return view('distribuciones-direccion.index', compact('distribuciones', 'departamentos'));
+        return view('distribuciones-direccion.index', compact('distribuciones', 'departamentos', 'estatuses'));
     }
 
     /**
@@ -63,8 +70,9 @@ class DistribucionDireccionController extends Controller
         $departamentos = Departamento::orderBy('nombre')->get();
         $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+        $estatuses = EstatusActa::all();
 
-        return view('distribuciones-direccion.create', compact('departamentos', 'areas', 'dticId'));
+        return view('distribuciones-direccion.create', compact('departamentos', 'areas', 'dticId', 'estatuses'));
     }
 
     public function store(StoreDistribucionDireccionRequest $request): RedirectResponse
@@ -92,6 +100,7 @@ class DistribucionDireccionController extends Controller
             'serial' => $validated['serial'] ?? null,
             'procedencia_id' => $validated['procedencia_id'],
             'area_id' => $validated['area_id'] ?? null,
+            'estatus_acta_id' => $validated['estatus_acta_id'] ?? null,
             'bien_externo_id' => $bienExterno->id,
             'user_id' => auth()->id(),
         ]);
@@ -108,7 +117,7 @@ class DistribucionDireccionController extends Controller
      */
     public function show(DistribucionDireccion $distribuciones_direccion): View
     {
-        $distribuciones_direccion->load(['procedencia', 'bien', 'bienExterno', 'user']);
+        $distribuciones_direccion->load(['procedencia', 'bien', 'bienExterno', 'user', 'estatusActa']);
         return view('distribuciones-direccion.show', ['distribucion' => $distribuciones_direccion]);
     }
 
@@ -120,12 +129,14 @@ class DistribucionDireccionController extends Controller
         $departamentos = Departamento::orderBy('nombre')->get();
         $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+        $estatuses = EstatusActa::all();
 
         return view('distribuciones-direccion.edit', [
             'distribucion' => $distribuciones_direccion,
             'departamentos' => $departamentos,
             'areas' => $areas,
             'dticId' => $dticId,
+            'estatuses' => $estatuses,
         ]);
     }
 

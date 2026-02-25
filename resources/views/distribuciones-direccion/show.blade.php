@@ -67,6 +67,18 @@
                                 <p class="text-base font-black text-white leading-tight">{{ $distribucion->procedencia?->nombre ?? 'N/A' }}</p>
                             </div>
                         </div>
+
+                        @if($distribucion->estatusActa)
+                        <div class="relative z-10 text-center mt-6 pt-6 border-t border-white/5">
+                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-3">Estatus del Acta</p>
+                            @php $estatusColor = $distribucion->estatusActa->color ?? '#6b7280'; @endphp
+                            <span class="px-3 py-2 inline-block text-center text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
+                                @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50"
+                                ])>
+                                {{ $distribucion->estatusActa->nombre }}
+                            </span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 

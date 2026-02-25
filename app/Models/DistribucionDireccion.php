@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Traits\HasUpperCaseAttributes;
+use App\Models\EstatusActa;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -55,6 +56,7 @@ class DistribucionDireccion extends Model
         'bien_id',
         'bien_externo_id',
         'area_id',
+        'estatus_acta_id',
         'user_id',
     ];
 
@@ -100,6 +102,14 @@ class DistribucionDireccion extends Model
     public function area(): BelongsTo
     {
         return $this->belongsTo(Area::class, 'area_id');
+    }
+
+    /**
+     * Relación: estatus del acta.
+     */
+    public function estatusActa(): BelongsTo
+    {
+        return $this->belongsTo(EstatusActa::class);
     }
 
     /**

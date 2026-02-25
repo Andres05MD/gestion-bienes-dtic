@@ -115,6 +115,24 @@
                             </div>
                         </div>
 
+                        <div class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative z-10">
+                            <div class="flex items-center gap-3 mb-8">
+                                <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
+                                    <x-mary-icon name="o-shield-check" class="w-6 h-6 text-brand-lila" />
+                                </div>
+                                <h3 class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-widest">Estado y Acta</h3>
+                            </div>
+                            <div class="space-y-6">
+                                <x-select-premium
+                                    name="estatus_acta_id"
+                                    label="Estatus del Acta"
+                                    placeholder="Seleccione estatus"
+                                    icon="o-clock"
+                                    :options="$estatuses->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()"
+                                    :value="old('estatus_acta_id')" />
+                            </div>
+                        </div>
+
                         <div class="p-2 space-y-4">
                             <button type="submit" class="w-full inline-flex items-center justify-center px-8 py-5 bg-linear-to-r from-brand-lila to-brand-purple border border-transparent rounded-2xl font-black text-xs text-white uppercase tracking-[0.2em] hover:brightness-110 active:scale-95 transition-all duration-300 shadow-[0_10px_30px_rgba(168,85,247,0.3)] hover:shadow-[0_15px_40px_rgba(168,85,247,0.5)] cursor-pointer group">
                                 <x-mary-icon name="o-check" class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />

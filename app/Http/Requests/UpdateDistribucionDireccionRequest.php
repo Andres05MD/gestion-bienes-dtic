@@ -28,6 +28,7 @@ class UpdateDistribucionDireccionRequest extends FormRequest
             'fecha' => ['required', 'date'],
             'bien_id' => ['nullable', 'exists:bienes,id'],
             'bien_externo_id' => ['nullable', 'exists:bienes_externos,id'],
+            'estatus_acta_id' => ['nullable', 'exists:estatus_actas,id'],
         ];
     }
 

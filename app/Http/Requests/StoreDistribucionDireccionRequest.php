@@ -30,6 +30,7 @@ class StoreDistribucionDireccionRequest extends FormRequest
             'procedencia_id' => ['required', 'exists:departamentos,id'],
             'area_id' => ['nullable', 'exists:areas,id'],
             'fecha' => ['required', 'date'],
+            'estatus_acta_id' => ['nullable', 'exists:estatus_actas,id'],
         ];
     }
 
