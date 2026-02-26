@@ -152,6 +152,7 @@ El sistema utiliza un Tech Stack moderno:
 
 - **Dashboard Interactivo:** Tarjetas de estado y KPIs que actúan como accesos directos pre-filtrados para el inventario.
 - **Operaciones Inteligentes:** Al importar registros para una transferencia u operación, el sistema detecta automáticamente la procedencia entre Bienes DTIC y los distintos departamentos externos.
+- **Interfaz Premium Estandarizada:** Los formularios de creación, edición y devolución en módulos como Mantenimientos y Desincorporaciones emplean componentes visuales (inputs y selects premium) con búsqueda en tiempo real, validación visual y consistencia estética, mejorando significativamente la experiencia de usuario.
 - **Campos Flexibles:** Asignación inteligente de valores por defecto como "S/N" (Sin Número de Bien) y "Pendiente por Categoría" en los formularios, agilizando el ingreso de data en masa o incompleta.
 - **Transferencias Físicas:** Cuando se transfiere un equipo entre el DTIC y servicios externos, la base de datos mueve automáticamente el registro a la tabla correspondiente manteniendo todo el historial.
 
