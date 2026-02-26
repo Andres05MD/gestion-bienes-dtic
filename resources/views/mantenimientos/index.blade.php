@@ -171,7 +171,7 @@
 
                                     <!-- Acciones -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold align-middle">
-                                        <div class="flex items-center gap-3">
+                                        <div class="flex items-center flex-wrap gap-3">
                                             @can('ver transferencias')
                                             <a href="{{ route('mantenimientos.show', $primera) }}" class="text-sky-400 hover:text-sky-300 transition" title="Ver detalle">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,24 +197,25 @@
                                                 </svg>
                                             </button>
                                             @endcan
-                                        </div>
 
-                                        <!-- Botón Devolver (Solo si es entrada y no ha sido devuelto) -->
-                                        @php
-                                        // Verificamos en BD si ya existe una salida posterior para este bien de entrada
-                                        $yaDevuelto = \App\Models\Mantenimiento::where('numero_bien', $primera->numero_bien)
-                                        ->where('tipo_movimiento', 'salida')
-                                        ->where('id', '>', $primera->id)
-                                        ->exists();
-                                        @endphp
-                                        @if($primera->tipo_movimiento === 'entrada' && !$yaDevuelto)
-                                        <a href="{{ route('mantenimientos.devolver', $primera) }}" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition" title="Devolver Bien al Origen">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
-                                            </svg>
-                                            <span class="text-xs">Devolver</span>
-                                        </a>
-                                        @endif
+                                            <!-- Botón Devolver (Solo si es entrada y no ha sido devuelto) -->
+                                            @php
+                                            // Verificamos en BD si ya existe una salida posterior para este bien de entrada
+                                            $yaDevuelto = \App\Models\Mantenimiento::where('numero_bien', $primera->numero_bien)
+                                            ->where('tipo_movimiento', 'salida')
+                                            ->where('id', '>', $primera->id)
+                                            ->exists();
+                                            @endphp
+                                            @if($primera->tipo_movimiento === 'entrada' && !$yaDevuelto)
+                                            <div class="h-6 w-px bg-dark-600/50"></div>
+                                            <a href="{{ route('mantenimientos.devolver', $primera) }}" class="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg flex items-center gap-2 transition border border-emerald-500/20 hover:border-emerald-500 shadow-sm shadow-emerald-500/5 group" title="Devolver Bien al Origen">
+                                                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                                </svg>
+                                                <span class="text-[10px] uppercase font-black tracking-widest">Devolver</span>
+                                            </a>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                                 @empty

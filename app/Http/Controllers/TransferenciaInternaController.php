@@ -9,7 +9,9 @@ use App\Http\Requests\StoreTransferenciaInternaRequest;
 use App\Http\Requests\UpdateTransferenciaInternaRequest;
 use App\Models\Bien;
 use App\Models\BienExterno;
+use App\Models\CategoriaBien;
 use App\Models\Departamento;
+use App\Models\Estado;
 use App\Models\TransferenciaInterna;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -106,9 +108,6 @@ class TransferenciaInternaController extends Controller
         ]);
     }
 
-    /**
-     * Muestra el formulario para crear una nueva transferencia.
-     */
     public function create(): View
     {
         $departamentos = Departamento::orderBy('nombre')->get();
@@ -116,7 +115,10 @@ class TransferenciaInternaController extends Controller
         $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
-        return view('transferencias-internas.create', compact('departamentos', 'estatuses', 'areas', 'dticId'));
+        $categorias = CategoriaBien::orderBy('nombre')->get();
+        $estados_bienes = Estado::orderBy('nombre')->get();
+
+        return view('transferencias-internas.create', compact('departamentos', 'estatuses', 'areas', 'dticId', 'categorias', 'estados_bienes'));
     }
 
     /**
@@ -140,6 +142,45 @@ class TransferenciaInternaController extends Controller
             ];
 
             foreach ($validated['bienes'] as $bienData) {
+                // Lógica de Creación Al Vuelo
+                if (empty($bienData['id'])) {
+                    $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+                    $esInterno = ($validated['procedencia_id'] == $dticId);
+
+                    if ($esInterno) {
+                        $nuevoBien = Bien::create([
+                            'equipo' => $bienData['descripcion'],
+                            'marca' => $bienData['marca'] ?? null,
+                            'modelo' => $bienData['modelo'] ?? null,
+                            'serial' => $bienData['serial'] ?? null,
+                            'color' => $bienData['color'] ?? null,
+                            'numero_bien' => $bienData['numero_bien'],
+                            'categoria_bien_id' => $bienData['categoria_bien_id'] ?? null,
+                            'estado_id' => $bienData['estado_id'],
+                            'area_id' => $validated['area_procedencia_id'] ?? null, // Nace en la procedencia
+                            'user_id' => auth()->id(),
+                        ]);
+                        $bienData['id'] = $nuevoBien->id;
+                        $bienData['tipo'] = 'dtic';
+                    } else {
+                        $nuevoBienExterno = BienExterno::create([
+                            'equipo' => $bienData['descripcion'],
+                            'marca' => $bienData['marca'] ?? null,
+                            'modelo' => $bienData['modelo'] ?? null,
+                            'serial' => $bienData['serial'] ?? null,
+                            'color' => $bienData['color'] ?? null,
+                            'numero_bien' => $bienData['numero_bien'],
+                            'categoria_bien_id' => $bienData['categoria_bien_id'] ?? null,
+                            'estado_id' => $bienData['estado_id'],
+                            'departamento_id' => $validated['procedencia_id'], // Nace en la procedencia
+                            'departamento_origen_id' => null, // O puede ser el DTIC si queremos trazabilidad
+                            'user_id' => auth()->id(),
+                        ]);
+                        $bienData['id'] = $nuevoBienExterno->id;
+                        $bienData['tipo'] = 'externo';
+                    }
+                }
+
                 $transferencia = TransferenciaInterna::create([
                     ...$commonData,
                     'numero_bien' => $bienData['numero_bien'],
@@ -174,15 +215,15 @@ class TransferenciaInternaController extends Controller
         ]);
     }
 
-    /**
-     * Muestra el formulario para editar una transferencia interna.
-     */
     public function edit(TransferenciaInterna $transferencias_interna): View
     {
         $departamentos = Departamento::orderBy('nombre')->get();
         $estatuses = EstatusActa::all();
         $areas = \App\Models\Area::orderBy('nombre')->get();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
+
+        $categorias = CategoriaBien::orderBy('nombre')->get();
+        $estados_bienes = Estado::orderBy('nombre')->get();
 
         $bienesGrupo = $transferencias_interna->codigo_acta
             ? TransferenciaInterna::where('codigo_acta', $transferencias_interna->codigo_acta)->get()
@@ -195,6 +236,8 @@ class TransferenciaInternaController extends Controller
             'estatuses' => $estatuses,
             'areas' => $areas,
             'dticId' => $dticId,
+            'categorias' => $categorias,
+            'estados_bienes' => $estados_bienes,
         ]);
     }
 

@@ -168,6 +168,13 @@ class MantenimientoController extends Controller
                     'bien_externo_id' => $bienData['tipo'] === 'externo' ? $bienData['id'] : null,
                 ]);
 
+                // Actualizar el estado físico si viene en la devolución (salida)
+                if ($tipo === 'salida' && !empty($bienData['estado_id'])) {
+                    if ($bienOriginal) {
+                        $bienOriginal->update(['estado_id' => $bienData['estado_id']]);
+                    }
+                }
+
                 // Actualizar ubicación utilizando el servicio, basado en qué estamos haciendo
                 if ($tipo === 'entrada') {
                     // Mover el bien a DTIC - Mantenimiento
@@ -253,10 +260,11 @@ class MantenimientoController extends Controller
         $estatuses = EstatusActa::all();
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
         $areaMantenimiento = Area::where('nombre', 'Soporte Técnico - Mantenimiento')->first();
+        $estados = \App\Models\Estado::orderBy('nombre')->get();
 
         // El destino por defecto es quien fue su "procedencia" original cuando entró.
         $destinoOriginalId = $mantenimiento->procedencia_id;
 
-        return view('mantenimientos.devolver', compact('mantenimiento', 'departamentos', 'estatuses', 'dticId', 'areaMantenimiento', 'destinoOriginalId'));
+        return view('mantenimientos.devolver', compact('mantenimiento', 'departamentos', 'estatuses', 'dticId', 'areaMantenimiento', 'destinoOriginalId', 'estados'));
     }
 }

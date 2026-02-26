@@ -33,11 +33,16 @@ class StoreTransferenciaInternaRequest extends FormRequest
 
             // Validación para múltiples bienes
             'bienes'               => ['required', 'array', 'min:1'],
-            'bienes.*.id'          => ['required'],
+            'bienes.*.id'          => ['nullable', 'string'],
             'bienes.*.tipo'        => ['required', 'in:dtic,externo'],
             'bienes.*.numero_bien' => ['required', 'string', 'max:255'],
             'bienes.*.descripcion' => ['required', 'string', 'max:255'],
             'bienes.*.serial'      => ['nullable', 'string', 'max:255'],
+            'bienes.*.marca'       => ['nullable', 'string', 'max:255'],
+            'bienes.*.modelo'      => ['nullable', 'string', 'max:255'],
+            'bienes.*.color'       => ['nullable', 'string', 'max:255'],
+            'bienes.*.categoria_bien_id' => ['nullable', 'exists:categoria_bienes,id'],
+            'bienes.*.estado_id'   => ['nullable', 'exists:estados,id'],
         ];
     }
 
@@ -79,7 +84,24 @@ class StoreTransferenciaInternaRequest extends FormRequest
                 $dticId = \App\Models\Departamento::where('nombre', 'DTIC')->first()?->id;
 
                 foreach ($bienes as $key => $bienData) {
-                    if (!isset($bienData['tipo']) || !isset($bienData['id'])) {
+                    if (!isset($bienData['tipo'])) {
+                        continue;
+                    }
+
+                    // Si se está creando al vuelo (id nulo), validamos obligatoriedades condicionales
+                    if (empty($bienData['id'])) {
+                        if (empty($bienData['estado_id'])) {
+                            $validator->errors()->add("bienes.{$key}.estado_id", "Al ingresar un bien manual sin registro previo, el estado es obligatorio.");
+                        }
+
+                        // Verificar que el número de bien no exista ya (para prevenir colisiones en la creación)
+                        $existeInterno = \App\Models\Bien::where('numero_bien', $bienData['numero_bien'])->exists();
+                        $existeExterno = \App\Models\BienExterno::where('numero_bien', $bienData['numero_bien'])->exists();
+
+                        if ($existeInterno || $existeExterno) {
+                            $validator->errors()->add("bienes.{$key}.numero_bien", "El número de bien '{$bienData['numero_bien']}' ya se encuentra registrado. Por favor, búsquelo en lugar de añadirlo manualmente.");
+                        }
+
                         continue;
                     }
 

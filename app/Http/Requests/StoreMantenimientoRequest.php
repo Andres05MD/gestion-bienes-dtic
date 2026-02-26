@@ -42,6 +42,7 @@ class StoreMantenimientoRequest extends FormRequest
             'bienes.*.numero_bien' => ['required', 'string', 'max:255'],
             'bienes.*.descripcion' => ['required', 'string', 'max:255'],
             'bienes.*.serial'      => ['nullable', 'string', 'max:255'],
+            'bienes.*.estado_id'   => ['nullable', 'exists:estados,id'],
         ];
     }
 

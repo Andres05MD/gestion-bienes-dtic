@@ -226,18 +226,91 @@
 
                     this.bienesSeleccionados.push({
                         id: '',
-                        tipo: 'dtic',
+                        tipo: 'dtic', // Default, se sobreescribe en el backend
                         numero_bien: '',
                         descripcion: '',
                         serial: '',
                         marca: '',
                         modelo: '',
                         color: '',
-                        categoria: '',
-                        estado_nombre: '',
+                        categoria_bien_id: '',
+                        estado_id: '',
+                        categoria: '', // String para display
+                        estado_nombre: '', // String para display
                         departamento_id: null,
-                        area_id: null
+                        area_id: null,
+                        importar_disponible: null
                     });
+                },
+
+                buscarCoincidenciaExacta(bien, campo) {
+                    let valor = campo === 'numero_bien' ? bien.numero_bien : bien.serial;
+                    if (!valor || String(valor).length < 2 || bien.id !== '') {
+                        bien.importar_disponible = null;
+                        return;
+                    }
+                    
+                    fetch(`/api/bienes/buscar?q=${encodeURIComponent(valor)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            let target = String(valor).toLowerCase();
+                            let coincidencia = data.find(b => {
+                                if (campo === 'numero_bien' && b.numero_bien && String(b.numero_bien).toLowerCase() === target) return true;
+                                if (campo === 'serial' && b.serial && String(b.serial).toLowerCase() === target) return true;
+                                return false;
+                            });
+                            
+                            if (coincidencia) {
+                                // Verificar que no esté agregado ya en la lista
+                                if (!this.bienesSeleccionados.find(b => b.id == coincidencia.id && b.tipo == coincidencia.tipo && b !== bien)) {
+                                    // Comprobar procedencia si es transferencia múltiple y hay otros bienes importados
+                                    let bienesConId = this.bienesSeleccionados.filter(b => b.id !== '');
+                                    if (this.modoTransferencia === 'multiple' && bienesConId.length > 0) {
+                                        const primerBien = bienesConId[0];
+                                        const origenPrimerBien = primerBien.tipo === 'dtic' ? 'DTIC' : primerBien.departamento_id;
+                                        const origenNuevoBien = coincidencia.tipo === 'dtic' ? 'DTIC' : coincidencia.departamento_id;
+                                        if (origenPrimerBien !== origenNuevoBien) {
+                                            // No sugerir si el origen es inváldio
+                                            bien.importar_disponible = null;
+                                            return;
+                                        }
+                                    }
+                                    bien.importar_disponible = coincidencia;
+                                } else {
+                                    bien.importar_disponible = null;
+                                }
+                            } else {
+                                bien.importar_disponible = null;
+                            }
+                        })
+                        .catch(() => { bien.importar_disponible = null; });
+                },
+
+                aplicarImportacion(bien, index) {
+                    let coincidencia = bien.importar_disponible;
+                    if (!coincidencia) return;
+                    
+                    let bienesConId = this.bienesSeleccionados.filter(b => b.id !== '');
+
+                    this.bienesSeleccionados[index] = {
+                        id: coincidencia.id,
+                        tipo: coincidencia.tipo,
+                        numero_bien: coincidencia.numero_bien,
+                        descripcion: coincidencia.equipo,
+                        serial: coincidencia.serial || '',
+                        marca: coincidencia.marca || '',
+                        modelo: coincidencia.modelo || '',
+                        color: coincidencia.color || '',
+                        categoria: coincidencia.categoria || '',
+                        estado_nombre: coincidencia.estado_nombre || '',
+                        departamento_id: coincidencia.departamento_id,
+                        area_id: coincidencia.area_id,
+                        importar_disponible: null
+                    };
+                    
+                    if (bienesConId.length === 0) {
+                        this.preseleccionarProcedencia(coincidencia);
+                    }
                 }
             }">
                 @csrf
@@ -531,10 +604,11 @@
                             </div>
 
                             <!-- Lista -->
-                            <div class="space-y-4 relative z-10">
+                            <div class="space-y-4 relative z-30">
                                 <template x-for="(bien, index) in bienesSeleccionados" :key="index">
-                                    <div class="p-5 border border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] relative group transition-all duration-300 hover:shadow-md hover:border-brand-purple/30">
-                                        <button x-show="modoTransferencia === 'multiple' || (modoTransferencia === 'individual' && bienesSeleccionados.length > 0)" type="button" @click="removerBien(index)" class="absolute -top-3 -right-3 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transform transition-all scale-100 md:scale-0 md:group-hover:scale-100 cursor-pointer z-60">
+                                    <div class="p-5 border border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] relative group transition-all duration-300 hover:shadow-md hover:border-brand-purple/30"
+                                        :style="{ zIndex: 50 - index }">
+                                        <button x-show="modoTransferencia === 'multiple' || (modoTransferencia === 'individual' && bienesSeleccionados.length > 0)" type="button" @click="removerBien(index)" class="absolute -top-3 -right-3 w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transform transition-all scale-100 md:scale-0 md:group-hover:scale-100 cursor-pointer z-50">
                                             <x-mary-icon name="o-x-mark" class="w-4 h-4" />
                                         </button>
 
@@ -546,42 +620,150 @@
                                             <!-- Si es una carga de un bien existente (tiene ID) en modo individual, mostramos los campos pero los deshabilitamos (usando x-bind:readonly) para no editar por error, o los mostramos como texto para estetica Premium -->
                                             <!-- Modo Múltiple o Manual Individual -->
 
-                                            <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <div>
-                                                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">N° Bien <span class="text-red-500">*</span></label>
-                                                    <input type="text" x-model="bien.numero_bien" :name="'bienes['+index+'][numero_bien]'" :readonly="bien.id !== '' && modoTransferencia === 'individual'" :class="bien.id !== '' && modoTransferencia === 'individual' ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-500 dark:text-gray-400' : 'bg-white dark:bg-[#222] text-gray-900 dark:text-white'" required class="w-full h-11 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple/20 outline-none transition-all shadow-sm dark:shadow-none placeholder-gray-400" placeholder="Ej: 12345">
+                                            <div class="md:col-span-3">
+                                                <div x-show="bien.importar_disponible" x-collapse x-cloak>
+                                                    <div class="mb-6 p-4 rounded-2xl bg-brand-purple/5 border border-brand-purple/20 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+                                                        <div class="flex items-center gap-3">
+                                                            <div class="w-10 h-10 rounded-xl bg-brand-purple/10 flex items-center justify-center shrink-0">
+                                                                <x-mary-icon name="o-sparkles" class="w-5 h-5 text-brand-purple" />
+                                                            </div>
+                                                            <div>
+                                                                <p class="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-widest">¡Bien Encontrado!</p>
+                                                                <p class="text-[10px] text-gray-500 font-medium">Tenemos registrado un <span class="font-bold text-gray-700 dark:text-gray-300" x-text="bien.importar_disponible?.equipo"></span> con estos datos. ¿Deseas importarlo?</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex items-center gap-2 shrink-0 w-full md:w-auto mt-2 md:mt-0">
+                                                            <button type="button" @click="aplicarImportacion(bien, index)" class="flex-1 md:flex-none px-6 py-3 bg-brand-purple text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:brightness-110 shadow-sm transition-all focus:ring-2 focus:ring-brand-purple/50">
+                                                                Importar
+                                                            </button>
+                                                            <button type="button" @click="bien.importar_disponible = null" class="p-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 bg-white dark:bg-[#222] border border-gray-200 dark:border-white/10 rounded-xl transition-all focus:ring-2 focus:ring-gray-400/20 shadow-sm dark:shadow-none">
+                                                                <x-mary-icon name="o-x-mark" class="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Equipo <span class="text-red-500">*</span></label>
-                                                    <input type="text" x-model="bien.descripcion" :name="'bienes['+index+'][descripcion]'" :readonly="bien.id !== '' && modoTransferencia === 'individual'" :class="bien.id !== '' && modoTransferencia === 'individual' ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-500 dark:text-gray-400' : 'bg-white dark:bg-[#222] text-gray-900 dark:text-white'" required class="w-full h-11 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple/20 outline-none transition-all shadow-sm dark:shadow-none placeholder-gray-400" placeholder="Ej: Monitor">
-                                                </div>
-                                                <div>
-                                                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Serial</label>
-                                                    <input type="text" x-model="bien.serial" :name="'bienes['+index+'][serial]'" :readonly="bien.id !== '' && modoTransferencia === 'individual'" :class="bien.id !== '' && modoTransferencia === 'individual' ? 'bg-gray-100 dark:bg-[#2a2a2a] text-gray-500 dark:text-gray-400' : 'bg-white dark:bg-[#222] text-gray-900 dark:text-white'" class="w-full h-11 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple/20 outline-none transition-all shadow-sm dark:shadow-none placeholder-gray-400" placeholder="Ej: S/N">
-                                                </div>
-                                            </div>
 
-                                            <!-- Campos adicionales solo visibles si fueron cargados de un bien existente y está en modo individual para visualización rápida -->
-                                            <div x-show="modoTransferencia === 'individual' && bien.id !== ''" class="md:col-span-3 grid grid-cols-2 md:grid-cols-4 gap-4 mt-2 p-3 bg-brand-purple/5 border border-brand-purple/10 rounded-xl">
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Marca</p>
-                                                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300" x-text="bien.marca || 'S/M'"></p>
-                                                </div>
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Modelo</p>
-                                                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300" x-text="bien.modelo || 'S/M'"></p>
-                                                </div>
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Color</p>
-                                                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300" x-text="bien.color || 'N/A'"></p>
-                                                </div>
-                                                <div>
-                                                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Estado / Cat.</p>
-                                                    <p class="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                                        <span x-text="bien.estado_nombre || 'N/A'"></span>
-                                                        <span class="text-gray-400">|</span>
-                                                        <span x-text="bien.categoria || 'N/A'"></span>
-                                                    </p>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                    <x-input-premium
+                                                        label="N° Bien"
+                                                        name="numero_bien"
+                                                        x-model="bien.numero_bien"
+                                                        x-bind:name="'bienes['+index+'][numero_bien]'"
+                                                        placeholder="Ej: 12345"
+                                                        required
+                                                        x-bind:readonly="bien.id !== ''"
+                                                        @change="buscarCoincidenciaExacta(bien, 'numero_bien')"
+                                                        class="transition-all" />
+
+                                                    <!-- Categoría ( Editable o Readonly ) -->
+                                                    <div class="contents">
+                                                        <div x-show="bien.id === ''" class="contents">
+                                                            <x-select-premium
+                                                                label="Categoría"
+                                                                name="categoria_bien_id"
+                                                                x-model="bien.categoria_bien_id"
+                                                                x-bind:name="'bienes['+index+'][categoria_bien_id]'"
+                                                                placeholder="Seleccione..."
+                                                                :options="$categorias->map(fn($c) => ['value' => $c->id, 'label' => $c->nombre])->toArray()" />
+                                                        </div>
+                                                        <div x-show="bien.id !== ''" class="contents">
+                                                            <x-input-premium
+                                                                label="Categoría"
+                                                                name="categoria_ro"
+                                                                x-model="bien.categoria"
+                                                                placeholder="N/A"
+                                                                readonly
+                                                                class="transition-all" />
+                                                        </div>
+                                                    </div>
+
+                                                    <x-input-premium
+                                                        label="Equipo"
+                                                        name="descripcion"
+                                                        x-model="bien.descripcion"
+                                                        x-bind:name="'bienes['+index+'][descripcion]'"
+                                                        placeholder="Ej: Monitor"
+                                                        required
+                                                        x-bind:readonly="bien.id !== ''"
+                                                        class="transition-all" />
+
+                                                    <x-input-premium
+                                                        label="Serial"
+                                                        name="serial"
+                                                        x-model="bien.serial"
+                                                        x-bind:name="'bienes['+index+'][serial]'"
+                                                        placeholder="Ej: S/N"
+                                                        x-bind:readonly="bien.id !== ''"
+                                                        @change="buscarCoincidenciaExacta(bien, 'serial')"
+                                                        class="transition-all" />
+
+                                                    <div x-show="bien.id === ''" class="contents">
+                                                        <x-input-premium
+                                                            label="Marca"
+                                                            name="marca"
+                                                            x-model="bien.marca"
+                                                            x-bind:name="'bienes['+index+'][marca]'"
+                                                            placeholder="Ej: Dell"
+                                                            class="transition-all" />
+
+                                                        <x-input-premium
+                                                            label="Modelo"
+                                                            name="modelo"
+                                                            x-model="bien.modelo"
+                                                            x-bind:name="'bienes['+index+'][modelo]'"
+                                                            placeholder="Ej: Inspiron"
+                                                            class="transition-all" />
+
+                                                        <x-input-premium
+                                                            label="Color"
+                                                            name="color"
+                                                            x-model="bien.color"
+                                                            x-bind:name="'bienes['+index+'][color]'"
+                                                            placeholder="Ej: Negro"
+                                                            class="transition-all" />
+
+                                                        <x-select-premium
+                                                            label="Edo. Físico"
+                                                            name="estado_id"
+                                                            x-model="bien.estado_id"
+                                                            x-bind:name="'bienes['+index+'][estado_id]'"
+                                                            placeholder="Requerido..."
+                                                            x-bind:required="bien.id === ''"
+                                                            :options="$estados_bienes->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()" />
+                                                    </div>
+                                                    <div x-show="modoTransferencia === 'individual' && bien.id !== ''" class="contents">
+                                                        <x-input-premium
+                                                            label="Marca"
+                                                            name="marca_ro"
+                                                            x-model="bien.marca"
+                                                            placeholder="S/M"
+                                                            readonly
+                                                            class="transition-all" />
+
+                                                        <x-input-premium
+                                                            label="Modelo"
+                                                            name="modelo_ro"
+                                                            x-model="bien.modelo"
+                                                            placeholder="S/M"
+                                                            readonly
+                                                            class="transition-all" />
+
+                                                        <x-input-premium
+                                                            label="Color"
+                                                            name="color_ro"
+                                                            x-model="bien.color"
+                                                            placeholder="N/A"
+                                                            readonly
+                                                            class="transition-all" />
+
+                                                        <x-input-premium
+                                                            label="Estado"
+                                                            name="estado_ro"
+                                                            x-model="bien.estado_nombre"
+                                                            placeholder="N/A"
+                                                            readonly
+                                                            class="transition-all" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -589,7 +771,7 @@
                                 </template>
                             </div>
 
-                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-10" x-show="bienesSeleccionados.length > 0">
+                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-0" x-show="bienesSeleccionados.length > 0">
                                 <div class="w-full sm:w-1/2">
                                     <x-date-input-premium
                                         name="fecha"
@@ -610,7 +792,7 @@
                             </div>
 
                             <div class="space-y-6">
-                                <div class="space-y-6">
+                                <div class="space-y-6 relative z-20">
                                     <x-select-premium
                                         name="procedencia_id"
                                         label="Procedencia"
@@ -633,7 +815,7 @@
                                     </div>
                                 </div>
 
-                                <div class="space-y-6">
+                                <div class="space-y-6 relative z-10">
                                     <x-select-premium
                                         name="destino_id"
                                         label="Destino"

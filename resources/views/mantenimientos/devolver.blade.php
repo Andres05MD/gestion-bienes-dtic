@@ -46,8 +46,11 @@
 
                             <!-- Lista (Un solo elemento en devolución) -->
                             <div class="space-y-4 relative z-10">
-                                <div class="p-5 border border-gray-100 dark:border-white/10 rounded-2xl bg-gray-50 dark:bg-[#1a1a1a] relative group transition-all duration-300">
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                @php
+                                $elBien = $mantenimiento->bien ?? $mantenimiento->bienExterno;
+                                @endphp
+                                <div class="p-5 border border-brand-purple/20 rounded-2xl bg-brand-purple/5 relative group transition-all duration-300">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <!-- Enviamos los datos del bien dentro del array que espera StoreMantenimientoRequest -->
                                         <input type="hidden" name="bienes[0][id]" value="{{ $mantenimiento->bien_id ?? $mantenimiento->bien_externo_id }}">
                                         <input type="hidden" name="bienes[0][tipo]" value="{{ $mantenimiento->bien_id ? 'dtic' : 'externo' }}">
@@ -55,23 +58,65 @@
                                         <input type="hidden" name="bienes[0][descripcion]" value="{{ $mantenimiento->descripcion }}">
                                         <input type="hidden" name="bienes[0][serial]" value="{{ $mantenimiento->serial }}">
 
-                                        <div>
-                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">N° Bien</label>
-                                            <div class="w-full h-11 bg-gray-100 dark:bg-[#222] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-400 opacity-80 cursor-not-allowed">
-                                                {{ $mantenimiento->numero_bien }}
-                                            </div>
-                                        </div>
-                                        <div class="md:col-span-2">
-                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Descripción <span class="text-gray-400 font-normal normal-case ml-1">(incluye marca/modelo si aplica)</span></label>
-                                            <div class="w-full h-11 bg-gray-100 dark:bg-[#222] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-400 opacity-80 cursor-not-allowed truncate" title="{{ $mantenimiento->descripcion }}">
-                                                {{ $mantenimiento->descripcion }}
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Serial</label>
-                                            <div class="w-full h-11 bg-gray-100 dark:bg-[#222] border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-gray-400 opacity-80 cursor-not-allowed">
-                                                {{ $mantenimiento->serial ?? 'S/N' }}
-                                            </div>
+                                        <x-input-premium
+                                            label="N° Bien"
+                                            name="numero_bien_ro"
+                                            :value="$mantenimiento->numero_bien"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <x-input-premium
+                                            label="Categoría"
+                                            name="categoria_ro"
+                                            :value="$elBien?->categoria->nombre ?? $elBien?->categoria ?? 'N/A'"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <x-input-premium
+                                            label="Descripción"
+                                            name="descripcion_ro"
+                                            :value="$mantenimiento->descripcion"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <x-input-premium
+                                            label="Serial"
+                                            name="serial_ro"
+                                            :value="$mantenimiento->serial ?? 'S/N'"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <x-input-premium
+                                            label="Marca"
+                                            name="marca_ro"
+                                            :value="$elBien?->marca ?? 'S/M'"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <x-input-premium
+                                            label="Modelo"
+                                            name="modelo_ro"
+                                            :value="$elBien?->modelo ?? 'S/M'"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <x-input-premium
+                                            label="Color"
+                                            name="color_ro"
+                                            :value="$elBien?->color ?? 'N/A'"
+                                            readonly
+                                            class="opacity-80" />
+
+                                        <!-- Selector de Estatus Físico Post-Mantenimiento -->
+                                        <div class="md:col-span-2 lg:col-span-1 pt-2 border-t border-brand-purple/10 mt-2">
+                                            <x-select-premium
+                                                name="bienes[0][estado_id]"
+                                                label="Estado Final"
+                                                placeholder="Seleccione resultado"
+                                                icon="o-check-badge"
+                                                :options="$estados->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()"
+                                                :value="old('bienes.0.estado_id', $elBien?->estado_id)"
+                                                required />
                                         </div>
                                     </div>
                                 </div>
