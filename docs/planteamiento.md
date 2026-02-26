@@ -38,9 +38,10 @@ El objetivo de este proyecto es desarrollar un sistema web integral para la gest
 ### 3.4. Operaciones
 
 - **Transferencias Internas:** Registrar movimientos de bienes entre departamentos, con campos de Procedencia, Destino, Fecha, Estatus del acta y Fecha de firma. Implementa traslados físicos entre tablas subyacentes (`bienes` y `bienes_externos`).
-- **Desincorporaciones:** Registrar bienes dados de baja, con campos de Procedencia, Fecha, Número de Informe (Opcional, formato "00-00-00"), Estatus del acta y Observaciones.
+- **Desincorporaciones:** Registrar bienes dados de baja, con campos de Procedencia, Fecha, Número de Informe (Opcional, formato "00-00-00"), Estatus del acta y Observaciones. Utiliza una interfaz premium estandarizada para la importación rápida de bienes.
 - **Distribución de Dirección:** Registrar la distribución de bienes, con campos de Marca, Procedencia y Fecha.
-- Todas las operaciones permiten importar bienes desde Bienes DTIC o Bienes Externos, detectando automáticamente la procedencia (ej. "DTIC").
+- **Mantenimientos:** Gestión de entrada y salida de equipos por soporte técnico (DTIC). Presenta una ficha del bien en modo lectura con componentes premium durante la devolución, y actualización automática de estatus.
+- Todas las operaciones permiten importar bienes desde Bienes DTIC o Bienes Externos, detectando automáticamente la procedencia (ej. "DTIC") y mostrando sugerencias en tiempo real.
 
 ### 3.5. Módulos de Configuración (Extras)
 

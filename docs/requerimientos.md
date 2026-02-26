@@ -55,6 +55,14 @@
 - [x] **Importación de Bienes:** Importar datos desde Bienes DTIC o Bienes Externos.
 - [x] **Búsqueda y Filtros:** Búsqueda global y filtros por columna.
 
+### 4.4. Mantenimientos
+
+- [x] **Listado:** Tabla centralizada. Botón "Devolver" reubicado junto a las acciones generales para mayor consistencia visual.
+- [x] **Restricción Externa:** Solo admite importar y realizar mantenimiento a bienes externos.
+- [x] **Flujo Automatizado:** Control de entrada a Soporte Técnico y salida al origen (Devolución).
+- [x] **Importación Premium:** Interfaz estandarizada `x-input-premium` con sugerencias de autocompletado en tiempo real.
+- [x] **Devolución:** Ficha integral en modo read-only usando componentes premium. Incluye selector `x-select-premium` para actualizar el estado físico post-mantenimiento.
+
 ## 5. Módulos de Configuración (Extras)
 
 - [x] **Áreas:** CRUD para gestionar las áreas/ubicaciones dentro de DTIC.
@@ -85,6 +93,7 @@
 ## 8. Interfaz de Usuario (UI/UX)
 
 - [x] **Estilo "Dark Premium":** Interfaz oscura cohesiva con fondos #050505, #0a0a0a, #1e1b2e.
+- [x] **Componentes Premium Estandarizados:** Uso consolidado de `<x-input-premium>` y `<x-select-premium>` (incluso en estados de sólo lectura) en los formularios de Mantenimientos y Desincorporaciones.
 - [x] **Acentos Púrpura:** Paleta de marca con #a855f7, #c084fc, #d8b4fe.
 - [x] **Fuente Outfit:** Tipografía moderna aplicada globalmente.
 - [x] **Componentes Reactivos:** Livewire para interacciones dinámicas sin recarga.
