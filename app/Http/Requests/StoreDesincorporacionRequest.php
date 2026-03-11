@@ -6,9 +6,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Traits\AsignaSNAutomatico;
 
 class StoreDesincorporacionRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     public function authorize(): bool
     {
         return $this->user()->can('crear desincorporaciones');

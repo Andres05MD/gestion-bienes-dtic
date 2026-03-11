@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\AsignaSNAutomatico;
 
 class StoreBienExternoRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     /**
      * Determina si el usuario está autorizado a realizar esta solicitud.
      */

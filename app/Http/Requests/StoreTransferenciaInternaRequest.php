@@ -5,66 +5,18 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\AsignaSNAutomatico;
 
 class StoreTransferenciaInternaRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     /**
      * Determina si el usuario está autorizado a realizar esta solicitud.
      */
     public function authorize(): bool
     {
         return $this->user()->can('crear transferencias');
-    }
-
-    /**
-     * Prepara los datos para la validación (asignación automática de S/N).
-     */
-    protected function prepareForValidation(): void
-    {
-        $bienes = $this->input('bienes', []);
-        
-        if (is_array($bienes)) {
-            $maxNumero = 0;
-            $haySn = false;
-            
-            // Primero, verificar si hay algún s/n en la lista
-            foreach ($bienes as $bien) {
-                if (isset($bien['numero_bien']) && trim(strtolower($bien['numero_bien'])) === 's/n') {
-                    $haySn = true;
-                    break;
-                }
-            }
-            
-            // Si hay s/n, calcular el máximo S/N actual en la BD
-            if ($haySn) {
-                $bienesSN = \App\Models\Bien::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
-                $externosSN = \App\Models\BienExterno::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
-                $todosLosSN = $bienesSN->merge($externosSN);
-
-                foreach ($todosLosSN as $numero) {
-                    $partes = explode('-', $numero);
-                    if (isset($partes[1]) && is_numeric($partes[1])) {
-                        $num = (int)$partes[1];
-                        if ($num > $maxNumero) {
-                            $maxNumero = $num;
-                        }
-                    }
-                }
-            }
-
-            // Asignar los nuevos S/N de manera secuencial
-            foreach ($bienes as $index => $bien) {
-                if (isset($bien['numero_bien']) && trim(strtolower($bien['numero_bien'])) === 's/n') {
-                    $maxNumero++;
-                    $nuevoNumero = 'S/N-' . str_pad((string)$maxNumero, 3, '0', STR_PAD_LEFT);
-                    $bienes[$index]['numero_bien'] = $nuevoNumero;
-                }
-            }
-            
-            $this->merge([
-                'bienes' => $bienes,
-            ]);
-        }
     }
 
     /**

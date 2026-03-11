@@ -7,9 +7,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Traits\AsignaSNAutomatico;
 
 class StoreBienRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     /**
      * Determina si el usuario está autorizado a realizar esta solicitud.
      */
