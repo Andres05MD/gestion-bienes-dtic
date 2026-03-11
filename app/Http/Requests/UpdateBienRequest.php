@@ -8,9 +8,12 @@ namespace App\Http\Requests;
 use App\Models\Bien;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Traits\AsignaSNAutomatico;
 
 class UpdateBienRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     /**
      * Determina si el usuario está autorizado a realizar esta solicitud.
      */

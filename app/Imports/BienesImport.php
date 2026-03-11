@@ -16,11 +16,30 @@ class BienesImport implements ToCollection, WithHeadingRow, WithLimit
 {
     private $previewMode = false;
     private $limit = 0;
+    private $maxSN = 0;
 
     public function __construct($previewMode = false, $limit = 0)
     {
         $this->previewMode = $previewMode;
         $this->limit = $limit;
+        $this->initMaxSN();
+    }
+    
+    private function initMaxSN(): void
+    {
+        $bienesSN = Bien::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
+        $externosSN = \App\Models\BienExterno::where('numero_bien', 'LIKE', 'S/N-%')->pluck('numero_bien');
+        $todosLosSN = $bienesSN->merge($externosSN);
+
+        foreach ($todosLosSN as $numero) {
+            $partes = explode('-', $numero);
+            if (isset($partes[1]) && is_numeric($partes[1])) {
+                $num = (int)$partes[1];
+                if ($num > $this->maxSN) {
+                    $this->maxSN = $num;
+                }
+            }
+        }
     }
 
     public function limit(): int
@@ -105,7 +124,9 @@ class BienesImport implements ToCollection, WithHeadingRow, WithLimit
         $upperRaw = Str::upper($raw);
 
         if (empty($raw) || $upperRaw === 'S/B' || $upperRaw === 'S/N') {
-            return ['categoria' => null, 'numero' => 'S/N'];
+            $this->maxSN++;
+            $nuevoNumero = 'S/N-' . str_pad((string)$this->maxSN, 3, '0', STR_PAD_LEFT);
+            return ['categoria' => null, 'numero' => $nuevoNumero];
         }
 
         // Limpiar puntos y espacios al inicio/final
@@ -129,11 +150,17 @@ class BienesImport implements ToCollection, WithHeadingRow, WithLimit
                 $numero = preg_replace('/[\s\.\-:]+/', '', $numero); 
                 return [
                     'categoria' => $nombreCategoria,
-                    'numero' => !empty($numero) ? $numero : 'S/N'
+                    'numero' => !empty($numero) ? $numero : $this->obtenerNuevoSN()
                 ];
             }
         }
 
         return ['categoria' => null, 'numero' => $rawUpper];
+    }
+    
+    private function obtenerNuevoSN(): string
+    {
+        $this->maxSN++;
+        return 'S/N-' . str_pad((string)$this->maxSN, 3, '0', STR_PAD_LEFT);
     }
 }

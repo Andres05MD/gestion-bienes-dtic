@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\AsignaSNAutomatico;
 
 class UpdateMantenimientoRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     /**
      * Determine if the user is authorized to make this request.
      */

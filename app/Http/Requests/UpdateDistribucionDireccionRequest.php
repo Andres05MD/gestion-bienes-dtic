@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\AsignaSNAutomatico;
 
 class UpdateDistribucionDireccionRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     public function authorize(): bool
     {
         return $this->user()->can('editar distribuciones');

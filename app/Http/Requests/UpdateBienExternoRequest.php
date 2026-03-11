@@ -6,9 +6,12 @@ namespace App\Http\Requests;
 
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Traits\AsignaSNAutomatico;
 
 class UpdateBienExternoRequest extends FormRequest
 {
+    use AsignaSNAutomatico;
+
     /**
      * Determina si el usuario está autorizado a realizar esta solicitud.
      */
