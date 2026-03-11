@@ -157,29 +157,40 @@
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-normal min-w-[160px]">
-                                        @php
-                                        $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
-                                        $tieneIndividuales = $grupo->contains(fn($d) => $d->estatus_acta_individual_id !== null);
-                                        @endphp
-                                        {{-- Estatus Grupal --}}
-                                        <span class="px-3 py-1.5 inline-block text-center text-xs leading-5 font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal"
-                                            @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50" ])>
-                                            {!! str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A'))) !!}
-                                        </span>
-                                        {{-- Indicador de actas individuales --}}
-                                        @if($tieneIndividuales && $cantidad > 1)
-                                        <div class="mt-2 flex flex-col gap-1">
+                                        @if($cantidad > 1)
+                                        <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $d)
-                                                @if($d->estatus_acta_individual_id)
-                                                @php $colorInd = $d->estatusActaIndividual?->color ?? '#6b7280'; @endphp
-                                                <span class="px-2 py-0.5 inline-block text-center text-[9px] leading-4 font-bold rounded-md uppercase tracking-wider whitespace-nowrap"
-                                                    @style([ "background-color: {$colorInd}15" , "color: {$colorInd}" , "border: 1px dashed {$colorInd}40" ])
-                                                    title="Acta individual: {{ $d->numero_bien }}">
-                                                    {{ $d->numero_bien }}: {{ $d->estatusActaIndividual?->nombre ?? 'N/A' }}
+                                            <div class="flex items-center">
+                                                @php
+                                                    $estatusActivo = $d->estatus_acta_individual_id ? $d->estatusActaIndividual : $primera->estatusActa;
+                                                    $colorEstatus = $estatusActivo?->color ?? '#6b7280';
+                                                    $nombreEstatus = str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($estatusActivo?->nombre ?? 'N/A')));
+                                                @endphp
+                                                <span class="px-2 py-1 inline-flex items-center justify-center text-center text-[10px] leading-tight font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal w-full max-w-[140px] min-h-[36px]"
+                                                    @style([
+                                                        "background-color: {$colorEstatus}15",
+                                                        "color: {$colorEstatus}",
+                                                        "border: 1px ".($d->estatus_acta_individual_id ? 'dashed' : 'solid')." {$colorEstatus}40"
+                                                    ])
+                                                    title="{{ $d->estatus_acta_individual_id ? 'Acta individual' : 'Acta grupal heredada' }}">
+                                                    {!! $nombreEstatus !!}
                                                 </span>
-                                                @endif
+                                            </div>
                                             @endforeach
                                         </div>
+                                        @else
+                                        @php
+                                            $estatusColor = $primera->estatus_acta_individual_id ? ($primera->estatusActaIndividual?->color ?? '#6b7280') : ($primera->estatusActa?->color ?? '#6b7280');
+                                            $nombreEstatus = str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($primera->estatus_acta_individual_id ? ($primera->estatusActaIndividual?->nombre ?? 'N/A') : ($primera->estatusActa?->nombre ?? 'N/A'))));
+                                        @endphp
+                                        <span class="px-3 py-1.5 inline-block text-center text-xs leading-5 font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal"
+                                            @style([ 
+                                                "background-color: {$estatusColor}20", 
+                                                "color: {$estatusColor}", 
+                                                "border: 1px ".($primera->estatus_acta_individual_id ? 'dashed' : 'solid')." {$estatusColor}50" 
+                                            ])>
+                                            {!! $nombreEstatus !!}
+                                        </span>
                                         @endif
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold align-middle" x-data="{ openModal: false }">

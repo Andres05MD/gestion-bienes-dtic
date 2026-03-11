@@ -37,6 +37,7 @@ class StoreDesincorporacionRequest extends FormRequest
             'bienes.*.numero_bien' => ['required', 'string', 'max:255'],
             'bienes.*.descripcion' => ['required', 'string', 'max:255'],
             'bienes.*.serial'      => ['nullable', 'string', 'max:255'],
+            'bienes.*.estatus_acta_individual_id' => ['nullable', 'exists:estatus_actas,id'],
         ];
     }
 

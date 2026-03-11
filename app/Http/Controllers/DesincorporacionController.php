@@ -133,6 +133,7 @@ class DesincorporacionController extends Controller
 
             foreach ($validated['bienes'] as $index => $bienData) {
                 $numeroInforme = $informesInput[$index] ?? null;
+                $estatusIndividualId = $bienData['estatus_acta_individual_id'] ?? null;
                 $desincorporacion = Desincorporacion::create([
                     ...$commonData,
                     'numero_informe' => $numeroInforme,
@@ -141,6 +142,7 @@ class DesincorporacionController extends Controller
                     'serial' => $bienData['serial'] ?? null,
                     'bien_id' => $bienData['tipo'] === 'dtic' ? $bienData['id'] : null,
                     'bien_externo_id' => $bienData['tipo'] === 'externo' ? $bienData['id'] : null,
+                    'estatus_acta_individual_id' => $estatusIndividualId ?: null,
                 ]);
 
                 // Marcar el bien como desincorporado usando el servicio

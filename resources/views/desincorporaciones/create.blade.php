@@ -776,6 +776,28 @@
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {{-- Toggle de Acta Individual (solo en modo múltiple) --}}
+                                            <div x-show="modoDesincorporacion === 'multiple'" x-transition class="mt-4 pt-4 border-t border-gray-200 dark:border-white/5" x-data="{ mostrarIndividual: false }">
+                                                <div class="flex items-center gap-2 mb-2">
+                                                    <label class="relative inline-flex items-center cursor-pointer group">
+                                                        <input type="checkbox" x-model="mostrarIndividual" class="sr-only peer">
+                                                        <div class="w-8 h-4 bg-gray-300 dark:bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:bg-brand-purple/60 transition-colors"></div>
+                                                        <div class="absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition-all peer-checked:translate-x-4"></div>
+                                                    </label>
+                                                    <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Acta Individual</span>
+                                                </div>
+                                                <div x-show="mostrarIndividual" x-transition x-cloak>
+                                                    <x-select-premium
+                                                        name="estatus_acta_individual"
+                                                        alpineName="'bienes['+index+'][estatus_acta_individual_id]'"
+                                                        :options="$estatuses->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()"
+                                                        placeholder="— Mismo que grupal —"
+                                                        icon="o-clipboard-document-check"
+                                                        :searchable="false"
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>

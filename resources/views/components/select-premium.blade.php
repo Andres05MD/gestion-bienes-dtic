@@ -1,6 +1,7 @@
 @props([
 'label' => null,
 'name',
+'alpineName' => null,
 'options' => [],
 'icon' => null,
 'placeholder' => 'Seleccione una opción',
@@ -69,7 +70,7 @@
         </button>
 
         <!-- Input oculto para validación nativa del formulario -->
-        <input type="text" name="{{ $name }}" :value="selected" class="absolute w-0 h-0 opacity-0 pointer-events-none" tabindex="-1" @if($required) required @endif>
+        <input type="text" @if($alpineName) x-bind:name="{!! $alpineName !!}" @else name="{{ $name }}" @endif :value="selected" class="absolute w-0 h-0 opacity-0 pointer-events-none" tabindex="-1" @if($required) required @endif>
 
         <!-- Dropdown Panel -->
         <div
