@@ -64,6 +64,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('desincorporaciones', DesincorporacionController::class)
         ->parameters(['desincorporaciones' => 'desincorporacione'])
         ->middleware('can:ver desincorporaciones');
+    Route::patch('desincorporaciones/{desincorporacione}/estatus-individual', [DesincorporacionController::class, 'actualizarEstatusIndividual'])
+        ->name('desincorporaciones.estatus-individual')
+        ->middleware('can:editar desincorporaciones');
 
     // Distribución Dirección
     Route::resource('distribuciones-direccion', DistribucionDireccionController::class)

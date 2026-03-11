@@ -159,14 +159,39 @@
                                     <td class="px-6 py-4 whitespace-normal min-w-[160px]">
                                         @php
                                         $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
+                                        $tieneIndividuales = $grupo->contains(fn($d) => $d->estatus_acta_individual_id !== null);
                                         @endphp
+                                        {{-- Estatus Grupal --}}
                                         <span class="px-3 py-1.5 inline-block text-center text-xs leading-5 font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal"
                                             @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50" ])>
                                             {!! str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A'))) !!}
                                         </span>
+                                        {{-- Indicador de actas individuales --}}
+                                        @if($tieneIndividuales && $cantidad > 1)
+                                        <div class="mt-2 flex flex-col gap-1">
+                                            @foreach($grupo as $d)
+                                                @if($d->estatus_acta_individual_id)
+                                                @php $colorInd = $d->estatusActaIndividual?->color ?? '#6b7280'; @endphp
+                                                <span class="px-2 py-0.5 inline-block text-center text-[9px] leading-4 font-bold rounded-md uppercase tracking-wider whitespace-nowrap"
+                                                    @style([ "background-color: {$colorInd}15" , "color: {$colorInd}" , "border: 1px dashed {$colorInd}40" ])
+                                                    title="Acta individual: {{ $d->numero_bien }}">
+                                                    {{ $d->numero_bien }}: {{ $d->estatusActaIndividual?->nombre ?? 'N/A' }}
+                                                </span>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                        @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold align-middle">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold align-middle" x-data="{ openModal: false }">
                                         <div class="flex items-center gap-3">
+                                            @if($cantidad > 1)
+                                            @can('editar desincorporaciones')
+                                            <button type="button" @click="openModal = true" class="text-brand-purple hover:text-brand-lila transition" title="Gestionar Actas Individuales">
+                                                <x-mary-icon name="o-clipboard-document-check" class="w-5 h-5" />
+                                            </button>
+                                            @endcan
+                                            @endif
+
                                             @can('ver desincorporaciones')
                                             <a href="{{ route('desincorporaciones.show', $primera) }}" class="text-sky-400 hover:text-sky-300 transition" title="Ver detalle">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,6 +218,60 @@
                                             </button>
                                             @endcan
                                         </div>
+
+                                        {{-- Modal Actas Individuales --}}
+                                        @if($cantidad > 1)
+                                        @can('editar desincorporaciones')
+                                        <div x-show="openModal" class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm whitespace-normal" x-transition x-cloak style="display: none;">
+                                            <div @click.away="openModal = false" class="bg-white dark:bg-dark-900 border border-gray-100 dark:border-white/10 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col mx-4 text-left">
+                                                <!-- Header -->
+                                                <div class="px-6 py-5 border-b border-gray-100 dark:border-white/5 flex justify-between items-center bg-gray-50 dark:bg-dark-850">
+                                                    <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
+                                                        <x-mary-icon name="o-clipboard-document-list" class="w-5 h-5 text-brand-purple" />
+                                                        Actas Individuales <span class="text-brand-purple bg-brand-purple/10 px-2 py-0.5 rounded-lg">{{ $primera->codigo_acta }}</span>
+                                                    </h3>
+                                                    <button @click="openModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1.5 rounded-xl">
+                                                        <x-mary-icon name="o-x-mark" class="w-5 h-5" />
+                                                    </button>
+                                                </div>
+                                                <!-- Body -->
+                                                <div class="p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-dark-900 space-y-4">
+                                                    @foreach($grupo as $bien)
+                                                    <div class="bg-gray-50 dark:bg-[#1a1a1a] p-5 rounded-2xl border border-gray-100 dark:border-white/5 relative group transition-all duration-300 hover:border-brand-purple/20">
+                                                        <div class="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-2">
+                                                            <div>
+                                                                <p class="text-[10px] font-black text-brand-lila uppercase tracking-[0.2em] mb-1">Bien N° {{ $bien->numero_bien }}</p>
+                                                                <p class="text-sm font-bold text-gray-900 dark:text-white leading-tight">{{ $bien->descripcion }}</p>
+                                                            </div>
+                                                            <div class="inline-flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-xl border border-white/5">
+                                                                <x-mary-icon name="o-qr-code" class="w-3.5 h-3.5 text-gray-500" />
+                                                                <span class="text-[9px] font-bold text-gray-400 uppercase tracking-wider">SN: <span class="text-gray-200 ml-0.5">{{ $bien->serial ?: 'N/A' }}</span></span>
+                                                            </div>
+                                                        </div>
+                                                        <form method="POST" action="{{ route('desincorporaciones.estatus-individual', $bien) }}" class="flex items-start gap-3">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <div class="flex-1 min-w-0">
+                                                                <x-select-premium 
+                                                                    name="estatus_acta_individual_id" 
+                                                                    :options="\App\Models\EstatusActa::all()->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()"
+                                                                    :value="$bien->estatus_acta_individual_id"
+                                                                    placeholder="— Heredar Grupal —"
+                                                                    icon="o-clipboard-document-check"
+                                                                    :searchable="false"
+                                                                />
+                                                            </div>
+                                                            <button type="submit" class="px-5 py-3 h-12 bg-linear-to-r from-brand-lila to-brand-purple text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-300 shadow-lg shadow-brand-purple/20 shrink-0">
+                                                                Guardar
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endcan
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty

@@ -28,7 +28,7 @@ class DesincorporacionController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Desincorporacion::query()->with(['procedencia', 'estatusActa']);
+        $query = Desincorporacion::query()->with(['procedencia', 'estatusActa', 'estatusActaIndividual']);
 
         // Búsqueda por texto
         if ($request->filled('buscar')) {
@@ -72,7 +72,7 @@ class DesincorporacionController extends Controller
 
         $clavesPagina = collect($gruposPaginados->items())->pluck('group_key');
 
-        $desincorporacionesFinales = Desincorporacion::with(['procedencia', 'estatusActa', 'bien', 'bienExterno'])
+        $desincorporacionesFinales = Desincorporacion::with(['procedencia', 'estatusActa', 'estatusActaIndividual', 'bien', 'bienExterno'])
             ->whereIn(DB::raw('COALESCE(codigo_acta, CONCAT("legacy_", id))'), $clavesPagina)
             ->latest('id')
             ->get();
@@ -157,9 +157,9 @@ class DesincorporacionController extends Controller
      */
     public function show(Desincorporacion $desincorporacione): View
     {
-        $desincorporacione->load(['procedencia', 'bien', 'bienExterno', 'user', 'estatusActa']);
+        $desincorporacione->load(['procedencia', 'bien', 'bienExterno', 'user', 'estatusActa', 'estatusActaIndividual']);
         $bienesGrupo = $desincorporacione->codigo_acta
-            ? Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->get()
+            ? Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->with(['estatusActa', 'estatusActaIndividual'])->get()
             : collect([$desincorporacione]);
 
         return view('desincorporaciones.show', [
@@ -179,8 +179,8 @@ class DesincorporacionController extends Controller
         $dticId = Departamento::where('nombre', 'DTIC')->first()?->id;
 
         $bienesGrupo = $desincorporacione->codigo_acta
-            ? Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->get()
-            : collect([$desincorporacione]);
+            ? Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->with('estatusActaIndividual')->get()
+            : collect([$desincorporacione->load('estatusActaIndividual')]);
 
         return view('desincorporaciones.edit', [
             'desincorporacion' => $desincorporacione,
@@ -244,5 +244,24 @@ class DesincorporacionController extends Controller
 
         return redirect()->route('desincorporaciones.index')
             ->with('success', 'Desincorporación eliminada exitosamente.');
+    }
+
+    /**
+     * Actualiza el estatus de acta individual de un ítem específico.
+     */
+    public function actualizarEstatusIndividual(Request $request, Desincorporacion $desincorporacione): RedirectResponse
+    {
+        $validated = $request->validate([
+            'estatus_acta_individual_id' => ['nullable', 'exists:estatus_actas,id'],
+        ], [
+            'estatus_acta_individual_id.exists' => 'El estatus seleccionado no es válido.',
+        ]);
+
+        $desincorporacione->update([
+            'estatus_acta_individual_id' => $validated['estatus_acta_individual_id'] ?: null,
+        ]);
+
+        return redirect()->back()
+            ->with('success', 'Estatus individual actualizado exitosamente.');
     }
 }

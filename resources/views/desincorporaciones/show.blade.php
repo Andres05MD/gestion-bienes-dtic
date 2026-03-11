@@ -139,10 +139,23 @@
                                                 <x-mary-icon name="o-cube" class="w-16 h-16 text-brand-purple" />
                                             </div>
                                             <div class="relative z-10">
-                                                <p class="text-[10px] font-black text-brand-lila uppercase tracking-[0.2em] mb-3">{{ $bg->numero_bien }}</p>
-                                                <p class="text-lg font-black text-white leading-tight tracking-tight mb-6 pr-12">{{ $bg->descripcion }}</p>
+                                                <div class="flex items-start justify-between mb-3">
+                                                    <p class="text-[10px] font-black text-brand-lila uppercase tracking-[0.2em]">{{ $bg->numero_bien }}</p>
+                                                    {{-- Badge de estatus efectivo (individual o heredado) --}}
+                                                    @php
+                                                    $estatusEfectivo = $bg->estatus_acta_individual_id ? $bg->estatusActaIndividual : $bg->estatusActa;
+                                                    $esIndividual = $bg->estatus_acta_individual_id !== null;
+                                                    $colorEfectivo = $estatusEfectivo?->color ?? '#6b7280';
+                                                    @endphp
+                                                    <span class="px-2 py-1 text-[8px] leading-3 font-bold rounded-lg uppercase tracking-wider whitespace-nowrap"
+                                                        @style([ "background-color: {$colorEfectivo}20" , "color: {$colorEfectivo}" , "border: 1px " . ($esIndividual ? 'solid' : 'dashed') . " {$colorEfectivo}40" ])
+                                                        title="{{ $esIndividual ? 'Acta Individual' : 'Hereda Acta Grupal' }}">
+                                                        {{ $esIndividual ? '● ' : '○ ' }}{{ $estatusEfectivo?->nombre ?? 'N/A' }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-lg font-black text-white leading-tight tracking-tight mb-4 pr-12">{{ $bg->descripcion }}</p>
 
-                                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
                                                     <div class="inline-flex items-center gap-2 bg-white/5 px-4 py-2.5 rounded-2xl border border-white/5 shadow-sm">
                                                         <x-mary-icon name="o-qr-code" class="w-4 h-4 text-gray-500" />
                                                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">SN: <span class="text-gray-200 ml-1">{{ $bg->serial ?: 'N/A' }}</span></span>
@@ -158,6 +171,37 @@
                                                     </div>
                                                     @endif
                                                 </div>
+
+                                                {{-- Formulario inline para cambiar estatus individual --}}
+                                                @if($bienesGrupo->count() > 1)
+                                                @can('editar desincorporaciones')
+                                                <div class="pt-4 border-t border-white/5" x-data="{ abierto: false }">
+                                                    <button type="button" @click="abierto = !abierto" class="text-[9px] font-bold text-gray-500 hover:text-brand-lila uppercase tracking-widest transition-colors flex items-center gap-1 cursor-pointer">
+                                                        <x-mary-icon name="o-pencil" class="w-3 h-3" />
+                                                        <span x-text="abierto ? 'Cerrar' : 'Cambiar Acta Individual'"></span>
+                                                    </button>
+                                                    <div x-show="abierto" x-transition class="mt-3">
+                                                        <form method="POST" action="{{ route('desincorporaciones.estatus-individual', $bg) }}" class="flex items-start gap-3">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <div class="flex-1">
+                                                                <x-select-premium 
+                                                                    name="estatus_acta_individual_id" 
+                                                                    :options="\App\Models\EstatusActa::all()->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()"
+                                                                    :value="$bg->estatus_acta_individual_id"
+                                                                    placeholder="— Heredar Grupal —"
+                                                                    icon="o-clipboard-document-check"
+                                                                    :searchable="false"
+                                                                />
+                                                            </div>
+                                                            <button type="submit" class="px-5 py-3 h-12 bg-linear-to-r from-brand-lila to-brand-purple text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-300 cursor-pointer whitespace-nowrap shadow-lg shadow-brand-purple/20">
+                                                                Guardar
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                                @endcan
+                                                @endif
                                             </div>
                                         </div>
                                         @endforeach

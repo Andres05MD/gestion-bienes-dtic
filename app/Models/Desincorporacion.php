@@ -55,6 +55,7 @@ class Desincorporacion extends Model
         'fecha',
         'numero_informe',
         'estatus_acta_id',
+        'estatus_acta_individual_id',
         'observaciones',
         'bien_id',
         'bien_externo_id',
@@ -76,11 +77,27 @@ class Desincorporacion extends Model
     }
 
     /**
-     * Relación: estatus del acta.
+     * Relación: estatus del acta (grupal).
      */
     public function estatusActa(): BelongsTo
     {
         return $this->belongsTo(EstatusActa::class);
+    }
+
+    /**
+     * Relación: estatus del acta individual (override por ítem).
+     */
+    public function estatusActaIndividual(): BelongsTo
+    {
+        return $this->belongsTo(EstatusActa::class, 'estatus_acta_individual_id');
+    }
+
+    /**
+     * Accessor: devuelve el estatus efectivo (individual si existe, grupal como fallback).
+     */
+    public function getEstatusEfectivoAttribute(): ?EstatusActa
+    {
+        return $this->estatusActaIndividual ?? $this->estatusActa;
     }
 
     /**

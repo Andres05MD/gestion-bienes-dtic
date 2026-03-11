@@ -69,6 +69,38 @@
                                             <p class="text-sm text-gray-800 dark:text-gray-200">{{ $bien->serial ?: 'S/N' }}</p>
                                         </div>
                                     </div>
+                                    {{-- Selector de acta individual (solo en grupos) --}}
+                                    @if($bienesGrupo->count() > 1)
+                                    <div class="mt-4 pt-4 border-t border-gray-200 dark:border-white/5" x-data="{ mostrarIndividual: {{ $bien->estatus_acta_individual_id ? 'true' : 'false' }} }">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <label class="relative inline-flex items-center cursor-pointer group">
+                                                <input type="checkbox" x-model="mostrarIndividual" class="sr-only peer">
+                                                <div class="w-8 h-4 bg-gray-300 dark:bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:bg-brand-purple/60 transition-colors"></div>
+                                                <div class="absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition-all peer-checked:translate-x-4"></div>
+                                            </label>
+                                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Acta Individual</span>
+                                        </div>
+                                        <div x-show="mostrarIndividual" x-transition x-cloak>
+                                            <form method="POST" action="{{ route('desincorporaciones.estatus-individual', $bien) }}" class="flex items-start gap-3">
+                                                @csrf
+                                                @method('PATCH')
+                                                <div class="flex-1">
+                                                    <x-select-premium 
+                                                        name="estatus_acta_individual_id" 
+                                                        :options="$estatuses->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()"
+                                                        :value="$bien->estatus_acta_individual_id"
+                                                        placeholder="— Heredar Grupal —"
+                                                        icon="o-clipboard-document-check"
+                                                        :searchable="false"
+                                                    />
+                                                </div>
+                                                <button type="submit" class="px-5 py-3 h-12 bg-linear-to-r from-brand-lila to-brand-purple text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all duration-300 cursor-pointer whitespace-nowrap shadow-lg shadow-brand-purple/20">
+                                                    Guardar
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
                                 @endforeach
                             </div>
