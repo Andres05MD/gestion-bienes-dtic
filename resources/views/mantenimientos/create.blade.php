@@ -636,8 +636,7 @@
                                     </div>
                                 </template>
                             </div>
-
-                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-10" x-show="bienesSeleccionados.length > 0">
+                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-20" x-show="bienesSeleccionados.length > 0">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <x-date-input-premium
                                         name="fecha"
