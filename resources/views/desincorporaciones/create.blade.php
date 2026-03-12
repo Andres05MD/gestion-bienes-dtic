@@ -599,7 +599,7 @@
 
 
                         <!-- Datos de la Transferencia / Lista -->
-                        <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative group transition-all duration-500 hover:shadow-brand-purple/5" :class="activeCard ? 'z-50' : 'z-10'">
+                        <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative group transition-all duration-500 hover:shadow-brand-purple/5 " :class="activeCard ? 'z-50' : 'z-10'">
                             <div class="absolute inset-0 rounded-[2.5rem] border border-white/5 pointer-events-none"></div>
                             <div class="flex items-center justify-between mb-8 relative z-10">
                                 <div class="flex items-center gap-3">
@@ -808,7 +808,7 @@
                                     </div>
                                 </template>
                             </div>
-                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-20" x-show="bienesSeleccionados.length > 0">
+                            <div class="mt-8 border-t border-gray-100 dark:border-white/10 pt-8 relative z-20 " x-show="bienesSeleccionados.length > 0">
                                 <div class="w-full sm:w-1/2">
                                     <x-date-input-premium
                                         name="fecha"
@@ -819,8 +819,8 @@
                         </div>
                     </div>
 
-                    <div class="space-y-8 relative z-10">
-                        <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300" :class="activeCard ? 'z-50' : 'z-10'">
+                    <div class="space-y-8 relative z-10 ">
+                        <div x-data="{ activeCard: false }" @click="activeCard = true" @click.outside="activeCard = false" class="bg-white dark:bg-dark-850/40 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-white/5 relative transition-all duration-300 " :class="activeCard ? 'z-50' : 'z-10'">
                             <div class="flex items-center gap-3 mb-8">
                                 <div class="w-10 h-10 bg-brand-purple/10 rounded-xl flex items-center justify-center">
                                     <x-mary-icon name="o-arrows-right-left" class="w-6 h-6 text-brand-lila" />

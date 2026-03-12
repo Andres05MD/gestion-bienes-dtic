@@ -13,10 +13,11 @@ $days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 @endphp
 
 <div class="space-y-2 transition-all duration-300 relative"
-    :class="show ? 'z-[60]' : 'z-0'"
+    :class="show ? 'z-60' : 'z-0'"
     x-data="{
         show: false,
         isUp: false,
+        calendarStyle: '',
         selectedDate: @js(old($name, $value)),
         displayText: '',
         month: '',
@@ -35,16 +36,47 @@ $days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             }
         },
 
-        toggleCalendar(forceOpen = false) {
-            if (!this.show || forceOpen) {
-                const rect = this.$el.getBoundingClientRect();
-                const windowHeight = window.innerHeight;
-                const calendarHeight = 420;
-                
-                this.isUp = (windowHeight - rect.bottom) < calendarHeight && rect.top > (windowHeight - rect.bottom);
+        posicionarCalendario() {
+            const inputEl = this.$refs.dateInput;
+            if (!inputEl) return;
+            const rect = inputEl.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            const windowWidth = window.innerWidth;
+            const calendarHeight = 420;
+            const calendarWidth = 352;
+
+            const espacioAbajo = windowHeight - rect.bottom;
+            const espacioArriba = rect.top;
+
+            this.isUp = espacioAbajo < calendarHeight && espacioArriba > espacioAbajo;
+
+            let top, left;
+
+            if (this.isUp) {
+                top = rect.top - calendarHeight - 8;
+                if (top < 8) top = 8;
+            } else {
+                top = rect.bottom + 8;
+                if (top + calendarHeight > windowHeight - 8) {
+                    top = windowHeight - calendarHeight - 8;
+                }
             }
+
+            left = rect.left;
+            if (left + calendarWidth > windowWidth - 8) {
+                left = windowWidth - calendarWidth - 8;
+            }
+            if (left < 8) left = 8;
+
+            this.calendarStyle = `top: ${top}px; left: ${left}px;`;
+        },
+
+        toggleCalendar(forceOpen = false) {
             if(!forceOpen) {
                 this.show = !this.show;
+            }
+            if (this.show) {
+                this.$nextTick(() => this.posicionarCalendario());
             }
         },
 
@@ -164,7 +196,9 @@ $days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         }
     }"
     x-init="initDate(); getNoOfDays()"
-    @click.away="show = false">
+    @click.away="show = false"
+    @scroll.window="if(show) posicionarCalendario()"
+    @resize.window="if(show) posicionarCalendario()">
 
     @if($label)
     <label for="{{ $name }}" class="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.2em] ml-1">
@@ -202,18 +236,19 @@ $days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             </button>
         </div>
 
-        <!-- Calendario Popover -->
+        <!-- Calendario Popover (FIXED para escape de stacking context) -->
         <div
             x-show="show"
             x-transition:enter="transition ease-out duration-200"
-            :x-transition:enter-start="isUp ? 'opacity-0 scale-95 translate-y-2' : 'opacity-0 scale-95 -translate-y-2'"
-            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
             x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-            :x-transition:leave-end="isUp ? 'opacity-0 scale-95 translate-y-2' : 'opacity-0 scale-95 -translate-y-2'"
-            class="absolute z-[100] p-4 bg-white/80 dark:bg-dark-900/90 backdrop-blur-xl border border-gray-100 dark:border-white/10 rounded-4xl shadow-2xl w-76 sm:w-88"
-            :class="isUp ? 'bottom-full mb-2' : 'top-full mt-2'"
-            style="display: none;">
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="fixed z-[9999] p-4 bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl border border-gray-100 dark:border-white/10 rounded-4xl shadow-2xl w-76 sm:w-88"
+            :style="calendarStyle"
+            style="display: none;"
+            @mousedown.stop>
             <!-- Header Calendario -->
             <div class="flex items-center justify-between mb-4 px-2">
                 <button type="button" @click="previousMonth()" class="p-2 hover:bg-brand-purple/10 rounded-xl transition-colors text-gray-500 dark:text-gray-400 hover:text-brand-purple">
