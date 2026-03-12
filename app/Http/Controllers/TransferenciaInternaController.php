@@ -138,6 +138,8 @@ class TransferenciaInternaController extends Controller
                 'fecha' => $validated['fecha'],
                 'estatus_acta_id' => $validated['estatus_acta_id'],
                 'fecha_firma' => $validated['fecha_firma'] ?? null,
+                'area_id' => $validated['area_id'] ?? null,
+                'area_procedencia_id' => $validated['area_procedencia_id'] ?? null,
                 'user_id' => auth()->id(),
             ];
 

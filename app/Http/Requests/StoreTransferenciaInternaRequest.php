@@ -30,6 +30,7 @@ class StoreTransferenciaInternaRequest extends FormRequest
             'procedencia_id' => ['required', 'exists:departamentos,id'],
             'destino_id'     => ['required', 'exists:departamentos,id'],
             'area_id'        => ['nullable', 'exists:areas,id'],
+            'area_procedencia_id' => ['nullable', 'exists:areas,id'],
             'fecha'          => ['required', 'date'],
             'estatus_acta_id' => ['required', 'exists:estatus_actas,id'],
             'fecha_firma'    => ['nullable', 'date'],
