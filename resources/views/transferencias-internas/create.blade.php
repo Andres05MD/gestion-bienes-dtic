@@ -245,7 +245,15 @@
 
                 buscarCoincidenciaExacta(bien, campo) {
                     let valor = campo === 'numero_bien' ? bien.numero_bien : bien.serial;
+                    
+                    // Ignorar búsuqedas si el valor es vacío, muy corto, o si es la cadena típica sin serial "S/N"
                     if (!valor || String(valor).length < 2 || bien.id !== '') {
+                        bien.importar_disponible = null;
+                        return;
+                    }
+                    
+                    let valorMinuscula = String(valor).toLowerCase().trim();
+                    if (campo === 'serial' && (valorMinuscula === 's/n' || valorMinuscula === 'sn' || valorMinuscula === 's-n')) {
                         bien.importar_disponible = null;
                         return;
                     }
@@ -253,7 +261,7 @@
                     fetch(`/api/bienes/buscar?q=${encodeURIComponent(valor)}`)
                         .then(r => r.json())
                         .then(data => {
-                            let target = String(valor).toLowerCase();
+                            let target = valorMinuscula;
                             let coincidencia = data.find(b => {
                                 if (campo === 'numero_bien' && b.numero_bien && String(b.numero_bien).toLowerCase() === target) return true;
                                 if (campo === 'serial' && b.serial && String(b.serial).toLowerCase() === target) return true;
