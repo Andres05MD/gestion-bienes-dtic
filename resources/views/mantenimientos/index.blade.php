@@ -115,9 +115,11 @@
                                     <!-- N° Bien Agrupado -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-white">
                                         @if($cantidad > 1)
-                                        <div class="flex flex-col gap-1 mt-6">
+                                        <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $t)
-                                            <span class="text-gray-300">{{ $t->numero_bien }}</span>
+                                            <div class="flex items-center min-h-[40px]">
+                                                <span class="text-gray-300">{{ $t->numero_bien }}</span>
+                                            </div>
                                             @endforeach
                                         </div>
                                         @else
@@ -128,9 +130,11 @@
                                     <!-- Descripción Agrupada -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                                         @if($cantidad > 1)
-                                        <div class="flex flex-col gap-1 mt-6">
+                                        <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $t)
-                                            <span class="text-gray-300 truncate max-w-[220px]" title="{{ $t->descripcion }}">{{ $t->descripcion }}</span>
+                                            <div class="flex items-center min-h-[40px]">
+                                                <span class="text-gray-300 truncate max-w-[220px]" title="{{ $t->descripcion }}">{{ $t->descripcion }}</span>
+                                            </div>
                                             @endforeach
                                         </div>
                                         @else
@@ -158,15 +162,47 @@
                                             @endif
                                         </div>
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
+                                    <td class="px-6 py-4 whitespace-normal min-w-[160px] align-middle">
                                         @php
-                                        $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
+                                            $todosTienenMismoEstatus = $cantidad > 1 ? $grupo->pluck('estatus_acta_id')->unique()->count() === 1 : true;
                                         @endphp
-                                        <span class="px-2.5 py-1.5 inline-block text-center text-[10px] leading-4 font-black rounded-lg shadow-sm uppercase tracking-widest"
-                                            @style([ "background-color: {$estatusColor}20" , "color: {$estatusColor}" , "border: 1px solid {$estatusColor}50"
+                                        
+                                        @if($cantidad > 1 && !$todosTienenMismoEstatus)
+                                        <div class="flex flex-col gap-4 py-2">
+                                            @foreach($grupo as $t)
+                                            <div class="flex items-center min-h-[40px]">
+                                                @php
+                                                    $estatusActivo = $t->estatusActa;
+                                                    $estatusNombre = $estatusActivo?->nombre ?? 'N/A';
+                                                    $estatusColor = $estatusActivo?->color ?? '#6b7280';
+                                                    $nombreEstatusFormateado = str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($estatusNombre)));
+                                                @endphp
+                                                <span class="px-2 py-1 inline-flex items-center justify-center text-center text-[10px] leading-tight font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal w-full max-w-[140px] min-h-[36px]"
+                                                    @style([
+                                                        "background-color: {$estatusColor}15",
+                                                        "color: {$estatusColor}",
+                                                        "border: 1px dashed {$estatusColor}40"
+                                                    ])
+                                                    title="Acta individual">
+                                                    {!! $nombreEstatusFormateado !!}
+                                                </span>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        @else
+                                        @php
+                                            $estatusColor = $primera->estatusActa?->color ?? '#6b7280';
+                                            $nombreEstatus = str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A')));
+                                        @endphp
+                                        <span class="px-3 py-1.5 inline-block text-center text-xs leading-5 font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal"
+                                            @style([ 
+                                                "background-color: {$estatusColor}20", 
+                                                "color: {$estatusColor}", 
+                                                "border: 1px solid {$estatusColor}50" 
                                             ])>
-                                            {!! str_replace(' falta ', '<br>falta ', e($primera->estatusActa?->nombre ?? 'N/A')) !!}
+                                            {!! $nombreEstatus !!}
                                         </span>
+                                        @endif
                                     </td>
 
                                     <!-- Acciones -->
