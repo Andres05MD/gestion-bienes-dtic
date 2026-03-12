@@ -62,7 +62,7 @@
             </div>
             @endif
 
-            <span class="flex-1 min-w-0 block truncate font-medium text-sm" :class="{'text-gray-400 dark:text-gray-500': !selected, 'text-gray-900 dark:text-white': selected}" x-text="selectedLabel()"></span>
+            <span class="flex-1 min-w-0 block truncate font-bold text-xs uppercase tracking-wider" :class="{'text-gray-400 dark:text-gray-500': !selected, 'text-gray-900 dark:text-white': selected}" x-text="selectedLabel()"></span>
 
             <span class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none transition-transform duration-300" :class="{'rotate-180': open}">
                 <x-mary-icon name="o-chevron-down" class="w-4 h-4 text-gray-400" />
@@ -108,7 +108,7 @@
                         <!-- Indicador de seleccionado -->
                         <div x-show="selected == option.value" class="absolute left-0 w-1 h-6 bg-brand-purple rounded-r-full"></div>
 
-                        <span class="ml-2" x-text="option.label"></span>
+                        <span class="ml-2 font-bold text-xs uppercase tracking-wider" x-text="option.label"></span>
 
                         <x-mary-icon
                             x-show="selected == option.value"
