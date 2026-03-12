@@ -99,21 +99,23 @@ class BienMovimientoService
                     // 2. Eliminar Bien Original primero (libera numero_bien único)
                     $bienOriginal->delete();
 
-                    // 3. Crear Bien Externo con trazabilidad de origen
-                    $bienExterno = BienExterno::create([
-                        'equipo' => $datosOriginal['equipo'],
-                        'marca' => $datosOriginal['marca'],
-                        'modelo' => $datosOriginal['modelo'],
-                        'serial' => $datosOriginal['serial'],
-                        'color' => $datosOriginal['color'],
-                        'numero_bien' => $datosOriginal['numero_bien'],
-                        'categoria_bien_id' => $datosOriginal['categoria_bien_id'],
-                        'estado_id' => $datosOriginal['estado_id'],
-                        'observaciones' => $datosOriginal['observaciones'],
-                        'departamento_id' => $transferencia->destino_id,
-                        'departamento_origen_id' => $dticId, // Trazabilidad DTIC
-                        'user_id' => auth()->id(),
-                    ]);
+                    // 3. Crear o actualizar Bien Externo con trazabilidad de origen
+                    $bienExterno = BienExterno::updateOrCreate(
+                        ['numero_bien' => $datosOriginal['numero_bien']],
+                        [
+                            'equipo' => $datosOriginal['equipo'],
+                            'marca' => $datosOriginal['marca'],
+                            'modelo' => $datosOriginal['modelo'],
+                            'serial' => $datosOriginal['serial'],
+                            'color' => $datosOriginal['color'],
+                            'categoria_bien_id' => $datosOriginal['categoria_bien_id'],
+                            'estado_id' => $datosOriginal['estado_id'],
+                            'observaciones' => $datosOriginal['observaciones'],
+                            'departamento_id' => $transferencia->destino_id,
+                            'departamento_origen_id' => $dticId, // Trazabilidad DTIC
+                            'user_id' => auth()->id(),
+                        ]
+                    );
 
                     // 4. Registrar movimiento en el historial
                     $this->registrarMovimiento(
@@ -179,20 +181,22 @@ class BienMovimientoService
                     // 2. Eliminar Bien Externo Original primero (libera numero_bien único)
                     $bienExternoOriginal->delete();
 
-                    // 3. Crear Bien Interno (DTIC)
-                    $bienInterno = Bien::create([
-                        'equipo' => $datosOriginal['equipo'],
-                        'marca' => $datosOriginal['marca'],
-                        'modelo' => $datosOriginal['modelo'],
-                        'serial' => $datosOriginal['serial'],
-                        'color' => $datosOriginal['color'],
-                        'numero_bien' => $datosOriginal['numero_bien'],
-                        'categoria_bien_id' => $datosOriginal['categoria_bien_id'],
-                        'estado_id' => $datosOriginal['estado_id'],
-                        'observaciones' => $datosOriginal['observaciones'],
-                        'area_id' => $areaId,
-                        'user_id' => auth()->id(),
-                    ]);
+                    // 3. Crear o actualizar Bien Interno (DTIC)
+                    $bienInterno = Bien::updateOrCreate(
+                        ['numero_bien' => $datosOriginal['numero_bien']],
+                        [
+                            'equipo' => $datosOriginal['equipo'],
+                            'marca' => $datosOriginal['marca'],
+                            'modelo' => $datosOriginal['modelo'],
+                            'serial' => $datosOriginal['serial'],
+                            'color' => $datosOriginal['color'],
+                            'categoria_bien_id' => $datosOriginal['categoria_bien_id'],
+                            'estado_id' => $datosOriginal['estado_id'],
+                            'observaciones' => $datosOriginal['observaciones'],
+                            'area_id' => $areaId,
+                            'user_id' => auth()->id(),
+                        ]
+                    );
 
                     // 4. Registrar movimiento
                     $this->registrarMovimiento(
