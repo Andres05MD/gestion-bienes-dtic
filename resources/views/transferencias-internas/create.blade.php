@@ -668,8 +668,8 @@
                                                             <x-select-premium
                                                                 label="Categoría"
                                                                 name="categoria_bien_id"
-                                                                x-model="bien.categoria_bien_id"
-                                                                x-bind:name="'bienes['+index+'][categoria_bien_id]'"
+                                                                alpineName="`bienes[${index}][categoria_bien_id]`"
+                                                                @option-selected="bien.categoria_bien_id = $event.detail"
                                                                 placeholder="Seleccione..."
                                                                 :options="$categorias->map(fn($c) => ['value' => $c->id, 'label' => $c->nombre])->toArray()" />
                                                         </div>
@@ -732,8 +732,8 @@
                                                         <x-select-premium
                                                             label="Edo. Físico"
                                                             name="estado_id"
-                                                            x-model="bien.estado_id"
-                                                            x-bind:name="'bienes['+index+'][estado_id]'"
+                                                            alpineName="`bienes[${index}][estado_id]`"
+                                                            @option-selected="bien.estado_id = $event.detail"
                                                             placeholder="Requerido..."
                                                             x-bind:required="bien.id === ''"
                                                             :options="$estados_bienes->map(fn($e) => ['value' => $e->id, 'label' => $e->nombre])->toArray()" />
