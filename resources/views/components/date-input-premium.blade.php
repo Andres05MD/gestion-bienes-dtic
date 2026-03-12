@@ -236,74 +236,76 @@ $days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
             </button>
         </div>
 
-        <!-- Calendario Popover (FIXED para escape de stacking context) -->
-        <div
-            x-show="show"
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 scale-95"
-            x-transition:enter-end="opacity-100 scale-100"
-            x-transition:leave="transition ease-in duration-150"
-            x-transition:leave-start="opacity-100 scale-100"
-            x-transition:leave-end="opacity-0 scale-95"
-            class="fixed z-[9999] p-4 bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl border border-gray-100 dark:border-white/10 rounded-4xl shadow-2xl w-76 sm:w-88"
-            :style="calendarStyle"
-            style="display: none;"
-            @mousedown.stop>
-            <!-- Header Calendario -->
-            <div class="flex items-center justify-between mb-4 px-2">
-                <button type="button" @click="previousMonth()" class="p-2 hover:bg-brand-purple/10 rounded-xl transition-colors text-gray-500 dark:text-gray-400 hover:text-brand-purple">
-                    <x-mary-icon name="o-chevron-left" class="w-4 h-4" />
-                </button>
-                <div class="text-center">
-                    <span x-text="months[month]" class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white"></span>
-                    <span x-text="year" class="text-xs font-medium text-brand-lila ml-1"></span>
-                </div>
-                <button type="button" @click="nextMonth()" class="p-2 hover:bg-brand-purple/10 rounded-xl transition-colors text-gray-500 dark:text-gray-400 hover:text-brand-purple">
-                    <x-mary-icon name="o-chevron-right" class="w-4 h-4" />
-                </button>
-            </div>
-
-            <!-- Días de la semana -->
-            <div class="grid grid-cols-7 gap-1 mb-2">
-                <template x-for="day in days" :key="day">
+        <!-- Calendario Popover (FIXED + Teleport para romper stacking context) -->
+        <template x-teleport="body">
+            <div
+                x-show="show"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="fixed z-[9999] p-4 bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl border border-gray-100 dark:border-white/10 rounded-4xl shadow-2xl w-76 sm:w-88"
+                :style="calendarStyle"
+                style="display: none;"
+                @mousedown.stop>
+                <!-- Header Calendario -->
+                <div class="flex items-center justify-between mb-4 px-2">
+                    <button type="button" @click="previousMonth()" class="p-2 hover:bg-brand-purple/10 rounded-xl transition-colors text-gray-500 dark:text-gray-400 hover:text-brand-purple">
+                        <x-mary-icon name="o-chevron-left" class="w-4 h-4" />
+                    </button>
                     <div class="text-center">
-                        <span x-text="day" class="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-tighter"></span>
+                        <span x-text="months[month]" class="text-xs font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white"></span>
+                        <span x-text="year" class="text-xs font-medium text-brand-lila ml-1"></span>
                     </div>
-                </template>
-            </div>
+                    <button type="button" @click="nextMonth()" class="p-2 hover:bg-brand-purple/10 rounded-xl transition-colors text-gray-500 dark:text-gray-400 hover:text-brand-purple">
+                        <x-mary-icon name="o-chevron-right" class="w-4 h-4" />
+                    </button>
+                </div>
 
-            <!-- Cuadrícula de días -->
-            <div class="grid grid-cols-7 gap-1">
-                <template x-for="blankday in blankdays" :key="'blank-'+blankday">
-                    <div class="h-9 w-full"></div>
-                </template>
-                <template x-for="date in no_of_days" :key="'date-'+date">
-                    <div class="relative">
-                        <button
-                            type="button"
-                            @click="selectDate(date)"
-                            x-text="date"
-                            class="h-9 w-full rounded-xl text-xs font-bold transition-all duration-200 relative z-10 flex items-center justify-center"
-                            :class="{
-                                'bg-linear-to-r from-brand-lila to-brand-purple text-white shadow-lg shadow-brand-purple/40 scale-105': isSelected(date),
-                                'text-gray-700 dark:text-gray-200 hover:bg-brand-purple/15 hover:text-brand-purple': !isSelected(date),
-                                'text-brand-purple border border-brand-purple/30': isToday(date) && !isSelected(date)
-                            }"></button>
-                        <div x-show="isSelected(date)" class="absolute inset-0 bg-brand-purple/30 blur-md rounded-xl z-0"></div>
-                    </div>
-                </template>
-            </div>
+                <!-- Días de la semana -->
+                <div class="grid grid-cols-7 gap-1 mb-2">
+                    <template x-for="day in days" :key="day">
+                        <div class="text-center">
+                            <span x-text="day" class="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-tighter"></span>
+                        </div>
+                    </template>
+                </div>
 
-            <!-- Footer con "Hoy" -->
-            <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex justify-center">
-                <button
-                    type="button"
-                    @click="let today = new Date(); month = today.getMonth(); year = today.getFullYear(); selectDate(today.getDate())"
-                    class="text-[10px] font-black uppercase tracking-[0.2em] text-brand-lila hover:text-brand-neon transition-colors">
-                    Seleccionar Hoy
-                </button>
+                <!-- Cuadrícula de días -->
+                <div class="grid grid-cols-7 gap-1">
+                    <template x-for="blankday in blankdays" :key="'blank-'+blankday">
+                        <div class="h-9 w-full"></div>
+                    </template>
+                    <template x-for="date in no_of_days" :key="'date-'+date">
+                        <div class="relative">
+                            <button
+                                type="button"
+                                @click="selectDate(date)"
+                                x-text="date"
+                                class="h-9 w-full rounded-xl text-xs font-bold transition-all duration-200 relative z-10 flex items-center justify-center"
+                                :class="{
+                                    'bg-linear-to-r from-brand-lila to-brand-purple text-white shadow-lg shadow-brand-purple/40 scale-105': isSelected(date),
+                                    'text-gray-700 dark:text-gray-200 hover:bg-brand-purple/15 hover:text-brand-purple': !isSelected(date),
+                                    'text-brand-purple border border-brand-purple/30': isToday(date) && !isSelected(date)
+                                }"></button>
+                            <div x-show="isSelected(date)" class="absolute inset-0 bg-brand-purple/30 blur-md rounded-xl z-0"></div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Footer con "Hoy" -->
+                <div class="mt-4 pt-4 border-t border-gray-100 dark:border-white/5 flex justify-center">
+                    <button
+                        type="button"
+                        @click="let today = new Date(); month = today.getMonth(); year = today.getFullYear(); selectDate(today.getDate())"
+                        class="text-[10px] font-black uppercase tracking-[0.2em] text-brand-lila hover:text-brand-neon transition-colors">
+                        Seleccionar Hoy
+                    </button>
+                </div>
             </div>
-        </div>
+        </template>
 
         <div class="absolute inset-0 rounded-2xl border border-transparent group-hover:border-brand-purple/10 pointer-events-none transition-colors duration-300"></div>
     </div>
