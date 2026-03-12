@@ -245,8 +245,7 @@
 
                 buscarCoincidenciaExacta(bien, campo) {
                     let valor = campo === 'numero_bien' ? bien.numero_bien : bien.serial;
-                    
-                    // Ignorar búsuqedas si el valor es vacío, muy corto, o si es la cadena típica sin serial "S/N"
+                    // Ignorar búsuqedas si el valor es vacío, muy corto, o si es la cadena típica sin serial 'S/N'
                     if (!valor || String(valor).length < 2 || bien.id !== '') {
                         bien.importar_disponible = null;
                         return;
