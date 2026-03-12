@@ -156,24 +156,32 @@
                                         </div>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-normal min-w-[160px]">
-                                        @if($cantidad > 1)
+                                    <td class="px-6 py-4 whitespace-normal min-w-[160px] align-middle">
+                                        @php
+                                            $todosTienenMismoEstatus = $cantidad > 1 ? $grupo->map(function($d) use ($primera) {
+                                                return $d->estatus_acta_individual_id ?: ($primera->estatus_acta_id ?? 0);
+                                            })->unique()->count() === 1 : true;
+                                        @endphp
+                                        
+                                        @if($cantidad > 1 && !$todosTienenMismoEstatus)
                                         <div class="flex flex-col gap-4 py-2">
                                             @foreach($grupo as $d)
-                                            <div class="flex items-center">
+                                            <div class="flex items-center min-h-[40px]">
                                                 @php
                                                     $estatusActivo = $d->estatus_acta_individual_id ? $d->estatusActaIndividual : $primera->estatusActa;
-                                                    $colorEstatus = $estatusActivo?->color ?? '#6b7280';
-                                                    $nombreEstatus = str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($estatusActivo?->nombre ?? 'N/A')));
+                                                    $estatusNombre = $estatusActivo?->nombre ?? 'N/A';
+                                                    $estatusColor = $estatusActivo?->color ?? '#6b7280';
+                                                    $esIndividual = $d->estatus_acta_individual_id ? true : false;
+                                                    $nombreEstatusFormateado = str_replace(' - ', '<br>', str_replace(' falta ', '<br>falta ', e($estatusNombre)));
                                                 @endphp
-                                                <span class="px-2 py-1 inline-flex items-center justify-center text-center text-[10px] leading-tight font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal w-full max-w-[140px] min-h-[36px]"
+                                                <span class="px-2 py-1 relative inline-flex items-center justify-center text-center text-[10px] leading-tight font-black rounded-lg shadow-sm uppercase tracking-widest whitespace-normal w-full max-w-[140px] min-h-[36px]"
                                                     @style([
-                                                        "background-color: {$colorEstatus}15",
-                                                        "color: {$colorEstatus}",
-                                                        "border: 1px ".($d->estatus_acta_individual_id ? 'dashed' : 'solid')." {$colorEstatus}40"
+                                                        "background-color: {$estatusColor}15",
+                                                        "color: {$estatusColor}",
+                                                        "border: 1px ".($esIndividual ? 'dashed' : 'solid')." {$estatusColor}40"
                                                     ])
-                                                    title="{{ $d->estatus_acta_individual_id ? 'Acta individual' : 'Acta grupal heredada' }}">
-                                                    {!! $nombreEstatus !!}
+                                                    title="{{ $esIndividual ? 'Acta individual' : 'Acta grupal heredada' }}">
+                                                    {!! $nombreEstatusFormateado !!}
                                                 </span>
                                             </div>
                                             @endforeach
