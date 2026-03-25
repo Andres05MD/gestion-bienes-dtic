@@ -201,7 +201,7 @@
                                         </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold align-middle" x-data="{ openModal: false }">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold align-middle" x-data="{ openModal: {{ session('open_acta') === $codigoActa ? 'true' : 'false' }} }">
                                         <div class="flex items-center gap-3">
                                             @if($cantidad > 1)
                                             @can('editar desincorporaciones')
@@ -242,7 +242,7 @@
                                         @if($cantidad > 1)
                                         @can('editar desincorporaciones')
                                         <div x-show="openModal" class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm whitespace-normal" x-transition x-cloak style="display: none;">
-                                            <div @click.away="openModal = false" class="bg-white dark:bg-dark-900 border border-gray-100 dark:border-white/10 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col mx-4 text-left">
+                                            <div @click.away="openModal = false" class="bg-white dark:bg-dark-900 border border-gray-100 dark:border-white/10 rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col mx-4 text-left relative z-50">
                                                 <!-- Header -->
                                                 <div class="px-6 py-5 border-b border-gray-100 dark:border-white/5 flex justify-between items-center bg-gray-50 dark:bg-dark-850">
                                                     <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
@@ -254,7 +254,7 @@
                                                     </button>
                                                 </div>
                                                 <!-- Body -->
-                                                <div class="p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-dark-900 space-y-4">
+                                                <div class="p-6 pb-20 bg-white dark:bg-dark-900 space-y-4">
                                                     @foreach($grupo as $bien)
                                                     <div class="bg-gray-50 dark:bg-[#1a1a1a] p-5 rounded-2xl border border-gray-100 dark:border-white/5 relative group transition-all duration-300 hover:border-brand-purple/20">
                                                         <div class="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-2">

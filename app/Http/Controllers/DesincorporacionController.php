@@ -263,7 +263,26 @@ class DesincorporacionController extends Controller
             'estatus_acta_individual_id' => $validated['estatus_acta_individual_id'] ?: null,
         ]);
 
+        // Sincronización con el estatus global:
+        // Si todos los ítems del mismo grupo (codigo_acta) tienen estatus "ACTAS LISTAS",
+        // actualizamos el estatus global del grupo también a "ACTAS LISTAS".
+        if ($desincorporacione->codigo_acta) {
+            $estatusListas = EstatusActa::where('nombre', 'ACTAS LISTAS')->first();
+            
+            if ($estatusListas) {
+                $grupo = Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->get();
+                $todosListos = $grupo->every(fn($item) => $item->estatus_acta_individual_id == $estatusListas->id);
+
+                if ($todosListos) {
+                    Desincorporacion::where('codigo_acta', $desincorporacione->codigo_acta)->update([
+                        'estatus_acta_id' => $estatusListas->id
+                    ]);
+                }
+            }
+        }
+
         return redirect()->back()
-            ->with('success', 'Estatus individual actualizado exitosamente.');
+            ->with('success', 'Estatus individual actualizado exitosamente.')
+            ->with('open_acta', $desincorporacione->codigo_acta);
     }
 }

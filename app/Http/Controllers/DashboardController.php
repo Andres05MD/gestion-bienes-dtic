@@ -152,7 +152,7 @@ class DashboardController extends Controller
 
         $desincPendientes = Desincorporacion::with(['procedencia', 'bien', 'bienExterno', 'estatusActa'])
             ->whereDoesntHave('estatusActa', function ($query) {
-                $query->where('nombre', 'Actas Listas');
+                $query->where('nombre', 'ACTAS LISTAS');
             })
             ->orderBy('fecha', 'asc')
             ->get()
@@ -166,7 +166,7 @@ class DashboardController extends Controller
 
         $transfPendientes = TransferenciaInterna::with(['procedencia', 'destino', 'bien', 'bienExterno', 'estatusActa'])
             ->whereDoesntHave('estatusActa', function ($query) {
-                $query->where('nombre', 'Actas Listas');
+                $query->where('nombre', 'ACTAS LISTAS');
             })
             ->orderBy('fecha', 'asc')
             ->get()
